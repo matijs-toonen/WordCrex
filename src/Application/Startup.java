@@ -1,4 +1,4 @@
-package view;
+package Application;
 	
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -13,14 +13,13 @@ public class Startup extends Application {
 	public void start(Stage primaryStage) {
 		try {
 			BorderPane root = new BorderPane();
-			Scene scene = new Scene(root,400,400);
+			Scene scene = new Scene(root,700,700);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			
-			primaryStage.setTitle("Test");			
-			Parent newScene = FXMLLoader.load(getClass().getResource("MainFrame.fxml"));
+			Parent mainFrame = FXMLLoader.load(getClass().getResource("/View/MainFrame.fxml"));
 			
-			primaryStage.setScene(new Scene(newScene));
+			primaryStage.setScene(new Scene(mainFrame));
 			primaryStage.show();
 		} catch(Exception e) {
 			e.printStackTrace();
