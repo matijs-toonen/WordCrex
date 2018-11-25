@@ -10,3 +10,7 @@
 .button:hover {
 	-fx-background-color: #3C3B54;
 }
+
+.search-bar {
+	-fx-text-fill: black;
+}
