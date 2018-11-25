@@ -8,7 +8,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane prefHeight="1080.0" prefWidth="1920.0" style="-fx-background-color: #f0f0f7;" stylesheets="@../Application/application.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane prefHeight="1080.0" prefWidth="1920.0" style="-fx-background-color: #f0f0f7;" stylesheets="@../Application/application.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.MainController">
    <opaqueInsets>
       <Insets />
    </opaqueInsets>
@@ -33,7 +33,7 @@
    <left>
       <AnchorPane prefHeight="980.0" prefWidth="285.0" style="-fx-background-color: #43425D;" BorderPane.alignment="CENTER">
          <children>
-            <Button alignment="BASELINE_LEFT" layoutY="5.0" mnemonicParsing="false" prefHeight="65.0" prefWidth="285.0" styleClass="button" text="Games" textFill="WHITE">
+            <Button alignment="BASELINE_LEFT" layoutY="5.0" mnemonicParsing="false" onMouseClicked="#loadGames" prefHeight="65.0" prefWidth="285.0" styleClass="button" text="Games" textFill="WHITE">
                <font>
                   <Font name="Source Sans Pro Regular" size="18.0" />
                </font>
@@ -41,7 +41,7 @@
                   <Insets left="50.0" />
                </padding>
             </Button>
-            <Button alignment="BASELINE_LEFT" layoutY="70.0" mnemonicParsing="false" prefHeight="65.0" prefWidth="285.0" styleClass="button" text="Uitdagen" textFill="WHITE">
+            <Button alignment="BASELINE_LEFT" layoutY="70.0" mnemonicParsing="false" onMouseClicked="#loadChallenge" prefHeight="65.0" prefWidth="285.0" styleClass="button" text="Uitdagen" textFill="WHITE">
                <font>
                   <Font name="Source Sans Pro Regular" size="18.0" />
                </font>
@@ -49,7 +49,7 @@
                   <Insets left="50.0" />
                </padding>
             </Button>
-            <Button alignment="BASELINE_LEFT" layoutY="135.0" mnemonicParsing="false" prefHeight="65.0" prefWidth="285.0" styleClass="button" text="Woord suggereren" textFill="WHITE">
+            <Button alignment="BASELINE_LEFT" layoutY="135.0" mnemonicParsing="false" onMouseClicked="#loadSuggest" prefHeight="65.0" prefWidth="285.0" styleClass="button" text="Woord suggereren" textFill="WHITE">
                <font>
                   <Font name="Source Sans Pro Regular" size="18.0" />
                </font>
@@ -57,7 +57,7 @@
                   <Insets left="50.0" />
                </padding>
             </Button>
-            <Button alignment="BASELINE_LEFT" layoutY="200.0" mnemonicParsing="false" prefHeight="65.0" prefWidth="285.0" styleClass="button" text="Spel bekijken" textFill="WHITE">
+            <Button alignment="BASELINE_LEFT" layoutY="200.0" mnemonicParsing="false" onMouseClicked="#loadWatch" prefHeight="65.0" prefWidth="285.0" styleClass="button" text="Spel bekijken" textFill="WHITE">
                <font>
                   <Font name="Source Sans Pro Regular" size="18.0" />
                </font>
@@ -65,7 +65,7 @@
                   <Insets left="50.0" />
                </padding>
             </Button>
-            <Button alignment="BASELINE_LEFT" layoutY="265.0" mnemonicParsing="false" prefHeight="65.0" prefWidth="285.0" styleClass="button" text="Woorden beoordelen" textFill="WHITE">
+            <Button alignment="BASELINE_LEFT" layoutY="265.0" mnemonicParsing="false" onMouseClicked="#loadJudge" prefHeight="65.0" prefWidth="285.0" styleClass="button" text="Woorden beoordelen" textFill="WHITE">
                <font>
                   <Font name="Source Sans Pro Regular" size="18.0" />
                </font>
@@ -73,7 +73,7 @@
                   <Insets left="50.0" />
                </padding>
             </Button>
-            <Button alignment="BASELINE_LEFT" layoutY="330.0" mnemonicParsing="false" prefHeight="65.0" prefWidth="285.0" styleClass="button" text="Gebruikers beheren" textFill="WHITE">
+            <Button alignment="BASELINE_LEFT" layoutY="330.0" mnemonicParsing="false" onMouseClicked="#loadManage" prefHeight="65.0" prefWidth="285.0" styleClass="button" text="Gebruikers beheren" textFill="WHITE">
                <font>
                   <Font name="Source Sans Pro Regular" size="18.0" />
                </font>
@@ -81,7 +81,7 @@
                   <Insets left="50.0" />
                </padding>
             </Button>
-            <Button alignment="BASELINE_LEFT" layoutY="395.0" mnemonicParsing="false" prefHeight="65.0" prefWidth="285.0" styleClass="button" text="Instellingen" textFill="WHITE">
+            <Button alignment="BASELINE_LEFT" layoutY="395.0" mnemonicParsing="false" onMouseClicked="#loadSettings" prefHeight="65.0" prefWidth="285.0" styleClass="button" text="Instellingen" textFill="WHITE">
                <font>
                   <Font name="Source Sans Pro Regular" size="18.0" />
                </font>
@@ -100,6 +100,6 @@
          </children></AnchorPane>
    </left>
    <center>
-      <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+      <AnchorPane fx:id="rootPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
    </center>
 </BorderPane>

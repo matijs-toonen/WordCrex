@@ -3,49 +3,80 @@ package Controller;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
-import javafx.stage.Window;
 
 public class MainController implements Initializable {
 
 	@FXML
-	private Label lblText;
+	private AnchorPane rootPane;
 	
-	@FXML
-	private Pane paneChild;
-	
-	public void showChild(ActionEvent actionEvent) {
-		//Type van de frame die je wilt inladen (graag alles Pane maken)
-		Pane endFrame = null;
-		try {
-			endFrame = (Pane) FXMLLoader.load(getClass().getResource("/View/TestFrame.fxml"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		if(endFrame != null) {
-			paneChild.getChildren().setAll(endFrame);
-		}
-	}
-
-	
-	public void showMessage(ActionEvent actionEvent) {
-		lblText.setText("Nieuwe test value");
-	}
-
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@FXML
+	private void loadGames(MouseEvent event)
+	{
+		loadPane("Games");
+	}
+	
+	@FXML
+	private void loadChallenge(MouseEvent event)
+	{
+		loadPane("Challenge");
+	}
+	
+	@FXML
+	private void loadSuggest(MouseEvent event)
+	{
+		loadPane("Suggest");
+	}
+	
+	@FXML
+	private void loadWatch(MouseEvent event)
+	{
+		loadPane("Watch");
+	}
+	
+	@FXML
+	private void loadJudge(MouseEvent event)
+	{
+		loadPane("Judge");
+	}
+	
+	@FXML
+	private void loadManage(MouseEvent event)
+	{
+		loadPane("Manage");
+	}
+	
+	@FXML
+	private void loadSettings(MouseEvent event)
+	{
+		loadPane("Settings");
+	}
+	
+	private void loadPane(String paneName) {
+		//Parent root = null;
+		AnchorPane pane = null;
+		try {
+			pane = FXMLLoader.load(getClass().getResource("/View/" + paneName + ".fxml"));
+		}
+		catch(IOException ex) {
+			Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		//borderPane.setCenter(root);
+		rootPane.getChildren().setAll(pane);
 	}
 }
