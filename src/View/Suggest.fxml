@@ -41,7 +41,7 @@
       </TextField>
       <ImageView fitHeight="23.0" fitWidth="17.0" layoutX="844.0" layoutY="61.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../../../../Desktop/search.png" />
+            <Image url="@../Resources/search.png" />
          </image>
       </ImageView>
       <Button alignment="BASELINE_LEFT" layoutX="100.0" layoutY="133.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="400.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);" text="Nieuw woord">
@@ -54,7 +54,7 @@
       </Button>
       <ImageView fitHeight="23.0" fitWidth="24.0" layoutX="138.0" layoutY="142.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../../../../Downloads/plus.png" />
+            <Image url="@../Resources/plus.png" />
          </image>
       </ImageView>
    </children>
