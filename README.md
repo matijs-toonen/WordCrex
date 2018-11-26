@@ -1,1 +1,5 @@
-Dit is alleen dev
+DATABASE CREDENTIALS
+HOST: www.digitalbyali.nl
+DATABASE: u17091p12601_wordcrex
+USER: u17091p12601_groepd
+PASS: P@s5w0rd!
