@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 
 
@@ -19,6 +20,7 @@ public class Startup extends Application {
 			
 			Parent mainFrame = FXMLLoader.load(getClass().getResource("/View/Sidebar.fxml"));
 			
+			primaryStage.getIcons().add(new Image("/Resources/logo.png"));
 			primaryStage.setScene(new Scene(mainFrame));
 			primaryStage.show();
 		} catch(Exception e) {
