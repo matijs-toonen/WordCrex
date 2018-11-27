@@ -1,10 +1,7 @@
 package Pane;
 
-import java.util.function.Function;
-import java.util.function.Predicate;
-
+import java.util.function.Consumer;
 import Model.Game;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -15,8 +12,8 @@ import javafx.scene.layout.AnchorPane;
 public class GameItem extends AnchorPane {
 	
 	private Game currentGame;
-	private Label lblTitle = new Label();
-	private Label lblSubTitle = new Label();
+	private Label lblUser = new Label();
+	private Label lblTime = new Label();
 	private ImageView imgStatus = new ImageView();
 	
 	public GameItem(Game game) {
@@ -25,7 +22,7 @@ public class GameItem extends AnchorPane {
 		setUserLabel();
 		setSubLabel();
 		setImage();
-		this.getChildren().addAll(lblTitle, lblSubTitle, imgStatus);
+		this.getChildren().addAll(lblTime, imgStatus, lblUser);
 	}
 	
 	private void setImage() {
@@ -38,35 +35,22 @@ public class GameItem extends AnchorPane {
 	}
 	
 	private void setUserLabel() {
-		lblTitle.setText(currentGame.usernamePlayer2);
-		lblTitle.setStyle("-fx-padding: 0 0 0 25; -fx-font-weight: bold");
-		
-		lblTitle.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-		    @Override
-		    public void handle(MouseEvent mouseEvent) {
-		        System.out.println("mouse click detected! " + mouseEvent.getSource());
-		    }
-		});
-		
-//		lblTitle.setOnMouseClicked(new EventHandler<MouseEvent>() {
-//			
-//			@Override
-//			public void handle(MouseEvent event) {
-//				System.out.println("KANKER ZOOI");
-//			}
-//		});
-	}
-	
-	public void callEvent(MouseEvent mouseEvent) {
-		System.out.println("mouse click detected! " + mouseEvent.getSource());
-	}
-	
-	private void setThing(Predicate<MouseEvent> action) {
-		action.test(null);
+		lblUser.setText(currentGame.usernamePlayer2);
+		lblUser.setStyle("-fx-padding: 0 0 0 25; -fx-font-weight: bold");
 	}
 	
 	private void setSubLabel() {
-		lblSubTitle.setText(String.valueOf(currentGame.answerPlayer2));
-		lblSubTitle.setStyle("-fx-padding: 10 0 5 25; -fx-text-fill: #cdcdb1");
+		lblTime.setText(String.valueOf(currentGame.answerPlayer2));
+		lblTime.setStyle("-fx-padding: 10 0 5 25; -fx-text-fill: #cdcdb1");
+	}
+
+	public void setThing(Consumer<MouseEvent> action) {
+		
+		lblUser.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				action.accept(event);
+			}
+		});
 	}
 }
