@@ -1,4 +1,12 @@
 /* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
+@font-face {
+    src: url(../Fonts/SourceSansPro-Regular.ttf);
+}
+
+@font-face {
+    src: url(../Fonts/SourceSansPro-Bold.ttf);
+}
+
 .split-pane > .split-pane-divider {  
     -fx-padding: 0 0 0 0;  
 }
@@ -11,6 +19,19 @@
 	-fx-background-color: #3C3B54;
 }
 
+.active {
+	-fx-background-color: #3C3B54;
+	-fx-padding: 0 0 5px 0;
+}
+
 .search-bar {
 	-fx-text-fill: black;
+}
+
+.text {
+	-fx-font-family: "Source Sans Pro"
+}
+
+.menu-text {
+	-fx-font-size: 18px;
 }
