@@ -12,20 +12,17 @@ import Model.Game;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
 
 public class MainController implements Initializable {
-
+	
 	@FXML
 	private AnchorPane rootPane;
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		// TODO Auto-generated method stub
-		getGames();
 	}
 	
 	@FXML
@@ -38,23 +35,6 @@ public class MainController implements Initializable {
 	private void loadChallenge(MouseEvent event)
 	{
 		loadPane("Challenge");
-	}
-	
-	private DatabaseController db;
-	
-	private void getGames() {
-		db = new DatabaseController<Game>(null, null, null, null);
-		String gameCommand = "SELECT objectnaam FROM hemelobject";
-		try {
-			ArrayList<Game> games = (ArrayList<Game>) db.SelectAll(gameCommand, Game.class);
-			games.forEach(game -> System.out.println(game.objectNaam));
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	
 	}
 	
 	@FXML
