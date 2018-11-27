@@ -8,14 +8,21 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class DataBaseController <T> {
+public class DatabaseController <T> {
+	private static String _url = "jdbc:mysql://localhost/";
+	private static String _user = "root";
+	private static String _password = "1234";
+	private static String _schema = "outerspace";
 	
-	private static final String _url = "jdbc:mysql://localhost/";
-	private static final String _user = "root";
-	private static final String _password = "1234";
-	private static final String _schema = "outerspace";
+	public DatabaseController(String url, String user, String password, String schema) {
+		_url = url != null ? url : _url;
+		_user = user != null ? user : _user;
+		_password = password != null ? password : _password;
+		_schema = schema != null ? schema : _schema;
+	}
 	
-	public T SelectLast(String statement, Class<T> cls) throws SQLException {
+
+	public T SelectLast(String statement, Class<T> type) throws SQLException {
 		Connection conn = DriverManager.getConnection(_url + _schema, _user, _password);
 		Statement state = conn.createStatement();
 		ResultSet resultSet = state.executeQuery(statement);
@@ -25,7 +32,7 @@ public class DataBaseController <T> {
 		resultSet.last();
 		
 		try {
-			item = cls.getDeclaredConstructor(ResultSet.class, ArrayList.class).newInstance(resultSet, setColumns(resultSet.getMetaData()));
+			item = type.getDeclaredConstructor(ResultSet.class, ArrayList.class).newInstance(resultSet, setColumns(resultSet.getMetaData()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -36,7 +43,7 @@ public class DataBaseController <T> {
 		return item;
 	}
 	
-	public Collection<T> SelectAll(String statement, Class<T> cls) throws SQLException {
+	public Collection<T> SelectAll(String statement, Class<T> type) throws SQLException {
 		Connection conn = DriverManager.getConnection(_url + _schema, _user, _password);
 		Statement state = conn.createStatement();
 		ResultSet resultSet = state.executeQuery(statement);
@@ -44,7 +51,7 @@ public class DataBaseController <T> {
 		
 		while(resultSet.next()) {	
 			try {
-				items.add(cls.getDeclaredConstructor(ResultSet.class, ArrayList.class).newInstance(resultSet, setColumns(resultSet.getMetaData())));
+				items.add(type.getDeclaredConstructor(ResultSet.class, ArrayList.class).newInstance(resultSet, setColumns(resultSet.getMetaData())));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
