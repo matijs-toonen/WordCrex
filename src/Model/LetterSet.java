@@ -1,10 +1,23 @@
 package Model;
 
 public class LetterSet {
-	public String code;
-	public String description;
+	private String _letterCode;
+	private String _description;
 	
-	public LetterSet(String letterSet) {
-		code = letterSet;
+	public LetterSet(String letterCode) {
+		_letterCode = letterCode;
+	}
+	
+	public LetterSet(String letterCode, String description) {
+		_letterCode = letterCode;
+		_description = description;
+	}
+	
+	public String getLetterCode() {
+		return _letterCode;
+	}
+	
+	public String getDescription() {
+		return _description;
 	}
 }

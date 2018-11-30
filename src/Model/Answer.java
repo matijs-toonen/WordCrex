@@ -6,7 +6,7 @@ public enum Answer {
 	Unknown;
 	
 	public static Answer getAnswer(String answer) {
-		switch(answer) {
+		switch(answer.toLowerCase()) {
 		case "accepted":
 			return Accepted;
 		case "rejected":

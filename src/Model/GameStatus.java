@@ -7,7 +7,7 @@ public enum GameStatus {
 	Resigned;
 	
 	public static GameStatus getGameStatus(String state) {
-		switch(state) {
+		switch(state.toLowerCase()) {
 		case "request":
 			return Requested;
 		case "playing":
