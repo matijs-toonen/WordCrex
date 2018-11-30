@@ -1,3 +1,4 @@
 bin/
 *.orig
 *.prefs
+*.classpath
