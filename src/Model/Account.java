@@ -2,8 +2,6 @@ package Model;
 
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.function.Predicate;
-
 import Model.Role.*;
 
 public class Account {
