@@ -44,7 +44,7 @@ public class GameItem extends AnchorPane {
 		lblTime.setStyle("-fx-padding: 10 0 5 25; -fx-text-fill: #cdcdb1");
 	}
 
-	public void setThing(Consumer<MouseEvent> action) {
+	public void setUserOnClickEvent(Consumer<MouseEvent> action) {
 		
 		lblUser.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override

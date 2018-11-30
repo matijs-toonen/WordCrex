@@ -23,7 +23,6 @@ public class Account {
 	public Account(String username, String password, String role) {
 		this(username, password);
 		addRole(role);
-//		_role = AccountRole.getRole(role);
 	}
 	
 	public void addRole(String role) {

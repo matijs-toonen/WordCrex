@@ -16,8 +16,8 @@ import javafx.scene.layout.VBox;
 
 public class GameController implements Initializable{
 	
-	private DatabaseController<Game> db;
-	private ArrayList<Game> games;
+	private DatabaseController<Game> _db;
+	private ArrayList<Game> _games;
 	
 	@FXML
 	private VBox vboxGames;
@@ -36,10 +36,10 @@ public class GameController implements Initializable{
 	}
 	
 	private void getGames() {
-		db = new DatabaseController<Game>();
+		_db = new DatabaseController<Game>();
 		String gameCommand = "SELECT * FROM game";
 		try {
-			this.games = (ArrayList<Game>) db.SelectAll(gameCommand, Game.class);
+			this._games = (ArrayList<Game>) _db.SelectAll(gameCommand, Game.class);
 			renderGames();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -48,32 +48,13 @@ public class GameController implements Initializable{
 	}
 	
 	private void renderGames() {
-		
 		vboxGames.getChildren().clear();
 		
-		this.games.forEach(game -> {
-			
-			boolean addItem = false;
-			
-			boolean searchEmpty = searchBox.getText() == null || searchBox.getText().isEmpty();
-			boolean containsUser1 = game.usernamePlayer1.toLowerCase().contains(searchBox.getText());
-			boolean containsUser2 = game.usernamePlayer2.toLowerCase().contains(searchBox.getText());
-			
-			if (searchEmpty) {
-				addItem = true;
-			}
-			
-			if (containsUser1 || containsUser2) {
-				addItem = true;
-			}
-			
-			if (addItem) {
-				var item = new GameItem(game); 
-				vboxGames.getChildren().add(item);
-				item.setThing(onLabelClick());
-			}
-			
-		});	
+		Game.hasGameWithUsername(_games, searchBox.getText()).forEach(game -> {
+			var gameItem = new GameItem(game);
+			vboxGames.getChildren().add(gameItem);
+			gameItem.setUserOnClickEvent(onLabelClick());
+		});
 	}
 	
 

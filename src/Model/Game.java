@@ -3,6 +3,8 @@ package Model;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Game {
 	public Integer gameId;
@@ -24,5 +26,11 @@ public class Game {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public static List<Game> hasGameWithUsername(List<Game> games, String username){
+		return games.stream().filter(game -> game.usernamePlayer1.toLowerCase().contains(username) || 
+				game.usernamePlayer2.toLowerCase().contains(username))
+				.collect(Collectors.toList());
 	}
 }
