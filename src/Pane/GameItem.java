@@ -1,16 +1,19 @@
 package Pane;
 
+import java.util.function.Consumer;
 import Model.Game;
+import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 
 public class GameItem extends AnchorPane {
 	
 	private Game currentGame;
-	private Label lblTitle = new Label();
-	private Label lblSubTitle = new Label();
+	private Label lblUser = new Label();
+	private Label lblTime = new Label();
 	private ImageView imgStatus = new ImageView();
 	
 	public GameItem(Game game) {
@@ -19,7 +22,7 @@ public class GameItem extends AnchorPane {
 		setUserLabel();
 		setSubLabel();
 		setImage();
-		this.getChildren().addAll(lblTitle, lblSubTitle, imgStatus);
+		this.getChildren().addAll(lblTime, imgStatus, lblUser);
 	}
 	
 	private void setImage() {
@@ -32,12 +35,22 @@ public class GameItem extends AnchorPane {
 	}
 	
 	private void setUserLabel() {
-		lblTitle.setText(currentGame.objectNaam);
-		lblTitle.setStyle("-fx-padding: 0 0 0 25; -fx-font-weight: bold");
+		lblUser.setText(currentGame.usernamePlayer2);
+		lblUser.setStyle("-fx-padding: 0 0 0 25; -fx-font-weight: bold");
 	}
 	
 	private void setSubLabel() {
-		lblSubTitle.setText(String.valueOf(currentGame.afstand));
-		lblSubTitle.setStyle("-fx-padding: 10 0 5 25; -fx-text-fill: #cdcdb1");
+		lblTime.setText(String.valueOf(currentGame.answerPlayer2));
+		lblTime.setStyle("-fx-padding: 10 0 5 25; -fx-text-fill: #cdcdb1");
+	}
+
+	public void setUserOnClickEvent(Consumer<MouseEvent> action) {
+		
+		lblUser.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				action.accept(event);
+			}
+		});
 	}
 }

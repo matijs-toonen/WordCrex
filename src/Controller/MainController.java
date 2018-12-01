@@ -2,13 +2,13 @@ package Controller;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
-import Model.Game;
+import Model.Account;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -23,6 +23,13 @@ public class MainController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		// TODO Auto-generated method stub
+
+		var accounts = new ArrayList<Account>();
+		accounts.add(new Account("henk"));
+		var acc = Account.getAccountByUsername(accounts, "henk");
+		
+		if(acc.isPresent()) 
+			System.out.println(acc.get().getUsername());	
 	}
 	
 	@FXML
@@ -68,6 +75,7 @@ public class MainController implements Initializable {
 	}
 	
 	private void loadPane(String paneName) {
+		
 		//Parent root = null;
 		AnchorPane pane = null;
 		try {

@@ -9,18 +9,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class DatabaseController <T> {
-	private static String _url = "jdbc:mysql://localhost/";
-	private static String _user = "root";
-	private static String _password = "1234";
-	private static String _schema = "outerspace";
+	private static String _url = "jdbc:mysql://digitalbyali.nl/";
+	private static String _schema = "u17091p12601_wordcrex";
+	private static String _user = "u17091p12601_groepd";
+	private static String _password = "P@s5w0rd!";
 	
-	public DatabaseController(String url, String user, String password, String schema) {
+	public DatabaseController(String url, String schema, String user, String password) {
 		_url = url != null ? url : _url;
 		_user = user != null ? user : _user;
 		_password = password != null ? password : _password;
 		_schema = schema != null ? schema : _schema;
 	}
 	
+	public DatabaseController() {
+		this(null, null, null, null);
+	}
 
 	public T SelectLast(String statement, Class<T> type) throws SQLException {
 		Connection conn = DriverManager.getConnection(_url + _schema, _user, _password);
