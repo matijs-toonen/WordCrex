@@ -1,4 +1,4 @@
-package Model.Role;
+package Model.AccountRole;
 
 public abstract class AccountRole {
 	

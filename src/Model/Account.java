@@ -2,7 +2,8 @@ package Model;
 
 import java.util.ArrayList;
 import java.util.Optional;
-import Model.Role.*;
+
+import Model.AccountRole.*;
 
 public class Account {
 	private String _username;

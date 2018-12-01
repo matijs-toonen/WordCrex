@@ -2,10 +2,10 @@ package Model;
 
 public class Turn {
 	private int _turnId;
-	private Game _gameId;
+	private Game _game;
 	
-	public Turn(Game gameId, int turnId) {
-		_gameId = gameId;
+	public Turn(Game game, int turnId) {
+		_game = game;
 		_turnId = turnId;
 	}
 }
