@@ -32,7 +32,7 @@
                   <Font name="Source Sans Pro Regular" size="18.0" />
                </font>
             </Text>
-            <TextField layoutX="200.0" layoutY="426.0" prefHeight="25.0" prefWidth="400.0" promptText="Gebruikersnaam" styleClass="text-field">
+            <TextField layoutX="200.0" layoutY="426.0" prefHeight="25.0" prefWidth="400.0" promptText="Gebruikersnaam" styleClass="loginfield">
                <padding>
                   <Insets bottom="10.0" left="5.0" />
                </padding>
@@ -40,7 +40,7 @@
                   <Font size="13.0" />
                </font>
             </TextField>
-            <PasswordField layoutX="200.0" layoutY="505.0" prefHeight="25.0" prefWidth="400.0" promptText="Wachtwoord" styleClass="text-field">
+            <PasswordField layoutX="200.0" layoutY="505.0" prefHeight="25.0" prefWidth="400.0" promptText="Wachtwoord" styleClass="loginfield">
                <padding>
                   <Insets bottom="10.0" left="5.0" />
                </padding>

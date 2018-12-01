@@ -49,10 +49,10 @@
             <Font name="Source Sans Pro Regular" size="12.0" />
          </font>
          <padding>
-            <Insets left="70.0" />
+            <Insets left="50.0" />
          </padding>
       </TextField>
-      <ImageView fitHeight="23.0" fitWidth="17.0" layoutX="844.0" layoutY="61.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fitHeight="23.0" fitWidth="17.0" layoutX="818.0" layoutY="61.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../Resources/search.png" />
          </image>
