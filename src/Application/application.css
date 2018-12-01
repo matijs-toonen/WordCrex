@@ -35,3 +35,14 @@
 .menu-text {
 	-fx-font-size: 18px;
 }
+
+.text-field {
+	-fx-background-color: white;
+	-fx-border-width: 0 0 2 0;
+	-fx-border-color:  #EAEAF1;
+	-fx-prompt-text-fill: #43425d;
+}
+
+.text-field:focused {
+	-fx-border-color: #43425d;
+}
