@@ -68,7 +68,7 @@ public class DatabaseController <T> {
 		return items;
 	}
 	
-	public Collection<T> SelectWithCustomLogic(Function<ResultSet, ArrayList<T>> customWay, String statement, Class<T> type) throws SQLException {
+	public Collection<T> SelectWithCustomLogic(Function<ResultSet, ArrayList<T>> customWay, String statement) throws SQLException {
 		Connection conn = DriverManager.getConnection(_url + _schema, _user, _password);
 		Statement state = conn.createStatement();
 		ResultSet resultSet = state.executeQuery(statement);

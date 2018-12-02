@@ -62,7 +62,7 @@ public class MainController implements Initializable {
 		//With db
 		var db = new DatabaseController<Account>();
 		try {
-			accounts = (ArrayList<Account>) db.SelectWithCustomLogic(getAccountRole(), "SELECT * FROM accountrole", Account.class);
+			accounts = (ArrayList<Account>) db.SelectWithCustomLogic(getAccountRole(), "SELECT * FROM accountrole");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
