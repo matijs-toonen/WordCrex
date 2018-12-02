@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class Letter {
-	private int _letterId;
+	private Integer _letterId;
 	private Game _game;
 	private LetterSet _letterSet;
 	private Symbol _symbol;
