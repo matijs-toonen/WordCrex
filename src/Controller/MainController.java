@@ -2,8 +2,12 @@ package Controller;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -23,13 +27,77 @@ public class MainController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		// TODO Auto-generated method stub
-
+		accountStub();
+		accountRoleStub();
+	}
+	
+	private void accountStub() {
+		//Dummy
 		var accounts = new ArrayList<Account>();
 		accounts.add(new Account("henk"));
 		var acc = Account.getAccountByUsername(accounts, "henk");
 		
 		if(acc.isPresent()) 
-			System.out.println(acc.get().getUsername());	
+			System.out.println(acc.get().getUsername());
+		
+		//With db
+		var db = new DatabaseController<Account>();
+		try {
+			accounts = (ArrayList<Account>) db.SelectAll("SELECT * FROM account", Account.class);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void accountRoleStub() {
+		//Dummy
+		var accounts = new ArrayList<Account>();
+		accounts.add(new Account("henk"));
+		var acc = Account.getAccountByUsername(accounts, "henk");
+		
+		if(acc.isPresent()) 
+			acc.get().addRole("player");
+		
+		//With db
+		var db = new DatabaseController<Account>();
+		try {
+			accounts = (ArrayList<Account>) db.SelectWithCustomLogic(getAccountRole(), "SELECT * FROM accountrole", Account.class);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	//Custom functionality for merging account and role together
+	private Function<ResultSet, ArrayList<Account>> getAccountRole(){
+		return (resultSet -> {
+			ArrayList<Account> accounts = new ArrayList<Account>();
+			
+			try {
+				while(resultSet.next()) {	
+					var columns = DatabaseController.setColumns(resultSet.getMetaData());
+					if(columns.contains("username")) {
+						var account = Account.getAccountByUsername(accounts, resultSet.getString("username"));
+						if(columns.contains("role")) {
+							if(account.isPresent()) {		
+								account.get().addRole(resultSet.getString("role"));
+							}else {
+								var newAccount = new Account(resultSet, columns);
+								newAccount.addRole(resultSet.getString("role"));
+								accounts.add(newAccount);		
+							}	
+						}else {
+							accounts.add(new Account(resultSet, columns));
+						}
+					}
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return accounts;
+		});
 	}
 	
 	@FXML

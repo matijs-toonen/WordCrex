@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class DatabaseController <T> {
 	private static String _url = "jdbc:mysql://digitalbyali.nl/";
@@ -66,7 +68,15 @@ public class DatabaseController <T> {
 		return items;
 	}
 	
-	private ArrayList<String> setColumns(ResultSetMetaData metaData) throws SQLException{
+	public Collection<T> SelectWithCustomLogic(Function<ResultSet, ArrayList<T>> customWay, String statement, Class<T> type) throws SQLException {
+		Connection conn = DriverManager.getConnection(_url + _schema, _user, _password);
+		Statement state = conn.createStatement();
+		ResultSet resultSet = state.executeQuery(statement);
+		
+		return customWay.apply(resultSet);
+	}
+	
+	public static ArrayList<String> setColumns(ResultSetMetaData metaData) throws SQLException{
 		ArrayList<String> columns = new ArrayList<String>();
 		for(int i = 1; i <= metaData.getColumnCount(); i++) {
 			columns.add(metaData.getColumnName(i));
