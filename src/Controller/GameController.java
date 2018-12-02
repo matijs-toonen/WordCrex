@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import Model.Game;
-import Pane.GameItem;
+import View.Items.GameItem;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;

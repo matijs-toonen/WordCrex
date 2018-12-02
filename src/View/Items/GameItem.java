@@ -1,4 +1,4 @@
-package Pane;
+package View.Items;
 
 import java.io.InputStream;
 import java.util.function.Consumer;
@@ -58,13 +58,13 @@ public class GameItem extends AnchorPane {
 	}
 	
 	private void setUserLabel() {
-		lblUser.setText(currentGame.usernamePlayer2);
+		lblUser.setText(currentGame.getUser2());
 		lblUser.getStyleClass().add("text");
 		lblUser.setStyle("-fx-padding: 0 0 0 50; -fx-font-size: 14px; -fx-text-fill: #4D4F5C; -fx-font-weight: bold;");
 	}
 	
 	private void setSubLabel() {
-		lblTime.setText(String.valueOf(currentGame.gameStatus));
+		lblTime.setText(String.valueOf(currentGame.getSatus()));
 		lblUser.getStyleClass().add("text");
 		lblTime.setStyle("-fx-padding: 20 0 40 50; -fx-font-size: 13px; -fx-text-fill: #ABABB1");
 	}
