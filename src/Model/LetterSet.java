@@ -9,7 +9,7 @@ public class LetterSet {
 	}
 	
 	public LetterSet(String letterCode, String description) {
-		_letterCode = letterCode;
+		this(letterCode);
 		_description = description;
 	}
 	
