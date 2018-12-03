@@ -76,6 +76,17 @@ public class DatabaseController <T> {
 		return customWay.apply(resultSet);
 	}
 	
+	public boolean Update(String statement) throws SQLException {
+		Connection conn = DriverManager.getConnection(_url + _schema, _user, _password);
+		Statement state = conn.createStatement();
+		int results = state.executeUpdate(statement);
+		
+		state.close();
+		conn.close();
+		
+		return results > 0;
+	}
+	
 	public static ArrayList<String> setColumns(ResultSetMetaData metaData) throws SQLException{
 		ArrayList<String> columns = new ArrayList<String>();
 		for(int i = 1; i <= metaData.getColumnCount(); i++) {
