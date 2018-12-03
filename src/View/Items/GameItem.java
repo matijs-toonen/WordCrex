@@ -3,6 +3,7 @@ package View.Items;
 import java.io.InputStream;
 import java.util.function.Consumer;
 import Model.Game;
+import Model.GameStatus;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -27,6 +28,24 @@ public class GameItem extends AnchorPane {
 	}
 	
 	private void setImage() {
+		
+		Image image = null;
+		if(currentGame.getSatus() == GameStatus.Playing) {
+			image = getActiveImage();
+		}
+		else {
+			image = getPlayedImage();
+		}
+
+		
+		
+		imgStatus.setFitHeight(40);
+		imgStatus.setFitWidth(40);
+		imgStatus.setStyle("-fx-height: 10px; -fx-width: 10px");
+		imgStatus.setImage(image);
+	}
+	
+	private Image getActiveImage() {
 		InputStream is = null;
 		
 		switch (lblTime.getText().toLowerCase()) {
@@ -50,11 +69,11 @@ public class GameItem extends AnchorPane {
 			is = this.getClass().getResourceAsStream("/Resources/playing.png");
 		}
 		
-		var image = new Image(is);
-		imgStatus.setFitHeight(40);
-		imgStatus.setFitWidth(40);
-		imgStatus.setStyle("-fx-height: 10px; -fx-width: 10px");
-		imgStatus.setImage(image);
+		return new Image(is);
+	}
+	
+	private Image getPlayedImage() {
+		return new Image(this.getClass().getResourceAsStream("/Resources/finished.png"));
 	}
 	
 	private void setUserLabel() {

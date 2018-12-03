@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import Model.Game;
+import Model.GameStatus;
 import View.Items.GameItem;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -20,7 +21,7 @@ public class GameController implements Initializable{
 	private ArrayList<Game> _games;
 	
 	@FXML
-	private VBox vboxGames;
+	private VBox vboxGames, vboxFinishedGames;
 	
 	@FXML 
 	private TextField searchBox;
@@ -37,9 +38,10 @@ public class GameController implements Initializable{
 	
 	private void getGames() {
 		_db = new DatabaseController<Game>();
-		String gameCommand = "SELECT * FROM game";
+		String gameCommandActive = "SELECT * FROM game";
+		String gameCommandPlayed = "SELECT * FROM game";
 		try {
-			this._games = (ArrayList<Game>) _db.SelectAll(gameCommand, Game.class);
+			_games = (ArrayList<Game>) _db.SelectAll(gameCommandActive, Game.class);
 			renderGames();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -52,7 +54,11 @@ public class GameController implements Initializable{
 		
 		Game.hasGameWithUsername(_games, searchBox.getText()).forEach(game -> {
 			var gameItem = new GameItem(game);
-			vboxGames.getChildren().add(gameItem);
+			if(game.getSatus() == GameStatus.Playing)
+				vboxGames.getChildren().add(gameItem);
+			else 
+				vboxFinishedGames.getChildren().add(gameItem);
+			
 			gameItem.setUserOnClickEvent(onLabelClick());
 		});
 	}
