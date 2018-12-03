@@ -39,7 +39,6 @@ public class GameController implements Initializable{
 	private void getGames() {
 		_db = new DatabaseController<Game>();
 		String gameCommandActive = "SELECT * FROM game";
-		String gameCommandPlayed = "SELECT * FROM game";
 		try {
 			_games = (ArrayList<Game>) _db.SelectAll(gameCommandActive, Game.class);
 			renderGames();
