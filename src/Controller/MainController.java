@@ -142,6 +142,12 @@ public class MainController implements Initializable {
 		loadPane("Settings");
 	}
 	
+	@FXML
+	private void loadBoard(MouseEvent event) 
+	{
+		loadPane("Board");
+	}
+	
 	private void loadPane(String paneName) {
 		
 		//Parent root = null;

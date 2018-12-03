@@ -34,7 +34,7 @@
    <left>
       <AnchorPane prefHeight="980.0" prefWidth="285.0" style="-fx-background-color: #43425D;" BorderPane.alignment="CENTER">
          <children>
-            <Button alignment="BASELINE_LEFT" layoutY="5.0" mnemonicParsing="false" onMouseClicked="#loadGames" prefHeight="65.0" prefWidth="285.0" styleClass="menu-text" text="Games" textFill="WHITE">
+            <Button alignment="BASELINE_LEFT" layoutY="5.0" mnemonicParsing="false" onMouseClicked="#loadBoard" prefHeight="65.0" prefWidth="285.0" styleClass="menu-text" text="Games" textFill="WHITE">
                <font>
                   <Font name="Source Sans Pro Regular" size="18.0" />
                </font>
@@ -112,6 +112,17 @@
                </cursor>
             </Button>
             <Button alignment="BASELINE_LEFT" layoutY="460.0" mnemonicParsing="false" prefHeight="65.0" prefWidth="285.0" styleClass="menu-text" text="Uitloggen" textFill="WHITE">
+               <font>
+                  <Font name="Source Sans Pro Regular" size="18.0" />
+               </font>
+               <padding>
+                  <Insets left="50.0" />
+               </padding>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+            <Button alignment="BASELINE_LEFT" layoutY="-29.0" mnemonicParsing="false" onMouseClicked="#loadGames" prefHeight="65.0" prefWidth="285.0" styleClass="menu-text" text="Board" textFill="WHITE">
                <font>
                   <Font name="Source Sans Pro Regular" size="18.0" />
                </font>
