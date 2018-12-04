@@ -6,6 +6,7 @@ import Model.Account;
 import Model.Game;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -39,12 +40,15 @@ public class ChallengePlayerItem extends AnchorPane{
 	private void setLabel() {
 		lblUsername.setText(_challengePlayer.getUsername());
 		lblUsername.setLayoutX(50);
+		lblUsername.setStyle("-fx-padding: 10 0 48 0; -fx-font-size: 14px; -fx-font-weight: bold");
 	}
 	
 	private void setButtons() {
 		btnChallenge.setText(challengeText);
-		btnChallenge.setLayoutX(200);
-		btnChallenge.setStyle("-fx-background-color: lightblue;");
+		btnChallenge.setLayoutX(240);
+		btnChallenge.setLayoutY(5);
+		btnChallenge.setCursor(Cursor.HAND);
+		btnChallenge.setStyle("-fx-background-color: #3B86FF; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-width: 80");
 	}
 	
 	public Account getOpponent() {

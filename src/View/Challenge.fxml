@@ -31,9 +31,9 @@
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="371.0">
                <children>
-                  <ScrollPane layoutX="14.0" layoutY="14.0" prefHeight="315.0" prefWidth="377.0">
+                  <ScrollPane hbarPolicy="NEVER" layoutX="13.0" layoutY="6.0" prefHeight="317.0" prefWidth="368.0" style="-fx-background-color: transparent;">
                      <content>
-                        <VBox fx:id="vboxChallenges" prefHeight="313.0" prefWidth="375.0" />
+                        <VBox fx:id="vboxChallenges" prefHeight="313.0" prefWidth="375.0" style="-fx-background-color: white;" />
                      </content>
                   </ScrollPane>
                </children></AnchorPane>
@@ -52,9 +52,9 @@
             </AnchorPane>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="245.0" prefWidth="398.0">
                <children>
-                  <ScrollPane layoutX="11.0" layoutY="12.0" prefHeight="315.0" prefWidth="377.0">
+                  <ScrollPane hbarPolicy="NEVER" layoutX="13.0" layoutY="6.0" prefHeight="317.0" prefWidth="368.0" style="-fx-background-color: transparent;">
                      <content>
-                        <VBox fx:id="vboxChallengePlayers" prefHeight="313.0" prefWidth="375.0" />
+                        <VBox fx:id="vboxChallengePlayers" prefHeight="313.0" prefWidth="375.0" style="-fx-background-color: white;" />
                      </content>
                   </ScrollPane>
                </children></AnchorPane>
