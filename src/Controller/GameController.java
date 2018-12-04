@@ -38,7 +38,9 @@ public class GameController implements Initializable{
 	
 	private void getGames() {
 		_db = new DatabaseController<Game>();
-		String gameCommandActive = "SELECT * FROM game";
+		var user = MainController.getUser();
+		System.out.println(user.getUsername());
+		String gameCommandActive = "SELECT * FROM game WHERE game_state != 'request'";
 		try {
 			_games = (ArrayList<Game>) _db.SelectAll(gameCommandActive, Game.class);
 			renderGames();
@@ -50,12 +52,13 @@ public class GameController implements Initializable{
 	
 	private void renderGames() {
 		vboxGames.getChildren().clear();
+		vboxFinishedGames.getChildren().clear();
 		
 		Game.hasGameWithUsername(_games, searchBox.getText()).forEach(game -> {
 			var gameItem = new GameItem(game);
 			if(game.getSatus() == GameStatus.Playing)
 				vboxGames.getChildren().add(gameItem);
-			else 
+			else if(game.getSatus() != GameStatus.Playing)
 				vboxFinishedGames.getChildren().add(gameItem);
 			
 			gameItem.setUserOnClickEvent(onLabelClick());
