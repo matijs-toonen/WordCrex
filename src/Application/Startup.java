@@ -20,6 +20,7 @@ public class Startup extends Application {
 			
 			Parent mainFrame = FXMLLoader.load(getClass().getResource("/View/Sidebar.fxml"));
 			
+			primaryStage.setMaximized(true);
 			primaryStage.getIcons().add(new Image("/Resources/logo.png"));
 			primaryStage.setScene(new Scene(mainFrame));
 			primaryStage.show();
