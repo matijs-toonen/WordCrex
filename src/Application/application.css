@@ -1,12 +1,4 @@
 /* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
-@font-face {
-    src: url(../Fonts/SourceSansPro-Regular.ttf);
-}
-
-@font-face {
-    src: url(../Fonts/SourceSansPro-Bold.ttf);
-}
-
 .split-pane > .split-pane-divider {  
     -fx-padding: 0 0 0 0;  
 }
