@@ -8,6 +8,18 @@ import java.util.stream.Collectors;
 import Model.Answer.*;
 
 public class Game {
+	public static final String getWinnerQuery(String username) {
+		return ("select g.game_id,"
+				+"(select IF(s.username_player1 = '"+ username +"', s.username_player2, s.username_player1)) as opponent,"
+				+"g.game_state,"
+				+"(select IF(s.score1 > s.score2, s.username_player1,s.username_player2)) as winner"
+				+" from game as g"
+				+" inner join score as s" 
+				+" on s.game_id = g.game_id"
+				+" where g.game_state = 'finished'"
+				+" and s.username_player1 = '"+ username +"' or s.username_player2 = '"+ username+"'");
+	}
+	
 	private Integer _gameId;
 	private GameStatus _gameStatus;
 	private LetterSet _letterSet;
@@ -29,8 +41,8 @@ public class Game {
 			_usernamePlayer1 = columns.contains("username_player1") ? rs.getString("username_player1") : null;
 			_usernamePlayer2 = columns.contains("username_player2") ? rs.getString("username_player2") : null;
 			_answerPlayer2 = columns.contains("answer_player2") ? getAnswer(rs.getString("answer_player2")) : null;
-			_opponent = _usernamePlayer2;
-			_winner = _usernamePlayer1;
+			_opponent = columns.contains("opponent") ? rs.getString("opponent") : null;
+			_winner = columns.contains("winner") ? rs.getString("winner") : null;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -60,6 +72,12 @@ public class Game {
 	
 	public GameStatus getSatus() {
 		return _gameStatus;
+	}
+	
+	public static List<Game> hasWinnerWithUsername(List<Game> games, String username){
+		return games.stream().filter(game -> game._opponent.toLowerCase().contains(username) || 
+				game._winner.toLowerCase().contains(username))
+				.collect(Collectors.toList());
 	}
 	
 	public static List<Game> hasGameWithUsername(List<Game> games, String username){

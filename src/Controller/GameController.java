@@ -19,6 +19,7 @@ public class GameController implements Initializable{
 	
 	private DatabaseController<Game> _db;
 	private ArrayList<Game> _games;
+	private ArrayList<Game> _finishedGames;
 	
 	@FXML
 	private VBox vboxGames, vboxFinishedGames;
@@ -39,19 +40,12 @@ public class GameController implements Initializable{
 	private void getGames() {
 		_db = new DatabaseController<Game>();
 		var user = MainController.getUser();
-		String Username = user.getUsername();
-		String gameCommandActive =
-				"select g.game_id,"
-				+"(select IF(s.username_player1 = '"+Username+"', s.username_player2, s.username_player1)) as username_player2,"
-				+"g.game_state,"
-				+"(select IF(s.score1 > s.score2, s.username_player1,s.username_player2)) as username_player1"
-				+" from game as g"
-				+" inner join score as s" 
-				+" on s.game_id = g.game_id"
-				+" where g.game_state = 'finished'"
-				+" and s.username_player1 = '"+Username+"' or s.username_player2 = '"+Username+"'";
+		String username = user.getUsername();
+		String gameCommandActive = Game.getWinnerQuery(username); 
+
 		try {
-			_games = (ArrayList<Game>) _db.SelectAll(gameCommandActive, Game.class);
+			_finishedGames = (ArrayList<Game>) _db.SelectAll(gameCommandActive, Game.class);
+			_games = (ArrayList<Game>) _db.SelectAll("SELECT * FROM game where game_state = 'playing'", Game.class);
 			renderGames();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -63,13 +57,15 @@ public class GameController implements Initializable{
 		vboxGames.getChildren().clear();
 		vboxFinishedGames.getChildren().clear();
 		
+		Game.hasWinnerWithUsername(_finishedGames, searchBox.getText()).forEach(game -> {
+			var gameItem = new GameItem(game);
+			vboxFinishedGames.getChildren().add(gameItem);
+			gameItem.setUserOnClickEvent(onLabelClick());
+		});
+		
 		Game.hasGameWithUsername(_games, searchBox.getText()).forEach(game -> {
 			var gameItem = new GameItem(game);
-			if(game.getSatus() == GameStatus.Playing)
-				vboxGames.getChildren().add(gameItem);
-			else if(game.getSatus() != GameStatus.Playing)
-				vboxFinishedGames.getChildren().add(gameItem);
-			
+			vboxGames.getChildren().add(gameItem);
 			gameItem.setUserOnClickEvent(onLabelClick());
 		});
 	}
