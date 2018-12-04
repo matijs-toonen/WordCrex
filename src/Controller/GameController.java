@@ -39,8 +39,17 @@ public class GameController implements Initializable{
 	private void getGames() {
 		_db = new DatabaseController<Game>();
 		var user = MainController.getUser();
-		System.out.println(user.getUsername());
-		String gameCommandActive = "SELECT * FROM game WHERE game_state != 'request'";
+		String Username = user.getUsername();
+		String gameCommandActive =
+				"select g.game_id,"
+				+"(select IF(s.username_player1 = '"+Username+"', s.username_player2, s.username_player1)) as username_player2,"
+				+"g.game_state,"
+				+"(select IF(s.score1 > s.score2, s.username_player1,s.username_player2)) as username_player1"
+				+" from game as g"
+				+" inner join score as s" 
+				+" on s.game_id = g.game_id"
+				+" where g.game_state = 'finished'"
+				+" and s.username_player1 = '"+Username+"' or s.username_player2 = '"+Username+"'";
 		try {
 			_games = (ArrayList<Game>) _db.SelectAll(gameCommandActive, Game.class);
 			renderGames();

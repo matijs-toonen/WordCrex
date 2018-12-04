@@ -2,6 +2,8 @@ package View.Items;
 
 import java.io.InputStream;
 import java.util.function.Consumer;
+
+import Controller.MainController;
 import Model.Game;
 import Model.GameStatus;
 import javafx.event.EventHandler;
@@ -13,14 +15,14 @@ import javafx.scene.layout.AnchorPane;
 
 public class GameItem extends AnchorPane {
 	
-	private Game currentGame;
+	private Game _currentGame;
 	private Label lblUser = new Label();
 	private Label lblTime = new Label();
 	private ImageView imgStatus = new ImageView();
 	
 	public GameItem(Game game) {
 		super();
-		currentGame = game;
+		_currentGame = game;
 		setUserLabel();
 		setSubLabel();
 		setImage();
@@ -30,7 +32,7 @@ public class GameItem extends AnchorPane {
 	private void setImage() {
 		
 		Image image = null;
-		if(currentGame.getSatus() == GameStatus.Playing) {
+		if(_currentGame.getSatus() == GameStatus.Playing) {
 			image = getActiveImage();
 		}
 		else {
@@ -73,17 +75,22 @@ public class GameItem extends AnchorPane {
 	}
 	
 	private Image getPlayedImage() {
+		var currentPlayer = MainController.getUser();
+		String username = currentPlayer.getUsername();
+		//Determine won/lost
+		
+		
 		return new Image(this.getClass().getResourceAsStream("/Resources/finished.png"));
 	}
 	
 	private void setUserLabel() {
-		lblUser.setText(currentGame.getUser2());
+		lblUser.setText(_currentGame.getUser2());
 		lblUser.getStyleClass().add("text");
 		lblUser.setStyle("-fx-padding: 0 0 0 50; -fx-font-size: 14px; -fx-text-fill: #4D4F5C; -fx-font-weight: bold;");
 	}
 	
 	private void setSubLabel() {
-		lblTime.setText(String.valueOf(currentGame.getSatus()));
+		lblTime.setText(String.valueOf(_currentGame.getSatus()));
 		lblUser.getStyleClass().add("text");
 		lblTime.setStyle("-fx-padding: 20 0 40 50; -fx-font-size: 13px; -fx-text-fill: #ABABB1");
 	}

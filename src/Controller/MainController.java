@@ -35,7 +35,7 @@ public class MainController implements Initializable {
 		accountStub();
 		accountRoleStub();
 		//Dummy user
-		_currentUser = new Account("ger", "wachtwoord", "player");
+		_currentUser = new Account("jagermeester", "wachtwoord", "player");
 		_currentUser.addAllRoles("observer", "administrator", "moderator");
 	}
 	
