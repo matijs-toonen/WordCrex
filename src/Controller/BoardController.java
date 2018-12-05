@@ -19,7 +19,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
@@ -41,7 +40,7 @@ public class BoardController implements Initializable {
 	private Button btnTest;
 	
 	@FXML
-	private Pane panePlayField;
+	private Pane panePlayField, paneHand;
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -52,6 +51,7 @@ public class BoardController implements Initializable {
 		lblScore2.setText("9");
 		_board = new Board();
 		createField();
+		createHand();
 		setDragEvents();
 	}
 	
@@ -73,6 +73,10 @@ public class BoardController implements Initializable {
 			}
 			x += 32;
 		}
+	}
+	
+	private void createHand() {
+		
 	}
 	
 	private void setDragEvents() {		
