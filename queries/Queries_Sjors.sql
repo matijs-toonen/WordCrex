@@ -102,7 +102,7 @@ FROM
     account
 WHERE
     username = @username
-        AND password = @upassword;
+        AND password = @upassword; 
         
 -- Account regristeren
 
