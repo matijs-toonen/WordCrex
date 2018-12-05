@@ -47,7 +47,7 @@ public class DatabaseController <T> {
 		resultSet.last();
 		
 		try {
-			item = type.getDeclaredConstructor(ResultSet.class, ArrayList.class).newInstance(resultSet, setColumns(resultSet.getMetaData()));
+			item = type.getDeclaredConstructor(ResultSet.class, ArrayList.class).newInstance(resultSet, getColumns(resultSet.getMetaData()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -66,7 +66,7 @@ public class DatabaseController <T> {
 		
 		while(resultSet.next()) {	
 			try {
-				items.add(type.getDeclaredConstructor(ResultSet.class, ArrayList.class).newInstance(resultSet, setColumns(resultSet.getMetaData())));
+				items.add(type.getDeclaredConstructor(ResultSet.class, ArrayList.class).newInstance(resultSet, getColumns(resultSet.getMetaData())));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -91,7 +91,7 @@ public class DatabaseController <T> {
 		return customLogic;
 	}
 	
-	public static ArrayList<String> setColumns(ResultSetMetaData metaData) throws SQLException{
+	public static ArrayList<String> getColumns(ResultSetMetaData metaData) throws SQLException{
 		ArrayList<String> columns = new ArrayList<String>();
 		for(int i = 1; i <= metaData.getColumnCount(); i++) {
 			columns.add(metaData.getColumnName(i));
