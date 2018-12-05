@@ -68,7 +68,7 @@ public class GameItem extends AnchorPane {
 		default:
 			is = this.getClass().getResourceAsStream("/Resources/playing.png");
 		}
-		
+    
 		return new Image(is);
 	}
 	
@@ -101,7 +101,6 @@ public class GameItem extends AnchorPane {
 	}
 	
 	private void setSubLabel() {
-		//lblTime.setText(String.valueOf(_currentGame.getSatus()));
 		lblUser.getStyleClass().add("text");
 		lblTime.setStyle("-fx-padding: 20 0 40 50; -fx-font-size: 13px; -fx-text-fill: #ABABB1");
 	}

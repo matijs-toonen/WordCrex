@@ -72,6 +72,14 @@ public class Game {
 		return _usernamePlayer2;
 	}
 	
+	public Answer getAnswer() {
+		return _answerPlayer2;
+	}
+	
+	public Integer getGameId() {
+		return _gameId;
+	}
+	
 	public GameStatus getSatus() {
 		return _gameStatus;
 	}
