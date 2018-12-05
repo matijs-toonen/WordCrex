@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
@@ -12,7 +19,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane fx:id="loginPane" prefHeight="960.0" prefWidth="1600.0" snapToPixel="false" style="-fx-background-color: white;" stylesheets="@../Application/application.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.MainController">
+<BorderPane fx:id="loginPane" prefHeight="960.0" prefWidth="1600.0" snapToPixel="false" style="-fx-background-color: white;" stylesheets="@../Application/application.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.LoginController">
    <left>
       <ImageView fitHeight="960.0" fitWidth="800.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
          <image>
@@ -33,7 +40,7 @@
                   <Font name="Source Sans Pro Regular" size="18.0" />
                </font>
             </Text>
-            <TextField layoutX="200.0" layoutY="426.0" prefHeight="25.0" prefWidth="400.0" promptText="Gebruikersnaam" styleClass="loginfield">
+            <TextField fx:id="txtLogin" layoutX="200.0" layoutY="426.0" prefHeight="25.0" prefWidth="400.0" promptText="Gebruikersnaam" styleClass="loginfield">
                <padding>
                   <Insets bottom="10.0" left="5.0" />
                </padding>
@@ -41,21 +48,21 @@
                   <Font size="13.0" />
                </font>
             </TextField>
-            <PasswordField layoutX="200.0" layoutY="505.0" prefHeight="25.0" prefWidth="400.0" promptText="Wachtwoord" styleClass="loginfield">
+            <PasswordField fx:id="txtPassword" layoutX="200.0" layoutY="505.0" prefHeight="25.0" prefWidth="400.0" promptText="Wachtwoord" styleClass="loginfield">
                <padding>
                   <Insets bottom="10.0" left="5.0" />
                </padding>
                <font>
                   <Font size="13.0" />
                </font></PasswordField>
-            <Button layoutX="200.0" layoutY="586.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="175.0" styleClass="loginButton" text="Inloggen" textFill="WHITE">
+            <Button fx:id="btnLogin" layoutX="200.0" layoutY="586.0" mnemonicParsing="false" onAction="#onClickLogin" prefHeight="50.0" prefWidth="175.0" styleClass="loginButton" text="Inloggen" textFill="WHITE">
                <font>
                   <Font name="Source Sans Pro Bold" size="24.0" />
                </font>
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor></Button>
-            <Button layoutX="425.0" layoutY="586.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="175.0" styleClass="registerButton" text="Registreren" />
+            <Button fx:id="btnRegister" layoutX="425.0" layoutY="586.0" mnemonicParsing="false" onAction="#onClickRegister" prefHeight="50.0" prefWidth="175.0" styleClass="registerButton" text="Registreren" />
          </children>
       </AnchorPane>
    </right>
