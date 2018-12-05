@@ -46,7 +46,7 @@ WHERE
 ;
 
 
--- actoeve games
+-- actieve games
 
 
 SET @username = 'jagermeester';
@@ -80,4 +80,18 @@ where (g.username_player1 = @username
         (g.game_state = 'playing')
 GROUP BY g.game_id;
 
--- asdasdas
+
+-- gebruikers beheren
+
+SELECT 
+    *
+FROM
+    accountrole;
+
+
+SET @username = 'jagermeester';
+SET @role = 'player';
+
+
+INSERT INTO accountrole values(@username,@role);
+
