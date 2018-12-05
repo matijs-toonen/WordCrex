@@ -14,7 +14,7 @@
             <Label fx:id="lblPlayer2" layoutX="292.0" layoutY="51.0" prefHeight="17.0" prefWidth="77.0" text="Player2" />
             <Label fx:id="lblScore1" layoutX="168.0" layoutY="51.0" text="Score1" />
             <Label fx:id="lblScore2" layoutX="241.0" layoutY="51.0" text="Score2" />
-            <Pane fx:id="panePlayField" layoutX="51.0" layoutY="84.0" prefHeight="465.0" prefWidth="465.0" style="-fx-border-color: black;" />
+            <Pane fx:id="panePlayField" layoutX="51.0" layoutY="84.0" prefHeight="480.0" prefWidth="480.0" style="-fx-border-color: black;" />
          </children>
       </Pane>
    </children>

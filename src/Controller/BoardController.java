@@ -14,6 +14,7 @@ import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Pair;
 
 public class BoardController implements Initializable {
@@ -45,11 +46,13 @@ public class BoardController implements Initializable {
 		for(int i = 0; i < 15; i++) {
 			int y = 1;
 			for(int j = 0; j < 15; j++) {
-				var tile = new BoardTile(i, j);
-				tile.setFill(Color.CHOCOLATE);
-				tile.setWidth(30);
-				tile.setHeight(30);
-				tile.setStroke(Color.BLACK);
+				var rectangle = new Rectangle();
+				rectangle.setFill(Color.CHOCOLATE);
+				rectangle.setWidth(30);
+				rectangle.setHeight(30);
+				rectangle.setStroke(Color.BLACK);
+				
+				var tile = new BoardTile(rectangle, i, j);
 				tile.setLayoutX(x);
 				tile.setLayoutY(y);
 				tile.createOnClickEvent(creatOnClickEvent());
@@ -70,7 +73,7 @@ public class BoardController implements Initializable {
 				return;
 			
 			_board.updateStatus(cords, PositionStatus.Taken);
-			tile.setFill(Color.YELLOW);
+			tile.getRectangle().setFill(Color.YELLOW);
 		});
 	}
 }
