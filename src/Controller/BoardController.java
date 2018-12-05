@@ -75,18 +75,7 @@ public class BoardController implements Initializable {
 		}
 	}
 	
-	private void setDragEvents() {
-		panePlayField.setOnDragOver(new EventHandler<DragEvent>() {
-
-			@Override
-			public void handle(DragEvent event) {
-				if(event.getGestureSource() != event.getTarget()) {
-					event.acceptTransferModes(TransferMode.ANY);
-				}
-				event.consume();
-			}
-		});
-		
+	private void setDragEvents() {		
 		btnTest.setOnDragDetected(new EventHandler<MouseEvent>() {
 
 			@Override
@@ -98,19 +87,6 @@ public class BoardController implements Initializable {
 				db.setDragView(createSnapshot(node));
 				content.putString(btnTest.getText());
 				db.setContent(content);
-				event.consume();
-			}
-		});
-		
-		panePlayField.setOnDragExited(new EventHandler<DragEvent>() {
-
-			@Override
-			public void handle(DragEvent event) {
-				if(event.getTarget() instanceof BoardTile) {
-					System.out.println("test");
-				}
-				event.acceptTransferModes(TransferMode.ANY);
-				event.setDropCompleted(true);
 				event.consume();
 			}
 		});

@@ -6,6 +6,7 @@ import Model.Symbol;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
@@ -54,16 +55,20 @@ public class BoardTile extends Pane {
 			}
 		});
 		
-		this.setOnDragExited(new EventHandler<DragEvent>() {
+		this.setOnDragDropped(new EventHandler<DragEvent>() {
 
 			@Override
 			public void handle(DragEvent event) {
 				if(event.getTarget() instanceof BoardTile) {
-					System.out.println("test");
+					System.out.println("testDropped");
 				}
-				event.acceptTransferModes(TransferMode.ANY);
-				event.setDropCompleted(true);
-				event.consume();
+				
+				Dragboard db = event.getDragboard();
+				if(db.hasString()) {
+					event.acceptTransferModes(TransferMode.ANY);
+					event.setDropCompleted(true);
+					event.consume();	
+				}
 			}
 		});
 	}
