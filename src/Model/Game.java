@@ -81,15 +81,15 @@ public class Game {
 	}
 	
 	public static List<Game> hasWinnerWithUsername(List<Game> games, String username){
-		return games.stream().filter(game -> game._opponent.toLowerCase().contains(username) || 
-				game._winner.toLowerCase().contains(username))
+		return games.stream().filter(game -> game._opponent.toLowerCase().contains(username.toLowerCase()) || 
+				game._winner.toLowerCase().contains(username.toLowerCase()))
 				.collect(Collectors.toList());
 	}
 	
 	public static List<Game> hasGameWithUsername(List<Game> games, String username){
 
-		return games.stream().filter(game -> game._usernamePlayer1.toLowerCase().contains(username) || 
-				game._usernamePlayer2.toLowerCase().contains(username))
+		return games.stream().filter(game -> game._usernamePlayer1.toLowerCase().contains(username.toLowerCase()) || 
+				game._usernamePlayer2.toLowerCase().contains(username.toLowerCase()))
 				.collect(Collectors.toList());
 	}
 }
