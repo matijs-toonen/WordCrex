@@ -109,10 +109,11 @@ WHERE
 set @username = 'testmannetje';
 set @upassword = 'test';
 
-if not exists(select username from account where username = @username)
-begin
-
-end
+INSERT INTO account (username, password)
+SELECT * FROM (SELECT @username, @upassword) AS tmp
+WHERE NOT EXISTS (
+    SELECT username FROM account WHERE username = @username
+) LIMIT 1;
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 select * from game where answer_player2 = 'unknown';
