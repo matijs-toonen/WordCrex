@@ -38,8 +38,6 @@ public class GameItem extends AnchorPane {
 		else {
 			image = getPlayedImage();
 		}
-
-		
 		
 		imgStatus.setFitHeight(40);
 		imgStatus.setFitWidth(40);
@@ -75,12 +73,24 @@ public class GameItem extends AnchorPane {
 	}
 	
 	private Image getPlayedImage() {
+		InputStream is = null;
+		
 		var currentPlayer = MainController.getUser();
 		String username = currentPlayer.getUsername();
+		String winner = _currentGame.getWinner();
+		
 		//Determine won/lost
+		if(username.equals(winner)) {
+			is = this.getClass().getResourceAsStream("/Resources/finished.png");
+			lblTime.setText("Je hebt gewonnen!");
+		}
+		else
+		{
+			is = this.getClass().getResourceAsStream("/Resources/resigned.png");
+			lblTime.setText("Je hebt verloren..");
+		}
 		
-		
-		return new Image(this.getClass().getResourceAsStream("/Resources/finished.png"));
+		return new Image(is);
 	}
 	
 	private void setUserLabel() { 
@@ -91,7 +101,7 @@ public class GameItem extends AnchorPane {
 	}
 	
 	private void setSubLabel() {
-		lblTime.setText(String.valueOf(_currentGame.getSatus()));
+		//lblTime.setText(String.valueOf(_currentGame.getSatus()));
 		lblUser.getStyleClass().add("text");
 		lblTime.setStyle("-fx-padding: 20 0 40 50; -fx-font-size: 13px; -fx-text-fill: #ABABB1");
 	}
