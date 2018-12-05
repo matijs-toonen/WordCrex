@@ -1,6 +1,6 @@
 package Model;
 
-public class loginModel {
+public class LoginModel {
 	public void checkUsername(String username) {
 		System.out.println(username);
 	}
