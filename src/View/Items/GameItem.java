@@ -48,25 +48,27 @@ public class GameItem extends AnchorPane {
 	private Image getActiveImage() {
 		InputStream is = null;
 		
-		switch (lblTime.getText().toLowerCase()) {
-		case "requested":
+		var currentPlayer = MainController.getUser();
+		String username = currentPlayer.getUsername();
+		int zetUser1, zetUser2; //User1 will always be the user who's logged in, User2 is always his opponent.
+		String opponent = _currentGame.getOpponent();
+	
+		if(_currentGame.getUser1().equals(username)) {
+			zetUser1 = _currentGame.getZettenPlayer1();
+			zetUser2 = _currentGame.getZettenPlayer2();
+		}
+		else {
+			zetUser1 = _currentGame.getZettenPlayer2();
+			zetUser2 = _currentGame.getZettenPlayer1();
+		}
+		
+		if(zetUser1 <= zetUser2){
 			is = this.getClass().getResourceAsStream("/Resources/request.png");
-			lblTime.setText("Wachten op een zet...");
-			break;
-		case "playing":
+			lblTime.setText(opponent + " wacht op jou...");
+		}
+		else {
 			is = this.getClass().getResourceAsStream("/Resources/playing.png");
-			lblTime.setText("Plaats een zet!");
-			break;
-		case "resigned":
-			is = this.getClass().getResourceAsStream("/Resources/resigned.png");
-			lblTime.setText("Spel is afgelopen.");
-			break;
-		case "finished":
-			is = this.getClass().getResourceAsStream("/Resources/finished.png");
-			lblTime.setText("Spel is afgelopen.");
-			break;
-		default:
-			is = this.getClass().getResourceAsStream("/Resources/playing.png");
+			lblTime.setText("We wachten op " + opponent);
 		}
     
 		return new Image(is);

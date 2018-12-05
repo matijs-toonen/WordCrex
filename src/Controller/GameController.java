@@ -18,7 +18,7 @@ import javafx.scene.layout.VBox;
 public class GameController implements Initializable{
 	
 	private DatabaseController<Game> _db;
-	private ArrayList<Game> _games;
+	private ArrayList<Game> _activeGames;
 	private ArrayList<Game> _finishedGames;
 	
 	@FXML
@@ -39,13 +39,17 @@ public class GameController implements Initializable{
 	
 	private void getGames() {
 		_db = new DatabaseController<Game>();
+		
 		var user = MainController.getUser();
 		String username = user.getUsername();
-		String gameCommandActive = Game.getWinnerQuery(username); 
+		
+		String gameCommandFinished = Game.getWinnerQuery(username); 
+		String gameCommandActive = Game.getAcitveQuery(username);
 
 		try {
-			_finishedGames = (ArrayList<Game>) _db.SelectAll(gameCommandActive, Game.class);
-			_games = (ArrayList<Game>) _db.SelectAll("SELECT * FROM game where game_state = '"+GameStatus.getGameStatus(GameStatus.Playing)+"' and username_player1 = 'jagermeester'", Game.class);
+			_activeGames = (ArrayList<Game>) _db.SelectAll(gameCommandActive, Game.class);
+			_finishedGames = (ArrayList<Game>) _db.SelectAll(gameCommandFinished, Game.class);
+	
 			renderGames();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -63,7 +67,7 @@ public class GameController implements Initializable{
 			gameItem.setUserOnClickEvent(onLabelClick());
 		});
 		
-		Game.hasGameWithUsername(_games, searchBox.getText()).forEach(game -> {
+		Game.hasGameWithUsername(_activeGames, searchBox.getText()).forEach(game -> {
 			var gameItem = new GameItem(game);
 			vboxGames.getChildren().add(gameItem);
 			gameItem.setUserOnClickEvent(onLabelClick());
