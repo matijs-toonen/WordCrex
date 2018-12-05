@@ -91,10 +91,24 @@ SET state = 'denied'
 WHERE word = @word;
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
--- 
+-- Login check
+
+set @username = 'ger';
+set @upassword = '123';
+
+SELECT 
+    username
+FROM
+    account
+WHERE
+    username = @username
+        AND password = @upassword;
+        
+-- Account regristeren
 
 select * from game where answer_player2 = 'unknown';
 select * from answer;
 select * from gamestate;
 select * from role;
 select * from wordstate;
+select * from account;
