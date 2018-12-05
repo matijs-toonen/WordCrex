@@ -76,7 +76,7 @@ public class MainController implements Initializable {
 			
 			try {
 				while(resultSet.next()) {	
-					var columns = DatabaseController.setColumns(resultSet.getMetaData());
+					var columns = DatabaseController.getColumns(resultSet.getMetaData());
 					if(columns.contains("username")) {
 						var account = Account.getAccountByUsername(accounts, resultSet.getString("username"));
 						if(columns.contains("role")) {
