@@ -10,13 +10,13 @@ SELECT
             IF(username_player1 = @username,
                     username_player2,
                     username_player1)
-        ) AS 'username_player2',
+        ) AS 'tegenstander',
     game_state,
     (SELECT 
             IF(score1 > score2,
                     username_player1,
                     username_player2)
-        ) AS 'username_player1'
+        ) AS 'winner'
 FROM
     score
 WHERE
@@ -25,21 +25,58 @@ WHERE
     (username_player1 = @username OR username_player2 = @username);
     
     
+-- na de update
+
+SET @username = 'jagermeester';
+
+SELECT 
+    game_id,
+    username_winner,
+    (SELECT 
+            IF(username_player1 = @username,
+                    username_player2,
+                    username_player1)
+        ) AS 'opponent'
+FROM
+    game
+WHERE
+    (username_player1 = @username
+        OR username_player2 = @username)
+        AND (username_winner IS NOT NULL)
+;
+
+
+-- actoeve games
+
+
+SET @username = 'jagermeester';
+
+
+SELECT 
+
+	(SELECT 
+            IF(g.username_player1 = @username,
+                    g.username_player2,
+                    g.username_player1)
+        ) AS 'opponent',
+	g.game_id,
+    g.game_state,
+    MAX(tp1.turn_id) AS max_turn_p1_zet,
+    tp1.username_player1 AS max_turn_p1_username,
     
--- game
-
-select count(turn_id)
-into @player1
-from turnplayer1;
-
-
-select count(turn_id)
-into @player2
-from turnplayer2;
-
-
-
-select if(@player1 = @player2,)
-
-
+    MAX(tp2.turn_id) AS max_turn_p2_zet,
+    tp2.username_player2 AS max_turn_p2_username
+    
+FROM
+    game g
+        LEFT JOIN
+    turnplayer1 tp1 ON g.game_id = tp1.game_id
+        LEFT JOIN
+    turnplayer2 tp2 ON g.game_id = tp2.game_id
+    
+where (g.username_player1 = @username
+        OR g.username_player2 = @username)
+        and
+        (g.game_state = 'playing')
+GROUP BY g.game_id;
 
