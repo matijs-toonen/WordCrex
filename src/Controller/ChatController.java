@@ -11,6 +11,8 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
@@ -19,6 +21,8 @@ public class ChatController implements Initializable {
 	//dummy values
 	private DatabaseController<ChatLine> _db;
 	private ArrayList<ChatLine> _chatLines;
+	
+	final String username = "test-player";
 	
 	@FXML
 	private VBox textScreen;
@@ -43,8 +47,7 @@ public class ChatController implements Initializable {
 		String message = chatInput.getText();
 		
 		try {
-			String insertStatement = String.format("INSERT INTO chatline (username, game_id, moment, message) VALUES ('%s', '500', NOW(), '%s');", "test-player", message);
-			System.out.println(insertStatement);
+			String insertStatement = String.format("INSERT INTO chatline (username, game_id, moment, message) VALUES ('%s', '500', NOW(), '%s');", username, message);
 			_db.Insert(insertStatement);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -52,7 +55,6 @@ public class ChatController implements Initializable {
 		}
 		
 		chatInput.setText("");
-		//updateChat();
 	}
 	
 	private void startChatListener() {
@@ -64,7 +66,7 @@ public class ChatController implements Initializable {
 	    			updateChat();
 	    			
 	    			try {
-						Thread.sleep(2000);
+						Thread.sleep(1000);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -79,7 +81,7 @@ public class ChatController implements Initializable {
 	
 	private void updateChat() {
 		try {
-			_chatLines = (ArrayList<ChatLine>) _db.SelectAll("SELECT * FROM chatline", ChatLine.class);
+			_chatLines = (ArrayList<ChatLine>) _db.SelectAll("SELECT * FROM chatline ORDER BY moment", ChatLine.class);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -97,10 +99,24 @@ public class ChatController implements Initializable {
 		textScreen.getChildren().clear();
 		
 		_chatLines.forEach(chatLine -> {
+			
 			Label label = new Label();
 			label.setText(chatLine.getMessage());
 			
-			textScreen.getChildren().add(label);
+			VBox vBox = new VBox();
+		    vBox.getChildren().add(label);
+			
+			if (chatLine.getUsername().equals(username)) {
+				label.setStyle("-fx-padding: 5px 10px; -fx-background-color: blue; -fx-text-fill: white;");
+				vBox.setPadding(new Insets(5,5,0,0));
+				vBox.setAlignment(Pos.BASELINE_RIGHT);
+			}else {
+				label.setStyle("-fx-padding: 5px 10px; -fx-background-color: white; -fx-text-fill: black;");
+				vBox.setPadding(new Insets(5,0,0,5));
+				vBox.setAlignment(Pos.BASELINE_LEFT);
+			}
+			
+			textScreen.getChildren().add(vBox);
 		});
 	}
 

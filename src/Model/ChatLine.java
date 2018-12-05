@@ -33,4 +33,8 @@ public class ChatLine {
 	public String getMessage() {
 		return _message;
 	}
+	
+	public String getUsername() {
+		return _username;
+	}
 }
