@@ -5,7 +5,9 @@ import java.util.function.Consumer;
 import Model.Symbol;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
+import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -27,6 +29,7 @@ public class BoardTile extends Pane {
 		_column = column;
 		_row = row;
 		_rectangle = rectangle;
+		setDragEvents();
 		getChildren().addAll(rectangle, lblValue);
 	}	
 	
@@ -44,6 +47,32 @@ public class BoardTile extends Pane {
 	
 	public Pair<Integer, Integer> getCords(){
 		return new Pair<Integer, Integer>(_column, _row);
+	}
+	
+	private void setDragEvents() {
+		this.setOnDragOver(new EventHandler<DragEvent>() {
+
+			@Override
+			public void handle(DragEvent event) {
+				if(event.getGestureSource() != event.getTarget()) {
+					event.acceptTransferModes(TransferMode.ANY);
+				}
+				event.consume();
+			}
+		});
+		
+		this.setOnDragExited(new EventHandler<DragEvent>() {
+
+			@Override
+			public void handle(DragEvent event) {
+				if(event.getTarget() instanceof BoardTile) {
+					System.out.println("test");
+				}
+				event.acceptTransferModes(TransferMode.ANY);
+				event.setDropCompleted(true);
+				event.consume();
+			}
+		});
 	}
 	
 	public void createOnClickEvent(Consumer<MouseEvent> action) {

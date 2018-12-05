@@ -8,10 +8,19 @@ import java.util.function.Consumer;
 import Model.Board.Board;
 import Model.Board.PositionStatus;
 import View.BoardPane.BoardTile;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.WritableImage;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -27,6 +36,9 @@ public class BoardController implements Initializable {
 	private Label lblScore1, lblScore2, lblPlayer1, lblPlayer2;
 	
 	@FXML
+	private Button btnTest;
+	
+	@FXML
 	private Pane panePlayField;
 	
 	@Override
@@ -39,6 +51,7 @@ public class BoardController implements Initializable {
 		lblScore2.setText("9");
 		_board = new Board();
 		createField();
+		setDragEvents();
 	}
 	
 	private void createField() {
@@ -63,6 +76,53 @@ public class BoardController implements Initializable {
 			}
 			x += 32;
 		}
+	}
+	
+	private void setDragEvents() {
+		panePlayField.setOnDragOver(new EventHandler<DragEvent>() {
+
+			@Override
+			public void handle(DragEvent event) {
+				if(event.getGestureSource() != event.getTarget()) {
+					event.acceptTransferModes(TransferMode.ANY);
+				}
+				event.consume();
+			}
+		});
+		
+		btnTest.setOnDragDetected(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				var node = (Button) event.getSource();
+				Dragboard db = node.startDragAndDrop(TransferMode.ANY);
+				
+				var content = new ClipboardContent();
+				db.setDragView(createSnapshot(node));
+				content.putString(btnTest.getText());
+				db.setContent(content);
+				event.consume();
+			}
+		});
+		
+		panePlayField.setOnDragExited(new EventHandler<DragEvent>() {
+
+			@Override
+			public void handle(DragEvent event) {
+				if(event.getTarget() instanceof BoardTile) {
+					System.out.println("test");
+				}
+				event.acceptTransferModes(TransferMode.ANY);
+				event.setDropCompleted(true);
+				event.consume();
+			}
+		});
+	}
+	
+	private WritableImage createSnapshot(Node item) {
+		var params = new SnapshotParameters();
+		params.setFill(Color.TRANSPARENT);
+		return item.snapshot(params, null);
 	}
 	
 	private Consumer<MouseEvent> creatOnClickEvent(){
