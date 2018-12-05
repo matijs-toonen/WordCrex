@@ -5,6 +5,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import Controller.MainController;
 import Model.Answer.*;
 
 public class Game {
@@ -41,7 +43,7 @@ public class Game {
 			_usernamePlayer1 = columns.contains("username_player1") ? rs.getString("username_player1") : null;
 			_usernamePlayer2 = columns.contains("username_player2") ? rs.getString("username_player2") : null;
 			_answerPlayer2 = columns.contains("answer_player2") ? getAnswer(rs.getString("answer_player2")) : null;
-			_opponent = columns.contains("opponent") ? rs.getString("opponent") : null;
+			_opponent = columns.contains("opponent") ? rs.getString("opponent") : MainController.getUser().getUsername() == _usernamePlayer1 ? _usernamePlayer1 : _usernamePlayer2;
 			_winner = columns.contains("winner") ? rs.getString("winner") : null;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -64,6 +66,10 @@ public class Game {
 	
 	public String getUser1() {
 		return _usernamePlayer1;
+	}
+	
+	public String getOpponent() {
+		return _opponent;
 	}
 	
 	public String getUser2() {

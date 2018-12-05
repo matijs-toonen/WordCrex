@@ -84,7 +84,7 @@ public class GameItem extends AnchorPane {
 	}
 	
 	private void setUserLabel() { 
-		var userText = _currentGame.getUser2() == null ? MainController.getUser().getUsername() : _currentGame.getUser2();
+		var userText = _currentGame.getOpponent();
 		lblUser.setText(userText);
 		lblUser.getStyleClass().add("text");
 		lblUser.setStyle("-fx-padding: 0 0 0 50; -fx-font-size: 14px; -fx-text-fill: #4D4F5C; -fx-font-weight: bold;");
