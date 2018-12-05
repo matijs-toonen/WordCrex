@@ -16,6 +16,7 @@ import Model.Account;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.control.SplitPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 
@@ -143,7 +144,6 @@ public class MainController implements Initializable {
 	}
 	
 	private void loadPane(String paneName) {
-		
 		//Parent root = null;
 		AnchorPane pane = null;
 		try {

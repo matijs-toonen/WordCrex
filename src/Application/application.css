@@ -50,3 +50,8 @@
 .loginfield:focused {
 	-fx-border-color: #43425d;
 }
+
+#textScreen, #chatInput{
+	-fx-focus-color: transparent;
+	-fx-background-color: black;
+}

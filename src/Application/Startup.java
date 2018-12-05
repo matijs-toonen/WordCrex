@@ -18,7 +18,7 @@ public class Startup extends Application {
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			
-			Parent mainFrame = FXMLLoader.load(getClass().getResource("/View/Sidebar.fxml"));
+			Parent mainFrame = FXMLLoader.load(getClass().getResource("/View/SideBar.fxml"));
 			
 			primaryStage.getIcons().add(new Image("/Resources/logo.png"));
 			primaryStage.setScene(new Scene(mainFrame));
