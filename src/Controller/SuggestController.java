@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 import Model.Account;
-import Model.Game;
 import Model.LetterSet;
 import Model.Word;
 import Model.WordState.AcceptedWordState;
@@ -22,7 +21,7 @@ import javafx.scene.input.MouseEvent;
 
 public class SuggestController implements Initializable{
 	
-	private DatabaseController _db;
+	private DatabaseController<Word> _db;
 	
 	@FXML
 	private TextField textfieldAddWord;
@@ -32,7 +31,6 @@ public class SuggestController implements Initializable{
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		// TODO Auto-generated method stub
 		_db = new DatabaseController<Word>();
 		
 		plusButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) ->  addWord() );
@@ -44,7 +42,6 @@ public class SuggestController implements Initializable{
 	
 	public void addWord() {
 		
-		// TODO: validate word
 		String wordValue = textfieldAddWord.getText().toLowerCase();
 		
 		if(wordValue == null || wordValue.isEmpty()) {
@@ -62,12 +59,11 @@ public class SuggestController implements Initializable{
 			String statement = "INSERT INTO dictionary (word, letterset_code, state, username) VALUES ('" + wordValue +"', 'NL', 'pending', 'test-player');";
 			_db.Insert(statement);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		System.out.println("Added word to database!");
-		
+		showSuggestedWords();
 	}
 	
 	private WordState getWordState(String state) {
@@ -81,6 +77,11 @@ public class SuggestController implements Initializable{
 		default:
 			return null;
 		}
+	}
+	
+	
+	private void showSuggestedWords() {
+		// TODO: Lars list loading
 	}
 	
 }
