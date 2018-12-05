@@ -18,11 +18,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
 public class ChatController implements Initializable {
-	//dummy values
+	
 	private DatabaseController<ChatLine> _db;
 	private ArrayList<ChatLine> _chatLines;
 	
-	final String username = "test-player";
+	// TODO: remove dummy data
+	final String username = "ger";
+	final int game_id = 500;
 	
 	@FXML
 	private VBox textScreen;
@@ -46,8 +48,12 @@ public class ChatController implements Initializable {
 		
 		String message = chatInput.getText();
 		
+		if (message == null || message.isEmpty()) {
+			return;
+		}
+		
 		try {
-			String insertStatement = String.format("INSERT INTO chatline (username, game_id, moment, message) VALUES ('%s', '500', NOW(), '%s');", username, message);
+			String insertStatement = String.format("INSERT INTO chatline (username, game_id, moment, message) VALUES ('%s', '%d', NOW(), '%s');", username, game_id, message);
 			_db.Insert(insertStatement);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -55,6 +61,7 @@ public class ChatController implements Initializable {
 		}
 		
 		chatInput.setText("");
+		updateChat();
 	}
 	
 	private void startChatListener() {
@@ -81,7 +88,8 @@ public class ChatController implements Initializable {
 	
 	private void updateChat() {
 		try {
-			_chatLines = (ArrayList<ChatLine>) _db.SelectAll("SELECT * FROM chatline ORDER BY moment", ChatLine.class);
+			String selectStatement = String.format("SELECT * FROM chatline WHERE game_id = '%d' ORDER BY moment", game_id);
+			_chatLines = (ArrayList<ChatLine>) _db.SelectAll(selectStatement, ChatLine.class);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
