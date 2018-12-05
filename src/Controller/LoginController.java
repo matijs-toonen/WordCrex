@@ -7,9 +7,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 
 public class LoginController {
-	LoginModel model = new LoginModel();
+	LoginModel model;
 	
 	private String _username, _password;
+	
+	public LoginController()
+	{
+		model = new LoginModel();
+	}
 	
 	@FXML
 	private TextField txtLogin, txtPassword; 
