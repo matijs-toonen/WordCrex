@@ -3,7 +3,9 @@ package Model;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import Model.AccountRole.*;
 
@@ -21,9 +23,9 @@ public class Account {
 		_password = password;
 	}
 	
-	public Account(String username, String password, String role) {
+	public Account(String username, String password, String... roles) {
 		this(username, password);
-		addRole(role);
+		addAllRoles(roles);
 	}
 	
 	public Account(ResultSet rs, ArrayList<String> columns) {
@@ -36,8 +38,10 @@ public class Account {
 		}
 	}
 	
-	public void addRole(String role) {
-		_roles.add(role == null ? new PlayerRole() : getRole(role));
+	public void addAllRoles(String... roles) {
+		for(var role : roles) {
+			_roles.add(role == null ? new PlayerRole() : getRole(role));	
+		}
 	}
 	
 	private AccountRole getRole(String role) {
@@ -61,5 +65,9 @@ public class Account {
 	
 	public static Optional<Account> getAccountByUsername(ArrayList<Account> accounts, String username){
 		return accounts.stream().filter(account -> account.getUsername().equals(username)).findFirst();
+	}
+	
+	public static List<Account> getAllAccountsByUsername(ArrayList<Account> accounts, String username){
+		return accounts.stream().filter(account -> account.getUsername().contains(username)).collect(Collectors.toList());
 	}
 }
