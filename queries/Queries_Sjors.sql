@@ -109,6 +109,11 @@ WHERE
 set @username = 'testmannetje';
 set @upassword = 'test';
 
+if not exists(select username from account where username = @username)
+begin
+
+end
+
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 select * from game where answer_player2 = 'unknown';
 select * from answer;
