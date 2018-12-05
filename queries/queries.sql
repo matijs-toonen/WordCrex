@@ -80,3 +80,4 @@ where (g.username_player1 = @username
         (g.game_state = 'playing')
 GROUP BY g.game_id;
 
+-- asdasdas
