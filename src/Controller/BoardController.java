@@ -1,5 +1,6 @@
 package Controller;
 
+import java.awt.Point;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.ResourceBundle;
@@ -11,6 +12,7 @@ import View.BoardPane.BoardTile;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
@@ -21,15 +23,15 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.util.Pair;
 
 public class BoardController implements Initializable {
 	
-	private HashMap<Pair<Integer, Integer>, BoardTile> _rectangles;
-	private HashMap<Pair<Integer, Integer>, Pair<Integer, Integer>> _positions;
+	private HashMap<Point, BoardTile> _tiles;
 	private Board _board;
 	
 	@FXML
@@ -43,8 +45,7 @@ public class BoardController implements Initializable {
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		_rectangles = new HashMap<Pair<Integer,Integer>, BoardTile>();
-		_positions = new HashMap<Pair<Integer,Integer>, Pair<Integer,Integer>>();
+		_tiles = new HashMap<Point, BoardTile>();
 		lblPlayer1.setText("SCHRUKTURK");
 		lblPlayer2.setText("BOEDER");
 		lblScore1.setText("1");
@@ -59,20 +60,16 @@ public class BoardController implements Initializable {
 		for(int i = 0; i < 15; i++) {
 			int y = 1;
 			for(int j = 0; j < 15; j++) {
-				var rectangle = new Rectangle();
-				rectangle.setFill(Color.CHOCOLATE);
-				rectangle.setWidth(30);
-				rectangle.setHeight(30);
-				rectangle.setStroke(Color.BLACK);
-				
-				var tile = new BoardTile(rectangle, i, j);
+				var tile = new BoardTile(i, j);
+				tile.setBackground(setBackgroundFill(Color.CHOCOLATE));
 				tile.setLayoutX(x);
 				tile.setLayoutY(y);
+				tile.setMinWidth(30);
+				tile.setMinHeight(30);
 				tile.createOnClickEvent(creatOnClickEvent());
-				_rectangles.put(new Pair<Integer, Integer>(i, j), tile);
+				_tiles.put(new Point(x, y), tile);
 				y += 32;
 				panePlayField.getChildren().add(tile);
-				_positions.put(new Pair<Integer, Integer>(i, j), new Pair<Integer, Integer>(x, y));
 			}
 			x += 32;
 		}
@@ -125,6 +122,11 @@ public class BoardController implements Initializable {
 		return item.snapshot(params, null);
 	}
 	
+	private Background setBackgroundFill(Color color) {
+		var backgroundFill = new BackgroundFill(color, CornerRadii.EMPTY, Insets.EMPTY);
+		return new Background(backgroundFill);
+	}
+	
 	private Consumer<MouseEvent> creatOnClickEvent(){
 		return (event -> {
 			var tile = (BoardTile) event.getSource();
@@ -133,7 +135,7 @@ public class BoardController implements Initializable {
 				return;
 			
 			_board.updateStatus(cords, PositionStatus.Taken);
-			tile.getRectangle().setFill(Color.YELLOW);
+			tile.setBackground(setBackgroundFill(Color.YELLOW));
 		});
 	}
 }

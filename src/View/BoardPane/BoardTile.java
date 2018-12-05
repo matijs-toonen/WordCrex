@@ -10,17 +10,15 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.util.Pair;
 
 public class BoardTile extends Pane {
 	private Symbol _symbol;
 	private int _column;
 	private int _row;
-	private Rectangle _rectangle;
 	private Label lblValue = new Label();
 
-	public BoardTile(Rectangle rectangle, int column, int row, Symbol symbol) {
+	public BoardTile(int column, int row, Symbol symbol) {
 		super();
 		lblValue.setLayoutX(20);
 		lblValue.setLayoutX(20);
@@ -28,21 +26,16 @@ public class BoardTile extends Pane {
 		lblValue.setText("5");
 		_column = column;
 		_row = row;
-		_rectangle = rectangle;
 		setDragEvents();
-		getChildren().addAll(rectangle, lblValue);
+		getChildren().addAll(lblValue);
 	}	
 	
-	public BoardTile(Rectangle rectangle, int column, int row) {
-		this(rectangle, column, row, null);
+	public BoardTile(int column, int row) {
+		this(column, row, null);
 	}
 	
 	public Symbol getSymbol() {
 		return _symbol;
-	}
-	
-	public Rectangle getRectangle() {
-		return _rectangle;
 	}
 	
 	public Pair<Integer, Integer> getCords(){
