@@ -102,10 +102,14 @@ FROM
     account
 WHERE
     username = @username
-        AND password = @upassword; 
+        AND password = @upassword;
         
 -- Account regristeren
 
+set @username = 'testmannetje';
+set @upassword = 'test';
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 select * from game where answer_player2 = 'unknown';
 select * from answer;
 select * from gamestate;
