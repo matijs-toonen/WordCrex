@@ -5,9 +5,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
+import Model.Account;
 import Model.ChatLine;
-import Model.Game;
-import Model.GameStatus;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -41,9 +40,19 @@ public class ChatController implements Initializable {
 
 	private void sendMessage() {
 		
+		String message = chatInput.getText();
 		
+		try {
+			String insertStatement = String.format("INSERT INTO chatline (username, game_id, moment, message) VALUES ('%s', '500', NOW(), '%s');", "test-player", message);
+			System.out.println(insertStatement);
+			_db.Insert(insertStatement);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		chatInput.setText("");
+		//updateChat();
 	}
 	
 	private void startChatListener() {
@@ -51,36 +60,37 @@ public class ChatController implements Initializable {
 		Thread chatThread = new Thread(){
 		    public void run(){
 		    	
-		    	try {
-		    		
-		    		while(true) {
-		    			
-		    			_chatLines = (ArrayList<ChatLine>) _db.SelectAll("SELECT * FROM chatline", ChatLine.class);
-						
-						Platform.runLater(new Runnable() {
-							@Override
-							public void run() {
-								showMessages();
-							}
-					    });
-						
-						System.out.println("Chat Updated.");
-		    			
-		    			Thread.sleep(2000);
-		    		}
-					
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					System.out.println(e.getMessage());
-				}catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
+		    	while(true) {
+	    			updateChat();
+	    			
+	    			try {
+						Thread.sleep(2000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+	    		}
 		    }
 		};
 		
 		chatThread.setDaemon(true);
 		chatThread.start();
 		
+	}
+	
+	private void updateChat() {
+		try {
+			_chatLines = (ArrayList<ChatLine>) _db.SelectAll("SELECT * FROM chatline", ChatLine.class);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				showMessages();
+			}
+	    });
 	}
 	
 	private void showMessages() {
