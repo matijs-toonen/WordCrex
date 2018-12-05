@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class DatabaseController <T> {
@@ -24,11 +23,22 @@ public class DatabaseController <T> {
 	}
 	
 	public DatabaseController() {
-		this(null, null, null, null);
+		// Default values
+	}
+	
+	private Connection OpenConnection() throws SQLException
+	{
+		return DriverManager.getConnection(_url + _schema, _user, _password);
+	}
+	
+	private void CloseConnection(Connection conn, Statement state) throws SQLException
+	{
+		state.close();
+		conn.close();
 	}
 
 	public T SelectLast(String statement, Class<T> type) throws SQLException {
-		Connection conn = DriverManager.getConnection(_url + _schema, _user, _password);
+		Connection conn = OpenConnection();
 		Statement state = conn.createStatement();
 		ResultSet resultSet = state.executeQuery(statement);
 		
@@ -37,61 +47,77 @@ public class DatabaseController <T> {
 		resultSet.last();
 		
 		try {
-			item = type.getDeclaredConstructor(ResultSet.class, ArrayList.class).newInstance(resultSet, setColumns(resultSet.getMetaData()));
+			item = type.getDeclaredConstructor(ResultSet.class, ArrayList.class).newInstance(resultSet, getColumns(resultSet.getMetaData()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	
 		resultSet.close();
-		state.close();
-		conn.close();
+		CloseConnection(conn, state);
+		
 		return item;
 	}
 	
 	public Collection<T> SelectAll(String statement, Class<T> type) throws SQLException {
-		Connection conn = DriverManager.getConnection(_url + _schema, _user, _password);
+		Connection conn = OpenConnection();
 		Statement state = conn.createStatement();
 		ResultSet resultSet = state.executeQuery(statement);
 		ArrayList<T> items = new ArrayList<T>();
 		
 		while(resultSet.next()) {	
 			try {
-				items.add(type.getDeclaredConstructor(ResultSet.class, ArrayList.class).newInstance(resultSet, setColumns(resultSet.getMetaData())));
+				items.add(type.getDeclaredConstructor(ResultSet.class, ArrayList.class).newInstance(resultSet, getColumns(resultSet.getMetaData())));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 		
 		resultSet.close();
-		state.close();
-		conn.close();
+		CloseConnection(conn, state);
+		
 		return items;
 	}
 	
 	public Collection<T> SelectWithCustomLogic(Function<ResultSet, ArrayList<T>> customWay, String statement) throws SQLException {
-		Connection conn = DriverManager.getConnection(_url + _schema, _user, _password);
+		Connection conn = OpenConnection();
 		Statement state = conn.createStatement();
 		ResultSet resultSet = state.executeQuery(statement);
 		
-		return customWay.apply(resultSet);
-	}
-	
-	public boolean Update(String statement) throws SQLException {
-		Connection conn = DriverManager.getConnection(_url + _schema, _user, _password);
-		Statement state = conn.createStatement();
-		int results = state.executeUpdate(statement);
+		var customLogic = customWay.apply(resultSet);
 		
-		state.close();
-		conn.close();
+		resultSet.close();
+		CloseConnection(conn, state);
 		
-		return results > 0;
+		return customLogic;
 	}
-	
-	public static ArrayList<String> setColumns(ResultSetMetaData metaData) throws SQLException{
+  
+	public static ArrayList<String> getColumns(ResultSetMetaData metaData) throws SQLException{
 		ArrayList<String> columns = new ArrayList<String>();
 		for(int i = 1; i <= metaData.getColumnCount(); i++) {
 			columns.add(metaData.getColumnName(i));
 		}
+		 
 		return columns;
+	}
+	
+	public boolean Update (String statement) throws SQLException
+	{
+		Connection conn = OpenConnection();
+		Statement state = conn.createStatement();
+		int results = state.executeUpdate(statement);
+		
+		CloseConnection(conn, state);
+		
+		return results > 0;
+	}
+	
+	public boolean Delete (String statement) throws SQLException
+	{
+		return Update(statement);
+	}
+	
+	public boolean Insert (String statement) throws SQLException
+	{
+		return Update(statement);
 	}
 }
