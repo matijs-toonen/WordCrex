@@ -90,7 +90,7 @@ public class DatabaseController <T> {
 		
 		return customLogic;
 	}
-	
+  
 	public static ArrayList<String> getColumns(ResultSetMetaData metaData) throws SQLException{
 		ArrayList<String> columns = new ArrayList<String>();
 		for(int i = 1; i <= metaData.getColumnCount(); i++) {
