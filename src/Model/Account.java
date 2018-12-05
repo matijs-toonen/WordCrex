@@ -3,7 +3,9 @@ package Model;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import Model.AccountRole.*;
 
@@ -63,5 +65,9 @@ public class Account {
 	
 	public static Optional<Account> getAccountByUsername(ArrayList<Account> accounts, String username){
 		return accounts.stream().filter(account -> account.getUsername().equals(username)).findFirst();
+	}
+	
+	public static List<Account> getAllAccountsByUsername(ArrayList<Account> accounts, String username){
+		return accounts.stream().filter(account -> account.getUsername().contains(username)).collect(Collectors.toList());
 	}
 }
