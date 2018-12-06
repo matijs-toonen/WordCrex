@@ -14,7 +14,12 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 
 public class ChatController implements Initializable {
 	
@@ -109,19 +114,20 @@ public class ChatController implements Initializable {
 			
 			Label messageLabel = new Label();
 			messageLabel.setText(chatLine.getMessage());
-			messageLabel.wrapTextProperty();
-			
-			VBox vBox = new VBox();
+			messageLabel.setWrapText(true);
+			messageLabel.setTextAlignment(TextAlignment.LEFT);
+
+			HBox vBox = new HBox();
 			vBox.setStyle("-fx-background-color: #FFFFFF");
 		    vBox.getChildren().add(messageLabel);
 			
 			if (chatLine.getUsername().equals(username)) {
 				messageLabel.setStyle("-fx-background-radius: 20 20 0 20; -fx-padding: 5px 10px; -fx-background-color: #3B86FF; -fx-text-fill: white;");
-				vBox.setPadding(new Insets(-5,5,10,0));
+				vBox.setPadding(new Insets(0,5,10,30));
 				vBox.setAlignment(Pos.BASELINE_RIGHT);
 			}else {
 				messageLabel.setStyle("-fx-background-radius: 20 20 20 0; -fx-padding: 5px 10px; -fx-background-color: #EDF0F5; -fx-text-fill: black;");
-				vBox.setPadding(new Insets(-5,0,10,5));
+				vBox.setPadding(new Insets(0,30,10,5));
 				vBox.setAlignment(Pos.BASELINE_LEFT);
 			}
 			
