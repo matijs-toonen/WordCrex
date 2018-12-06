@@ -109,21 +109,19 @@ public class ChatController implements Initializable {
 			
 			Label messageLabel = new Label();
 			messageLabel.setText(chatLine.getMessage());
-			
-			Label timeLabel = new Label();
-        	timeLabel.setText(chatLine.getTime());
+			messageLabel.wrapTextProperty();
 			
 			VBox vBox = new VBox();
+			vBox.setStyle("-fx-background-color: #FFFFFF");
 		    vBox.getChildren().add(messageLabel);
-		    vBox.getChildren().add(timeLabel);
 			
 			if (chatLine.getUsername().equals(username)) {
-				messageLabel.setStyle("-fx-padding: 5px 10px; -fx-background-color: blue; -fx-text-fill: white;");
-				vBox.setPadding(new Insets(5,5,0,0));
+				messageLabel.setStyle("-fx-background-radius: 20 20 0 20; -fx-padding: 5px 10px; -fx-background-color: #3B86FF; -fx-text-fill: white;");
+				vBox.setPadding(new Insets(-5,5,10,0));
 				vBox.setAlignment(Pos.BASELINE_RIGHT);
 			}else {
-				messageLabel.setStyle("-fx-padding: 5px 10px; -fx-background-color: white; -fx-text-fill: black;");
-				vBox.setPadding(new Insets(5,0,0,5));
+				messageLabel.setStyle("-fx-background-radius: 20 20 20 0; -fx-padding: 5px 10px; -fx-background-color: #EDF0F5; -fx-text-fill: black;");
+				vBox.setPadding(new Insets(-5,0,10,5));
 				vBox.setAlignment(Pos.BASELINE_LEFT);
 			}
 			
