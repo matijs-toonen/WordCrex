@@ -4,7 +4,11 @@ import java.util.function.Consumer;
 
 import Model.Symbol;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Label;
+import javafx.scene.image.WritableImage;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
@@ -19,20 +23,30 @@ public class BoardTile extends Pane {
 	private int _row;
 	private Label lblValue = new Label();
 
-	public BoardTile(int column, int row, Symbol symbol) {
+	public BoardTile(boolean isDraggable) {
 		super();
 		lblValue.setLayoutX(20);
 		lblValue.setLayoutX(20);
 		lblValue.setTextFill(Color.GREEN);
 		lblValue.setText("5");
+		
+		if(isDraggable)
+			setDraggableEvents();
+		else 
+			setDragEvents();
+
+		getChildren().addAll(lblValue);
+	}
+	
+	public BoardTile(boolean isDraggable, int column, int row, Symbol symbol) {
+		this(isDraggable);
 		_column = column;
 		_row = row;
-		setDragEvents();
-		getChildren().addAll(lblValue);
+		_symbol = symbol;
 	}	
 	
-	public BoardTile(int column, int row) {
-		this(column, row, null);
+	public BoardTile(boolean isDraggable, int column, int row) {
+		this(isDraggable, column, row, null);
 	}
 	
 	public Symbol getSymbol() {
@@ -71,6 +85,29 @@ public class BoardTile extends Pane {
 				}
 			}
 		});
+	}
+	
+	private void setDraggableEvents() {
+		this.setOnDragDetected(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				var node = (Pane) event.getSource();
+				Dragboard db = node.startDragAndDrop(TransferMode.ANY);
+				
+				var content = new ClipboardContent();
+				db.setDragView(createSnapshot(node));
+				content.putString(lblValue.getText());
+				db.setContent(content);
+				event.consume();
+			}
+		});
+	}
+	
+	private WritableImage createSnapshot(Node item) {
+		var params = new SnapshotParameters();
+		params.setFill(Color.TRANSPARENT);
+		return item.snapshot(params, null);
 	}
 	
 	public void createOnClickEvent(Consumer<MouseEvent> action) {

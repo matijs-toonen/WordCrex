@@ -2,10 +2,21 @@ package Controller;
 
 import java.awt.Point;
 import java.net.URL;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
+import Model.Account;
+import Model.Game;
+import Model.HandLetter;
+import Model.Letter;
+import Model.LetterSet;
+import Model.Symbol;
+import Model.Turn;
 import Model.Board.Board;
 import Model.Board.PositionStatus;
 import View.BoardPane.BoardTile;
@@ -30,6 +41,7 @@ import javafx.scene.paint.Color;
 
 public class BoardController implements Initializable {
 	
+	private DatabaseController _db;
 	private HashMap<Point, BoardTile> _tiles;
 	private Board _board;
 	
@@ -60,8 +72,8 @@ public class BoardController implements Initializable {
 		for(int i = 0; i < 15; i++) {
 			int y = 1;
 			for(int j = 0; j < 15; j++) {
-				var tile = new BoardTile(i, j);
-				tile.setBackground(setBackgroundFill(Color.CHOCOLATE));
+				var tile = new BoardTile(false, i, j);
+				tile.setBackground(getBackground(Color.CHOCOLATE));
 				tile.setLayoutX(x);
 				tile.setLayoutY(y);
 				tile.setMinWidth(30);
@@ -76,7 +88,58 @@ public class BoardController implements Initializable {
 	}
 	
 	private void createHand() {
-		
+		_db = new DatabaseController<HandLetter>();
+		try {
+			var handLetters = (ArrayList<HandLetter>) _db.SelectWithCustomLogic(getHandLetter(), "SELECT * FROM handletter NATURAL JOIN letter where turn_id = 1");
+			int x = 12;
+			int y = 0;
+			for(var handLetter : handLetters) {
+				var boardTile = new BoardTile(true);
+				boardTile.setBackground(getBackground(Color.LIGHTPINK));
+				boardTile.setLayoutX(x);
+				boardTile.setLayoutY(y);
+				y += 32;
+				boardTile.setMinWidth(30);
+				boardTile.setMinHeight(30);
+				paneHand.getChildren().add(boardTile);
+			};
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private Function<ResultSet, ArrayList<HandLetter>> getHandLetter(){
+		return (resultSet -> {
+			var handLetters = new ArrayList<HandLetter>();
+			try {
+				while(resultSet.next()) {	
+					var columns = DatabaseController.getColumns(resultSet.getMetaData());
+					
+					var letterId = resultSet.getInt("letter_id");
+					var game = new Game(resultSet.getInt("game_id"));
+					var letterSet = new LetterSet(resultSet.getString("symbol_letterset_code"));
+					var symbol = new Symbol(resultSet.getString("symbol").charAt(0));
+					var turn = new Turn(resultSet.getInt("turn_id"));
+					var letter = new Letter(letterId, game, letterSet, symbol);
+					
+					var existingHandLetter = HandLetter.getHandByGameAndTurn(handLetters, game.getGameId(), turn.getTurnId());
+					HandLetter handLetter = null;
+					if(existingHandLetter.isPresent()) {
+						handLetter = existingHandLetter.get();
+						handLetter.addLetters(letter);
+					}
+					else 
+						handLetter = new HandLetter(game, turn, letter);
+					
+					handLetters.add(handLetter);
+				}	
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return handLetters;
+		});
 	}
 	
 	private void setDragEvents() {		
@@ -102,7 +165,7 @@ public class BoardController implements Initializable {
 		return item.snapshot(params, null);
 	}
 	
-	private Background setBackgroundFill(Color color) {
+	private Background getBackground(Color color) {
 		var backgroundFill = new BackgroundFill(color, CornerRadii.EMPTY, Insets.EMPTY);
 		return new Background(backgroundFill);
 	}
@@ -115,7 +178,7 @@ public class BoardController implements Initializable {
 				return;
 			
 			_board.updateStatus(cords, PositionStatus.Taken);
-			tile.setBackground(setBackgroundFill(Color.YELLOW));
+			tile.setBackground(getBackground(Color.YELLOW));
 		});
 	}
 }

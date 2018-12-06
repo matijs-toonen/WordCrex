@@ -26,4 +26,8 @@ public class Turn {
 			e.printStackTrace();
 		}
 	}
+	
+	public int getTurnId() {
+		return _turnId;
+	}
 }
