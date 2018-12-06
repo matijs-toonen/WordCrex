@@ -2,6 +2,7 @@ package Model;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -36,5 +37,10 @@ public class ChatLine {
 	
 	public String getUsername() {
 		return _username;
+	}
+	
+	public String getTime() {
+		SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");
+        return DATE_FORMAT.format(_moment);
 	}
 }

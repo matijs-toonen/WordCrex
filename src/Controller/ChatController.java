@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
-import Model.Account;
 import Model.ChatLine;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -23,7 +22,7 @@ public class ChatController implements Initializable {
 	private ArrayList<ChatLine> _chatLines;
 	
 	// TODO: remove dummy data
-	final String username = "ger";
+	final String username = "test-player";
 	final int game_id = 500;
 	
 	@FXML
@@ -108,18 +107,22 @@ public class ChatController implements Initializable {
 		
 		_chatLines.forEach(chatLine -> {
 			
-			Label label = new Label();
-			label.setText(chatLine.getMessage());
+			Label messageLabel = new Label();
+			messageLabel.setText(chatLine.getMessage());
+			
+			Label timeLabel = new Label();
+        	timeLabel.setText(chatLine.getTime());
 			
 			VBox vBox = new VBox();
-		    vBox.getChildren().add(label);
+		    vBox.getChildren().add(messageLabel);
+		    vBox.getChildren().add(timeLabel);
 			
 			if (chatLine.getUsername().equals(username)) {
-				label.setStyle("-fx-padding: 5px 10px; -fx-background-color: blue; -fx-text-fill: white;");
+				messageLabel.setStyle("-fx-padding: 5px 10px; -fx-background-color: blue; -fx-text-fill: white;");
 				vBox.setPadding(new Insets(5,5,0,0));
 				vBox.setAlignment(Pos.BASELINE_RIGHT);
 			}else {
-				label.setStyle("-fx-padding: 5px 10px; -fx-background-color: white; -fx-text-fill: black;");
+				messageLabel.setStyle("-fx-padding: 5px 10px; -fx-background-color: white; -fx-text-fill: black;");
 				vBox.setPadding(new Insets(5,0,0,5));
 				vBox.setAlignment(Pos.BASELINE_LEFT);
 			}
