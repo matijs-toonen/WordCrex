@@ -59,6 +59,15 @@
 	-fx-background-color: transparent;
 }
 
+.closeButton {
+	-fx-background-image: url('../Resources/close.png');
+	-fx-background-repeat: no-repeat;
+}
+
+.closeButton:hover {
+	-fx-background-color: transparent;
+}
+
 .active {
 	-fx-background-color: #3C3B54;
 	-fx-padding: 0 0 5px 0;

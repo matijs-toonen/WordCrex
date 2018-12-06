@@ -109,7 +109,7 @@ public class ChatController implements Initializable {
 	
 	private void showMessages() {
 		textScreen.getChildren().clear();
-		
+		textScreen.setStyle("-fx-padding: 15 5 0 5");
 		_chatLines.forEach(chatLine -> {
 			
 			Label messageLabel = new Label();
