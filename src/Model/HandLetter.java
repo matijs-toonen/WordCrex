@@ -1,7 +1,6 @@
 package Model;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -17,14 +16,9 @@ public class HandLetter {
 	}
 	
 	public HandLetter(ResultSet rs, ArrayList<String> columns) {
-		try {
-			_game = columns.contains("game_id") ? new Game(rs.getInt("game_id")) : null;
-			_turn = columns.contains("turn_id") ? new Turn(rs.getInt("turn_id")) : null;
-			_letters.add(columns.contains("letter_id") ? new Letter(rs.getInt("letter_id")) : null);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		_game = columns.contains("game_id") ? new Game(rs, columns) : null;
+		_turn = columns.contains("turn_id") ? new Turn(rs, columns) : null;
+		_letters.add(columns.contains("letter_id") ? new Letter(rs, columns) : null);
 	}
 	
 	public int getGameId() {
@@ -33,6 +27,10 @@ public class HandLetter {
 	
 	public int getTurnId() {
 		return _turn.getTurnId();
+	}
+	
+	public ArrayList<Letter> getLetters() {
+		return _letters;
 	}
 	
 	public void addLetters(Letter... letters) {

@@ -23,26 +23,30 @@ public class BoardTile extends Pane {
 	private int _row;
 	private Label lblValue = new Label();
 
-	public BoardTile(boolean isDraggable) {
+	public BoardTile(boolean isDraggable, Symbol symbol) {
 		super();
+		_symbol = symbol;
 		lblValue.setLayoutX(20);
 		lblValue.setLayoutX(20);
 		lblValue.setTextFill(Color.GREEN);
-		lblValue.setText("5");
 		
-		if(isDraggable)
+		if(isDraggable) {
 			setDraggableEvents();
-		else 
+			lblValue.setText(String.valueOf(_symbol.getChar()));
+		}
+		else {
 			setDragEvents();
+			lblValue.setText("4");
+		}
+			
 
 		getChildren().addAll(lblValue);
 	}
 	
 	public BoardTile(boolean isDraggable, int column, int row, Symbol symbol) {
-		this(isDraggable);
+		this(isDraggable, symbol);
 		_column = column;
 		_row = row;
-		_symbol = symbol;
 	}	
 	
 	public BoardTile(boolean isDraggable, int column, int row) {

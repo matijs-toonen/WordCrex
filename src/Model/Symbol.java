@@ -32,4 +32,8 @@ public class Symbol {
 			e.printStackTrace();
 		}
 	}
+	
+	public char getChar() {
+		return _symbol;
+	}
 }

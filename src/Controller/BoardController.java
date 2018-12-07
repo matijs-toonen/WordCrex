@@ -93,15 +93,19 @@ public class BoardController implements Initializable {
 			var handLetters = (ArrayList<HandLetter>) _db.SelectWithCustomLogic(getHandLetter(), "SELECT * FROM handletter NATURAL JOIN letter where turn_id = 1");
 			int x = 12;
 			int y = 0;
+
 			for(var handLetter : handLetters) {
-				var boardTile = new BoardTile(true);
-				boardTile.setBackground(getBackground(Color.LIGHTPINK));
-				boardTile.setLayoutX(x);
-				boardTile.setLayoutY(y);
-				y += 32;
-				boardTile.setMinWidth(30);
-				boardTile.setMinHeight(30);
-				paneHand.getChildren().add(boardTile);
+				for(var letter : handLetter.getLetters()) {
+					System.out.println(letter.getSymbol().getChar());
+					var boardTile = new BoardTile(true, letter.getSymbol());
+					boardTile.setBackground(getBackground(Color.LIGHTPINK));
+					boardTile.setLayoutX(x);
+					boardTile.setLayoutY(y);
+					y += 32;
+					boardTile.setMinWidth(30);
+					boardTile.setMinHeight(30);
+					paneHand.getChildren().add(boardTile);	
+				}
 			};
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -116,23 +120,17 @@ public class BoardController implements Initializable {
 				while(resultSet.next()) {	
 					var columns = DatabaseController.getColumns(resultSet.getMetaData());
 					
-					var letterId = resultSet.getInt("letter_id");
-					var game = new Game(resultSet.getInt("game_id"));
-					var letterSet = new LetterSet(resultSet.getString("symbol_letterset_code"));
-					var symbol = new Symbol(resultSet.getString("symbol").charAt(0));
 					var turn = new Turn(resultSet.getInt("turn_id"));
-					var letter = new Letter(letterId, game, letterSet, symbol);
+					var letter = new Letter(resultSet, columns);
 					
-					var existingHandLetter = HandLetter.getHandByGameAndTurn(handLetters, game.getGameId(), turn.getTurnId());
-					HandLetter handLetter = null;
-					if(existingHandLetter.isPresent()) {
-						handLetter = existingHandLetter.get();
-						handLetter.addLetters(letter);
+					var existingHandLetter = HandLetter.getHandByGameAndTurn(handLetters, letter.getGame().getGameId(), turn.getTurnId());
+					
+					if(existingHandLetter.isPresent()) 
+						existingHandLetter.get().addLetters(letter);
+					else {
+						var handLetter = new HandLetter(resultSet, columns);
+						handLetters.add(handLetter);
 					}
-					else 
-						handLetter = new HandLetter(game, turn, letter);
-					
-					handLetters.add(handLetter);
 				}	
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
