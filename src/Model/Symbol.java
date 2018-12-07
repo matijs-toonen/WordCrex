@@ -36,4 +36,8 @@ public class Symbol {
 	public char getChar() {
 		return _symbol;
 	}
+	
+	public int getValue() {
+		return _value;
+	}
 }

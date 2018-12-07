@@ -90,7 +90,7 @@ public class BoardController implements Initializable {
 	private void createHand() {
 		_db = new DatabaseController<HandLetter>();
 		try {
-			var handLetters = (ArrayList<HandLetter>) _db.SelectWithCustomLogic(getHandLetter(), "SELECT * FROM handletter NATURAL JOIN letter where turn_id = 1");
+			var handLetters = (ArrayList<HandLetter>) _db.SelectWithCustomLogic(getHandLetter(), "SELECT * FROM handletter NATURAL JOIN letter NATURAL JOIN symbol where turn_id = 1");
 			int x = 12;
 			int y = 0;
 
