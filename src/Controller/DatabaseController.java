@@ -36,6 +36,20 @@ public class DatabaseController <T> {
 		state.close();
 		conn.close();
 	}
+	
+	public int SelectCount(String statement) throws SQLException {
+		Connection conn = OpenConnection();
+		Statement state = conn.createStatement();
+		ResultSet resultSet = state.executeQuery(statement);
+		
+		resultSet.first();
+		
+		int total = resultSet.getInt(1);
+		
+		resultSet.close();
+		CloseConnection(conn, state);
+		return total;
+	}
 
 	public T SelectLast(String statement, Class<T> type) throws SQLException {
 		Connection conn = OpenConnection();
