@@ -28,7 +28,7 @@ public class BoardTile extends Pane {
 	private Label lblValue = new Label();
 	private Label lblSymbol = new Label();
 
-	public BoardTile(boolean isDraggable, Symbol symbol) {
+	public BoardTile(Symbol symbol) {
 		super();
 		_symbol = symbol;
 		lblValue.setLayoutX(20);
@@ -38,30 +38,26 @@ public class BoardTile extends Pane {
 		lblSymbol.setLayoutY(8);
 		lblSymbol.setTextFill(Color.BLUE);
 		
-		if(isDraggable) {
-			setDraggableEvents();
+		if(_symbol == null) {
+//			lblValue.setText("4");
+			lblSymbol.setText("H");
+			
+		}else {
 			lblValue.setText(String.valueOf(_symbol.getValue()));
 			lblSymbol.setText(String.valueOf(_symbol.getChar()));
 		}
-		else {
-			setDragEvents();
-			_symbol = new Symbol('h');
-//			lblValue.setText("4");
-//			lblSymbol.setText("H");
-		}
-			
 
 		getChildren().addAll(lblValue, lblSymbol);
 	}
 	
-	public BoardTile(boolean isDraggable, int column, int row, Symbol symbol) {
-		this(isDraggable, symbol);
+	public BoardTile(int column, int row, Symbol symbol) {
+		this(symbol);
 		_column = column;
 		_row = row;
 	}	
 	
-	public BoardTile(boolean isDraggable, int column, int row) {
-		this(isDraggable, column, row, null);
+	public BoardTile(int column, int row) {
+		this(column, row, null);
 	}
 	
 	public Symbol getSymbol() {
@@ -72,11 +68,12 @@ public class BoardTile extends Pane {
 		return new Pair<Integer, Integer>(_column, _row);
 	}
 	
-	private void setDragEvents() {
+	public void setDropEvents(Consumer<DragEvent> action) {
 		this.setOnDragOver(new EventHandler<DragEvent>() {
 
 			@Override
 			public void handle(DragEvent event) {
+				
 				if(event.getGestureSource() != event.getTarget()) {
 					event.acceptTransferModes(TransferMode.ANY);
 				}
@@ -88,31 +85,12 @@ public class BoardTile extends Pane {
 
 			@Override
 			public void handle(DragEvent event) {
-				if(event.getTarget() instanceof BoardTile) {
-					System.out.println("testDropped");
-					var boardTile = (BoardTile) event.getGestureTarget();
-					var sourceTile = (BoardTile) event.getGestureSource();
-					var symbol = sourceTile.getSymbol().getChar();
-					boardTile.setSymbol(String.valueOf(symbol));
-					boardTile.setBackground(getBackground(Color.PINK));
-				}
-				
-				Dragboard db = event.getDragboard();
-				if(db.hasString()) {
-					event.acceptTransferModes(TransferMode.ANY);
-					event.setDropCompleted(true);
-					event.consume();	
-				}
+				action.accept(event);
 			}
 		});
 	}
 	
-	private Background getBackground(Color color) {
-		var backgroundFill = new BackgroundFill(color, CornerRadii.EMPTY, Insets.EMPTY);
-		return new Background(backgroundFill);
-	}
-	
-	private void setDraggableEvents() {
+	public void setDraggableEvents() {
 		this.setOnDragDetected(new EventHandler<MouseEvent>() {
 
 			@Override
@@ -129,9 +107,10 @@ public class BoardTile extends Pane {
 		});
 	}
 	
-	public void setSymbol(String text) {
+	public void setSymbol(Symbol symbol) {
 		lblSymbol.setTextFill(Color.BLUE);
-		lblSymbol.setText(text);
+		lblSymbol.setText(String.valueOf(symbol.getChar()));
+		lblValue.setText(String.valueOf(symbol.getValue()));
 	}
 	
 	private WritableImage createSnapshot(Node item) {

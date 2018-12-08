@@ -30,6 +30,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
@@ -64,7 +65,6 @@ public class BoardController implements Initializable {
 		_board = new Board();
 		createField();
 		createHand();
-		setDragEvents();
 	}
 	
 	private void createField() {
@@ -72,7 +72,8 @@ public class BoardController implements Initializable {
 		for(int i = 0; i < 15; i++) {
 			int y = 1;
 			for(int j = 0; j < 15; j++) {
-				var tile = new BoardTile(false, i, j);
+				var tile = new BoardTile(i, j);
+				tile.setDropEvents(createDropEvents());
 				tile.setBackground(getBackground(Color.CHOCOLATE));
 				tile.setLayoutX(x);
 				tile.setLayoutY(y);
@@ -90,6 +91,8 @@ public class BoardController implements Initializable {
 	private void createHand() {
 		_db = new DatabaseController<HandLetter>();
 		try {
+			var count = _db.SelectCount("SELECT COUNT(*) FROM handletter");
+			System.out.println(count);
 			var handLetters = (ArrayList<HandLetter>) _db.SelectWithCustomLogic(getHandLetter(), "SELECT * FROM handletter NATURAL JOIN letter NATURAL JOIN symbol where turn_id = 1");
 			int x = 12;
 			int y = 0;
@@ -97,7 +100,8 @@ public class BoardController implements Initializable {
 			for(var handLetter : handLetters) {
 				for(var letter : handLetter.getLetters()) {
 					System.out.println(letter.getSymbol().getChar());
-					var boardTile = new BoardTile(true, letter.getSymbol());
+					var boardTile = new BoardTile(letter.getSymbol());
+					boardTile.setDraggableEvents();
 					boardTile.setBackground(getBackground(Color.LIGHTPINK));
 					boardTile.setLayoutX(x);
 					boardTile.setLayoutY(y);
@@ -140,32 +144,28 @@ public class BoardController implements Initializable {
 		});
 	}
 	
-	private void setDragEvents() {		
-		btnTest.setOnDragDetected(new EventHandler<MouseEvent>() {
-
-			@Override
-			public void handle(MouseEvent event) {
-				var node = (Button) event.getSource();
-				Dragboard db = node.startDragAndDrop(TransferMode.ANY);
-				
-				var content = new ClipboardContent();
-				db.setDragView(createSnapshot(node));
-				content.putString(btnTest.getText());
-				db.setContent(content);
-				event.consume();
-			}
-		});
-	}
-	
-	private WritableImage createSnapshot(Node item) {
-		var params = new SnapshotParameters();
-		params.setFill(Color.TRANSPARENT);
-		return item.snapshot(params, null);
-	}
-	
 	private Background getBackground(Color color) {
 		var backgroundFill = new BackgroundFill(color, CornerRadii.EMPTY, Insets.EMPTY);
 		return new Background(backgroundFill);
+	}
+	
+	private Consumer<DragEvent> createDropEvents(){
+		return (event -> {
+			if(event.getGestureTarget() instanceof BoardTile) {
+				var boardTile = (BoardTile) event.getGestureTarget();
+				var sourceTile = (BoardTile) event.getGestureSource();
+				var symbol = sourceTile.getSymbol();
+				boardTile.setSymbol(symbol);
+				boardTile.setBackground(getBackground(Color.PINK));
+			}
+			
+			Dragboard db = event.getDragboard();
+			if(db.hasString()) {
+				event.acceptTransferModes(TransferMode.ANY);
+				event.setDropCompleted(true);
+				event.consume();	
+			}
+		});
 	}
 	
 	private Consumer<MouseEvent> creatOnClickEvent(){
