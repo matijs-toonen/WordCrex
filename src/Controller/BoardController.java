@@ -223,16 +223,17 @@ public class BoardController implements Initializable {
 			var reqCharOccurence = wordChars.length;
 			
 			// Horizontal
-			for(int row = 0; row < 15; row++)
+			for(int i = 0; i < 15; i++)
 			{
 				int rowOccurrence = 0;
-				if(playedCord.getValue() == row)
+				
+				if(playedCord.getValue() == i)
 				{
-					for(int column = 0; column < 15; column++)
+					for(int j = 0; j < 15; j++)
 					{
 						for(var pair : occupiedNodes)
 						{
-							if(pair.getKey() == column && pair.getValue()  == row)
+							if(pair.getKey() == j && pair.getValue()  == i)
 							{
 								rowOccurrence++;
 								if(rowOccurrence == reqCharOccurence)
@@ -247,17 +248,17 @@ public class BoardController implements Initializable {
 			}
 			
 			// Vertical
-			for(int row = 0; row < 15; row++)
+			for(int i = 0; i < 15; i++)
 			{
 				int rowOccurrence = 0;
 				
-				if(playedCord.getKey() == row)
+				if(playedCord.getKey() == i)
 				{
-					for(int column = 0; column < 15; column++)
+					for(int j = 0; j < 15; j++)
 					{
 						for(var pair : occupiedNodes)
 						{
-							if(pair.getKey() == row && pair.getValue()  == column)
+							if(pair.getKey() == i && pair.getValue()  == j)
 							{
 								rowOccurrence++;
 								if(rowOccurrence == reqCharOccurence)
