@@ -11,8 +11,8 @@ WHERE
 
 -- Uitdaging accepteren
 
-set @username = 'rik';
-set @gameid = 508;
+set @username = 'luc';
+set @gameid = 503;
 
 UPDATE game 
 SET 
@@ -35,8 +35,8 @@ WHERE
 
 -- Speler uitdaging aanmaken
 
-set @player1 = 'ger';
-set @player2 = 'rik';
+set @player1 = 'rik';
+set @player2 = 'luc';
 
 INSERT INTO game (game_state, letterset_code, username_player1, username_player2, answer_player2)
 VALUES ('request','NL',@player1,@player2,'unknown');
@@ -116,6 +116,9 @@ WHERE NOT EXISTS (
 ) LIMIT 1;
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+
+
 select * from game where answer_player2 = 'unknown';
 select * from answer;
 select * from gamestate;
