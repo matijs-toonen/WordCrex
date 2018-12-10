@@ -176,22 +176,22 @@ public class BoardController implements Initializable {
 					event.acceptTransferModes(TransferMode.ANY);
 					event.setDropCompleted(true);
 					_board.updateStatus(cords, PositionStatus.Taken);
-					testGetWordCords();
+					testGetWordCords(boardTile.getSymbolAsChar(), cords);
 					event.consume();	
 				}
 			}
 		});
 	}
 	
-	private void testGetWordCords()
+	private void testGetWordCords(char c, Pair<Integer, Integer> cord)
 	{
-		var test = getWordCords(null);
+		var test = getWordCords(null,c, cord);
 	}
 	
-	private ArrayList<Point> getWordCords(ArrayList<String> words)
+	private ArrayList<Point> getWordCords(ArrayList<String> words, char playedChar, Pair<Integer, Integer> playedCord)
 	{
 		// Dummy data
-		words = new ArrayList<String>() { { add("Beller"); add("Belles"); add("Bellec"); } };
+		words = new ArrayList<String>() { { add("Beller"); add("Belles"); add("Bellec"); add("Bel"); add("Bell"); } };
 		
 		ArrayList<Point> wordCords = new ArrayList<Point>();
 		
@@ -214,29 +214,35 @@ public class BoardController implements Initializable {
 		}
 				
 		for(var word : words)
-		{
+		{			
+			if(word.toLowerCase().indexOf(Character.toLowerCase(playedChar)) == -1)
+				continue;
+			
 			var wordChars = word.toCharArray();
+			
 			var reqCharOccurence = wordChars.length;
 			
 			// Horizontal
 			for(int row = 0; row < 15; row++)
 			{
 				int rowOccurrence = 0;
-				
-				for(int column = 0; column < 15; column++)
+				if(playedCord.getValue() == row)
 				{
-					for(var pair : occupiedNodes)
+					for(int column = 0; column < 15; column++)
 					{
-						if(pair.getKey() == row && pair.getValue()  == column)
+						for(var pair : occupiedNodes)
 						{
-							rowOccurrence++;
-							if(rowOccurrence == reqCharOccurence)
+							if(pair.getKey() == column && pair.getValue()  == row)
 							{
-								// found possible word
-								System.out.println("Horizontal: " + word);
+								rowOccurrence++;
+								if(rowOccurrence == reqCharOccurence)
+								{
+									// found possible word
+									System.out.println("Horizontal: " + word);
+								}
 							}
-						}
-					}	
+						}	
+					}
 				}
 			}
 			
@@ -245,22 +251,27 @@ public class BoardController implements Initializable {
 			{
 				int rowOccurrence = 0;
 				
-				for(int column = 0; column < 15; column++)
+				if(playedCord.getKey() == row)
 				{
-					for(var pair : occupiedNodes)
+					for(int column = 0; column < 15; column++)
 					{
-						if(pair.getKey() == column && pair.getValue()  == row)
+						for(var pair : occupiedNodes)
 						{
-							rowOccurrence++;
-							if(rowOccurrence == reqCharOccurence)
+							if(pair.getKey() == row && pair.getValue()  == column)
 							{
-								// found possible word
-								System.out.println("Vertical: " + word);
+								rowOccurrence++;
+								if(rowOccurrence == reqCharOccurence)
+								{
+									// found possible word
+									System.out.println("Vertical: " + word);
+								}
 							}
-						}
-					}	
+						}	
+					}
 				}
 			}
+			
+
 		}
 		
 		return wordCords;
