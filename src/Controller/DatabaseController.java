@@ -72,6 +72,27 @@ public class DatabaseController <T> {
 		return item;
 	}
 	
+	public T SelectFirst(String statement, Class<T> type) throws SQLException {
+		Connection conn = OpenConnection();
+		Statement state = conn.createStatement();
+		ResultSet resultSet = state.executeQuery(statement);
+		
+		T item = null;
+		
+		resultSet.first();
+		
+		try {
+			item = type.getDeclaredConstructor(ResultSet.class, ArrayList.class).newInstance(resultSet, getColumns(resultSet.getMetaData()));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	
+		resultSet.close();
+		CloseConnection(conn, state);
+		
+		return item;
+	}
+	
 	public Collection<T> SelectAll(String statement, Class<T> type) throws SQLException {
 		Connection conn = OpenConnection();
 		Statement state = conn.createStatement();
@@ -118,11 +139,39 @@ public class DatabaseController <T> {
 	{
 		Connection conn = OpenConnection();
 		Statement state = conn.createStatement();
+		
 		int results = state.executeUpdate(statement);
 		
 		CloseConnection(conn, state);
 		
 		return results > 0;
+	}
+	
+	public ResultSet UpdateWithReturn(String statement) throws SQLException {
+		Connection conn = OpenConnection();
+		Statement state = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS);
+		
+		int results = state.executeUpdate(statement);
+		if(results == 0) 
+			return null;
+		
+		ResultSet generatedKeys = null;
+		try{
+			generatedKeys = state.getGeneratedKeys();
+		}catch(Exception e) {
+			System.out.println(e.getMessage());
+		}
+		
+		CloseConnection(conn, state);	
+		return generatedKeys;		
+	}
+	
+	public ResultSet DeleteWithReturn(String statement) throws SQLException {
+		return UpdateWithReturn(statement);
+	}
+	
+	public ResultSet InsertWithReturn(String statement) throws SQLException {
+		return UpdateWithReturn(statement);
 	}
 	
 	public boolean Delete (String statement) throws SQLException
