@@ -17,8 +17,21 @@ public class Game {
 				"WHERE (username_player1 = '"+username+"' OR username_player2 = '"+username+"') " +
 				"AND (username_winner is not null)");
 	}
+ 	public static final String getAcitveQuery(String username) {
+		return ("SELECT " +
+				"(SELECT IF(g.username_player1 = '"+username+"', g.username_player2, g.username_player1)) AS 'opponent', " +
+				"g.game_id, g.game_state, " +
+				"MAX(tp1.turn_id) AS player1_zet, tp1.username_player1 AS username_player1, " +
+				"MAX(tp2.turn_id) AS player2_zet, tp2.username_player2 AS username_player2 " +
+				"FROM game g " +
+				"LEFT JOIN turnplayer1 tp1 ON g.game_id = tp1.game_id " +
+				"LEFT JOIN turnplayer2 tp2 ON g.game_id = tp2.game_id " +
+				"WHERE (g.username_player1 = '"+username+"' OR g.username_player2 = '"+username+"') " +
+				"AND (g.game_state = '"+GameStatus.getGameStatus(GameStatus.Playing)+"')" +
+				"GROUP BY g.game_id");
+	}
 	
-	private Integer _gameId;
+	private Integer _gameId, _zetPlayer1, _zetPlayer2;
 	private GameStatus _gameStatus;
 	private LetterSet _letterSet;
 	private String _usernamePlayer1;
@@ -41,6 +54,8 @@ public class Game {
 			_answerPlayer2 = columns.contains("answer_player2") ? getAnswer(rs.getString("answer_player2")) : null;
 			_opponent = columns.contains("opponent") ? rs.getString("opponent"): null;
 			_winner = columns.contains("username_winner") ? rs.getString("username_winner") : null;
+			_zetPlayer1 = columns.contains("player1_zet") ? rs.getInt("player1_zet") : null;
+			_zetPlayer2 = columns.contains("player2_zet") ? rs.getInt("player2_zet") : null;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -58,6 +73,14 @@ public class Game {
 		default:
 			return null;
 		}
+	}
+	
+	public int getZettenPlayer1(){
+		return _zetPlayer1;
+	}
+	
+	public int getZettenPlayer2(){
+		return _zetPlayer2;
 	}
 	
 	public String getUser1() {
