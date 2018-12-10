@@ -5,36 +5,24 @@ import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import Model.Account;
-import Model.Game;
 import Model.HandLetter;
 import Model.Letter;
-import Model.LetterSet;
-import Model.Symbol;
 import Model.Turn;
 import Model.Board.Board;
 import Model.Board.PositionStatus;
 import View.BoardPane.BoardTile;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.WritableImage;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -188,30 +176,37 @@ public class BoardController implements Initializable {
 		var test = getWordCords(null,c, cord);
 	}
 	
+	private String getWordFromCords(ArrayList<Pair<Integer, Integer>> cords)
+	{
+		if(!_board.areConnected(cords))
+			return null;
+		
+		var letters = new ArrayList<Character>();
+		
+		for(Pair<Integer,Integer> coordinate : cords)
+		{
+			var tile = _boardTiles.get(new Point(coordinate.getKey(), coordinate.getValue()));
+			letters.add(Character.toLowerCase(tile.getSymbolAsChar()));
+		}
+		
+		StringBuilder word = new StringBuilder(letters.size());
+		
+		for(var c : letters)
+		{
+			word.append(c);
+		}
+		
+		return word.toString();
+	}
+	
 	private ArrayList<Point> getWordCords(ArrayList<String> words, char playedChar, Pair<Integer, Integer> playedCord)
 	{
 		// Dummy data
 		words = new ArrayList<String>() { { add("Beller"); add("Belles"); add("Bellec"); add("Bel"); add("Bell"); } };
-		
+				
 		ArrayList<Point> wordCords = new ArrayList<Point>();
 		
-		ArrayList<Character> allChars = new ArrayList<Character>();
-		
 		var occupiedNodes = _board.getOccupiedPositions();
-		
-		for(var coordinate : occupiedNodes)
-		{
-			if(!_board.canPlace(coordinate))
-			{
-				allChars.add(_boardTiles.get(new Point(coordinate.getKey(), coordinate.getValue())).getSymbolAsChar());
-			}
-			else
-			{
-				System.out.println("Error board getWordCords functionality");
-				return null;
-			}
-				
-		}
 				
 		for(var word : words)
 		{			
@@ -226,6 +221,7 @@ public class BoardController implements Initializable {
 			for(int i = 0; i < 15; i++)
 			{
 				int rowOccurrence = 0;
+				var occurenceCords = new ArrayList<Pair<Integer, Integer>>();
 				
 				if(playedCord.getValue() == i)
 				{
@@ -236,10 +232,12 @@ public class BoardController implements Initializable {
 							if(pair.getKey() == j && pair.getValue()  == i)
 							{
 								rowOccurrence++;
+								occurenceCords.add(pair);
 								if(rowOccurrence == reqCharOccurence)
 								{
 									// found possible word
-									System.out.println("Horizontal: " + word);
+									if(getWordFromCords(occurenceCords).equals(word.toLowerCase()))
+										System.out.println("Horizontal: " + word);
 								}
 							}
 						}	
@@ -251,6 +249,7 @@ public class BoardController implements Initializable {
 			for(int i = 0; i < 15; i++)
 			{
 				int rowOccurrence = 0;
+				var occurenceCords = new ArrayList<Pair<Integer, Integer>>();
 				
 				if(playedCord.getKey() == i)
 				{
@@ -261,10 +260,12 @@ public class BoardController implements Initializable {
 							if(pair.getKey() == i && pair.getValue()  == j)
 							{
 								rowOccurrence++;
+								occurenceCords.add(pair);
 								if(rowOccurrence == reqCharOccurence)
 								{
 									// found possible word
-									System.out.println("Vertical: " + word);
+									if(getWordFromCords(occurenceCords).equals(word.toLowerCase()))
+										System.out.println("Vertical: " + word);
 								}
 							}
 						}	
