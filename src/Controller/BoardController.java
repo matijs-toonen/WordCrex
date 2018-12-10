@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -43,6 +44,10 @@ import javafx.scene.paint.Color;
 public class BoardController implements Initializable {
 	
 	private DatabaseController _db;
+	private Random _random = new Random();
+	private ArrayList<Symbol> _symbols = new ArrayList<Symbol>();
+	private Turn _currentTurn;
+	private Game _currentGame;
 	private HashMap<Point, BoardTile> _tiles;
 	private Board _board;
 	
@@ -55,14 +60,32 @@ public class BoardController implements Initializable {
 	@FXML
 	private Pane panePlayField, paneHand;
 	
+	public BoardController(Game game) {
+		_board = new Board();
+		_tiles = new HashMap<Point, BoardTile>();
+		_currentGame = game;
+		_currentTurn = new Turn(0);
+		getSymbols();
+	}
+	
+	private void getSymbols() {
+		_db = new DatabaseController<Symbol>();
+		var statement = "SELECT * FROM symbol";
+		
+		try {
+			_symbols = (ArrayList<Symbol>)_db.SelectAll(statement, Symbol.class);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		_tiles = new HashMap<Point, BoardTile>();
 		lblPlayer1.setText("SCHRUKTURK");
 		lblPlayer2.setText("BOEDER");
 		lblScore1.setText("1");
 		lblScore2.setText("9");
-		_board = new Board();
 		createField();
 		createHand();
 	}
@@ -91,7 +114,9 @@ public class BoardController implements Initializable {
 	private void createHand() {
 		_db = new DatabaseController<HandLetter>();
 		try {
-			var count = _db.SelectCount("SELECT COUNT(*) FROM handletter");
+			var count = _db.SelectCount("SELECT COUNT(*) FROM letter");
+			var henk = generateHandLetters();
+			System.out.println(henk);
 			System.out.println(count);
 			var handLetters = (ArrayList<HandLetter>) _db.SelectWithCustomLogic(getHandLetter(), "SELECT * FROM handletter NATURAL JOIN letter NATURAL JOIN symbol where turn_id = 1");
 			int x = 12;
@@ -115,6 +140,30 @@ public class BoardController implements Initializable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	private HandLetter[] generateHandLetters() {
+		var handLetters = new HandLetter[7];
+		var letterSet = new LetterSet("NL");
+
+		for(var handLetter : handLetters) {
+			var rnd = _random.nextInt(_symbols.size());
+			var symbol = _symbols.get(rnd);
+			var statement = "INSERT INTO letter (game_id, symbol_letterset_code, symbol) VALUES (" + _currentGame.getGameId() + ", '" + letterSet.getLetterCode() + "', ' " + symbol.getChar() + "')"; 
+			ResultSet rs = null;
+			try {
+				rs = _db.InsertWithReturn(statement);
+				if(rs != null && rs.next()) {
+					var letter = new Letter(rs.getInt(0), _currentGame, letterSet, symbol);
+					handLetter = new HandLetter(_currentGame, _currentTurn, letter);
+					rs.close();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return handLetters;
 	}
 	
 	private Function<ResultSet, ArrayList<HandLetter>> getHandLetter(){
