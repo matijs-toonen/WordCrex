@@ -176,7 +176,7 @@ public class BoardController implements Initializable {
 		var test = getWordCords(null,c, cord);
 	}
 	
-	private String getWordFromCords(ArrayList<Pair<Integer, Integer>> cords)
+	private String getWordFromCords(ArrayList<Pair<Integer, Integer>> cords, String word)
 	{
 		if(!_board.areConnected(cords))
 			return null;
@@ -189,14 +189,14 @@ public class BoardController implements Initializable {
 			letters.add(Character.toLowerCase(tile.getSymbolAsChar()));
 		}
 		
-		StringBuilder word = new StringBuilder(letters.size());
+		StringBuilder wordFromChar = new StringBuilder(letters.size());
 		
 		for(var c : letters)
 		{
-			word.append(c);
+			wordFromChar.append(c);
 		}
 		
-		return word.toString();
+		return wordFromChar.toString().toLowerCase();
 	}
 	
 	private ArrayList<Point> getWordCords(ArrayList<String> words, char playedChar, Pair<Integer, Integer> playedCord)
@@ -236,7 +236,7 @@ public class BoardController implements Initializable {
 								if(rowOccurrence == reqCharOccurence)
 								{
 									// found possible word
-									if(getWordFromCords(occurenceCords).equals(word.toLowerCase()))
+									if(getWordFromCords(occurenceCords, word).equals(word.toLowerCase()))
 										System.out.println("Horizontal: " + word);
 								}
 							}
@@ -264,7 +264,7 @@ public class BoardController implements Initializable {
 								if(rowOccurrence == reqCharOccurence)
 								{
 									// found possible word
-									if(getWordFromCords(occurenceCords).equals(word.toLowerCase()))
+									if(getWordFromCords(occurenceCords, word).equals(word.toLowerCase()))
 										System.out.println("Vertical: " + word);
 								}
 							}
