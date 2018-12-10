@@ -1,12 +1,14 @@
 package Controller;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class DatabaseController <T> {
@@ -147,31 +149,54 @@ public class DatabaseController <T> {
 		return results > 0;
 	}
 	
-	public ResultSet UpdateWithReturn(String statement) throws SQLException {
+	public boolean UpdateBatch (String... statements) throws SQLException
+	{
 		Connection conn = OpenConnection();
-		Statement state = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS);
+		Statement state = conn.createStatement();
 		
-		int results = state.executeUpdate(statement);
+		for(var statement : statements) {
+			state.addBatch(statement);
+		}
+		
+		int[] results = state.executeBatch();
+		
+		CloseConnection(conn, state);
+		
+		return results.length > 0;
+	}
+	
+	public T UpdateWithReturnKeys(String statement, Function<ResultSet, T> action) throws SQLException {
+		Connection conn = OpenConnection();
+		PreparedStatement preparedState = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS);
+		
+		int results = preparedState.executeUpdate();
 		if(results == 0) 
 			return null;
 		
-		ResultSet generatedKeys = null;
-		try{
-			generatedKeys = state.getGeneratedKeys();
-		}catch(Exception e) {
-			System.out.println(e.getMessage());
-		}
+		var generatedKeys = preparedState.getGeneratedKeys();
+		var returnValue = action.apply(generatedKeys);
 		
-		CloseConnection(conn, state);	
-		return generatedKeys;		
+		generatedKeys.close();
+		CloseConnection(conn, preparedState);
+		return returnValue;
 	}
 	
-	public ResultSet DeleteWithReturn(String statement) throws SQLException {
-		return UpdateWithReturn(statement);
+	public T DeleteWithReturnKeys(String statement, Function<ResultSet, T> action) throws SQLException {
+		return UpdateWithReturnKeys(statement, action);
 	}
 	
-	public ResultSet InsertWithReturn(String statement) throws SQLException {
-		return UpdateWithReturn(statement);
+	public T InsertWithReturnKeys(String statement, Function<ResultSet, T> action) throws SQLException {
+		return UpdateWithReturnKeys(statement, action);
+	}
+	
+	public boolean DeleteBatch (String... statements) throws SQLException
+	{
+		return UpdateBatch(statements);
+	}
+	
+	public boolean InsertBatch (String... statements) throws SQLException
+	{
+		return UpdateBatch(statements);
 	}
 	
 	public boolean Delete (String statement) throws SQLException
