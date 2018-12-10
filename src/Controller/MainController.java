@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import Model.Account;
+import Model.Game;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -109,7 +110,8 @@ public class MainController implements Initializable {
 	@FXML
 	private void loadChallenge(MouseEvent event)
 	{
-		loadPane("Challenge");
+		loadPaneWithParam("Challenge");
+//		loadPane("Challenge");
 	}
 	
 	@FXML
@@ -145,7 +147,25 @@ public class MainController implements Initializable {
 	@FXML
 	private void loadBoard(MouseEvent event) 
 	{
+//		loadPaneWithParam("Board");
 		loadPane("Board");
+	}
+	
+	private void loadPaneWithParam(String paneName) {
+		
+		//Parent root = null;
+		AnchorPane pane = null;
+		try {
+			var con = new ChallengeController(rootPane);
+			var panes = new FXMLLoader(getClass().getResource("/View/" + paneName + ".fxml"));
+			panes.setController(con);
+			pane = panes.load();
+		}
+		catch(Exception ex) {
+			Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		//borderPane.setCenter(root);
+		rootPane.getChildren().setAll(pane);
 	}
 	
 	private void loadPane(String paneName) {
