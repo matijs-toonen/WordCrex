@@ -64,6 +64,10 @@ public class BoardTile extends Pane {
 		return _symbol;
 	}
 	
+	public Character getSymbolAsChar() {
+		return String.valueOf(_symbol.getChar()).toCharArray()[0];
+	}
+	
 	public Pair<Integer, Integer> getCords(){
 		return new Pair<Integer, Integer>(_column, _row);
 	}
@@ -108,6 +112,7 @@ public class BoardTile extends Pane {
 	}
 	
 	public void setSymbol(Symbol symbol) {
+		_symbol = symbol;
 		lblSymbol.setTextFill(Color.BLUE);
 		lblSymbol.setText(String.valueOf(symbol.getChar()));
 		lblValue.setText(String.valueOf(symbol.getValue()));

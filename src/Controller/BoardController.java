@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -39,11 +41,13 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.util.Pair;
 
 public class BoardController implements Initializable {
 	
 	private DatabaseController _db;
-	private HashMap<Point, BoardTile> _tiles;
+	private LinkedHashMap<Point, BoardTile> _tiles;
+	private LinkedHashMap<Point, BoardTile> _boardTiles; // 15 by 15
 	private Board _board;
 	
 	@FXML
@@ -57,7 +61,8 @@ public class BoardController implements Initializable {
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		_tiles = new HashMap<Point, BoardTile>();
+		_tiles = new LinkedHashMap<Point, BoardTile>();
+		_boardTiles = new LinkedHashMap<Point, BoardTile>();
 		lblPlayer1.setText("SCHRUKTURK");
 		lblPlayer2.setText("BOEDER");
 		lblScore1.setText("1");
@@ -79,8 +84,8 @@ public class BoardController implements Initializable {
 				tile.setLayoutY(y);
 				tile.setMinWidth(30);
 				tile.setMinHeight(30);
-				tile.createOnClickEvent(creatOnClickEvent());
 				_tiles.put(new Point(x, y), tile);
+				_boardTiles.put(new Point(i, j), tile);
 				y += 32;
 				panePlayField.getChildren().add(tile);
 			}
@@ -151,32 +156,113 @@ public class BoardController implements Initializable {
 	
 	private Consumer<DragEvent> createDropEvents(){
 		return (event -> {
+			
 			if(event.getGestureTarget() instanceof BoardTile) {
+
 				var boardTile = (BoardTile) event.getGestureTarget();
+				var cords = boardTile.getCords();
+				
+				if(!_board.canPlace(cords))
+					return;
+				
 				var sourceTile = (BoardTile) event.getGestureSource();
 				var symbol = sourceTile.getSymbol();
 				boardTile.setSymbol(symbol);
 				boardTile.setBackground(getBackground(Color.PINK));
-			}
-			
-			Dragboard db = event.getDragboard();
-			if(db.hasString()) {
-				event.acceptTransferModes(TransferMode.ANY);
-				event.setDropCompleted(true);
-				event.consume();	
+				
+				Dragboard db = event.getDragboard();
+				
+				if(db.hasString()) {
+					event.acceptTransferModes(TransferMode.ANY);
+					event.setDropCompleted(true);
+					_board.updateStatus(cords, PositionStatus.Taken);
+					testGetWordCords();
+					event.consume();	
+				}
 			}
 		});
 	}
 	
-	private Consumer<MouseEvent> creatOnClickEvent(){
-		return (event -> {
-			var tile = (BoardTile) event.getSource();
-			var cords = tile.getCords();
-			if(!_board.canPlace(cords))
-				return;
+	private void testGetWordCords()
+	{
+		var test = getWordCords(null);
+	}
+	
+	private ArrayList<Point> getWordCords(ArrayList<String> words)
+	{
+		// Dummy data
+		words = new ArrayList<String>() { { add("Beller"); add("Belles"); add("Bellec"); } };
+		
+		ArrayList<Point> wordCords = new ArrayList<Point>();
+		
+		ArrayList<Character> allChars = new ArrayList<Character>();
+		
+		var occupiedNodes = _board.getOccupiedPositions();
+		
+		for(var coordinate : occupiedNodes)
+		{
+			if(!_board.canPlace(coordinate))
+			{
+				allChars.add(_boardTiles.get(new Point(coordinate.getKey(), coordinate.getValue())).getSymbolAsChar());
+			}
+			else
+			{
+				System.out.println("Error board getWordCords functionality");
+				return null;
+			}
+				
+		}
+				
+		for(var word : words)
+		{
+			var wordChars = word.toCharArray();
+			var reqCharOccurence = wordChars.length;
 			
-			_board.updateStatus(cords, PositionStatus.Taken);
-			tile.setBackground(getBackground(Color.YELLOW));
-		});
+			// Horizontal
+			for(int row = 0; row < 15; row++)
+			{
+				int rowOccurrence = 0;
+				
+				for(int column = 0; column < 15; column++)
+				{
+					for(var pair : occupiedNodes)
+					{
+						if(pair.getKey() == row && pair.getValue()  == column)
+						{
+							rowOccurrence++;
+							if(rowOccurrence == reqCharOccurence)
+							{
+								// found possible word
+								System.out.println("Horizontal: " + word);
+							}
+						}
+					}	
+				}
+			}
+			
+			// Vertical
+			for(int row = 0; row < 15; row++)
+			{
+				int rowOccurrence = 0;
+				
+				for(int column = 0; column < 15; column++)
+				{
+					for(var pair : occupiedNodes)
+					{
+						if(pair.getKey() == column && pair.getValue()  == row)
+						{
+							rowOccurrence++;
+							if(rowOccurrence == reqCharOccurence)
+							{
+								// found possible word
+								System.out.println("Vertical: " + word);
+							}
+						}
+					}	
+				}
+			}
+		}
+		
+		return wordCords;
 	}
 }
