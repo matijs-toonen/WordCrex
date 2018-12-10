@@ -45,7 +45,7 @@ public class BoardController implements Initializable {
 	
 	private DatabaseController _db;
 	private Random _random = new Random();
-	private ArrayList<Symbol> _symbols = new ArrayList<Symbol>();
+	private ArrayList<Letter> _letters = new ArrayList<Letter>();
 	private Turn _currentTurn;
 	private Game _currentGame;
 	private HashMap<Point, BoardTile> _tiles;
@@ -64,16 +64,16 @@ public class BoardController implements Initializable {
 		_board = new Board();
 		_tiles = new HashMap<Point, BoardTile>();
 		_currentGame = game;
-		_currentTurn = new Turn(0);
-		getSymbols();
+		_currentTurn = new Turn(1);
+		getLetters();
 	}
 	
-	private void getSymbols() {
+	private void getLetters() {
 		_db = new DatabaseController<Symbol>();
-		var statement = "SELECT * FROM symbol";
+		var statement = "SELECT * FROM letter WHERE game_id = " + _currentGame.getGameId();
 		
 		try {
-			_symbols = (ArrayList<Symbol>)_db.SelectAll(statement, Symbol.class);
+			_letters = (ArrayList<Letter>)_db.SelectAll(statement, Letter.class);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -113,57 +113,118 @@ public class BoardController implements Initializable {
 	
 	private void createHand() {
 		_db = new DatabaseController<HandLetter>();
-		try {
-			var count = _db.SelectCount("SELECT COUNT(*) FROM letter");
-			var henk = generateHandLetters();
-			System.out.println(henk);
-			System.out.println(count);
-			var handLetters = (ArrayList<HandLetter>) _db.SelectWithCustomLogic(getHandLetter(), "SELECT * FROM handletter NATURAL JOIN letter NATURAL JOIN symbol where turn_id = 1");
-			int x = 12;
-			int y = 0;
+		var handLetters = getHandLetters();
+		int x = 12;
+		int y = 0;
 
-			for(var handLetter : handLetters) {
-				for(var letter : handLetter.getLetters()) {
-					System.out.println(letter.getSymbol().getChar());
-					var boardTile = new BoardTile(letter.getSymbol());
-					boardTile.setDraggableEvents();
-					boardTile.setBackground(getBackground(Color.LIGHTPINK));
-					boardTile.setLayoutX(x);
-					boardTile.setLayoutY(y);
-					y += 32;
-					boardTile.setMinWidth(30);
-					boardTile.setMinHeight(30);
-					paneHand.getChildren().add(boardTile);	
-				}
-			};
+		for(var handLetter : handLetters) {
+			for(var letter : handLetter.getLetters()) {
+				System.out.println(letter.getSymbol().getChar());
+				var boardTile = new BoardTile(letter.getSymbol());
+				boardTile.setDraggableEvents();
+				boardTile.setBackground(getBackground(Color.LIGHTPINK));
+				boardTile.setLayoutX(x);
+				boardTile.setLayoutY(y);
+				y += 32;
+				boardTile.setMinWidth(30);
+				boardTile.setMinHeight(30);
+				paneHand.getChildren().add(boardTile);	
+			}
+		};
+	}
+	
+	private ArrayList<HandLetter> getHandLetters() {
+		var handLetters = getExistingHandLetters();
+		return handLetters.size() == 0 ? generateHandLetters() : handLetters; 
+	}
+	
+	private ArrayList<HandLetter> getExistingHandLetters() {
+		_db = new DatabaseController<HandLetter>();
+		
+		var statement = "SELECT * FROM handletter NATURAL JOIN letter NATURAL JOIN symbol where game_id = " + _currentGame.getGameId() + " AND turn_id = " + _currentTurn.getTurnId();
+		
+		ArrayList<HandLetter> handLetters = new ArrayList<HandLetter>();
+		
+		try {
+			handLetters = (ArrayList<HandLetter>) _db.SelectWithCustomLogic(getHandLetter(), statement);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return handLetters;
+	}
+	
+	private ArrayList<HandLetter> generateHandLetters() {
+		var handLetters = new ArrayList<HandLetter>();
+		
+		if(!hasExisitingTurn()) {
+			addTurn();
+		}
+		
+		for(int i = 0; i < 7; i++) {
+			handLetters.add(createHandLetter());
+		}
+		
+		return handLetters;
+	}
+	
+	private void addTurn() {
+		var turnStatement = "INSERT INTO turn VALUES(" + _currentGame.getGameId() + ", " + _currentTurn.getTurnId() + ")";
+		
+		try {
+			_db.Insert(turnStatement); 
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	private HandLetter[] generateHandLetters() {
-		var handLetters = new HandLetter[7];
-		var letterSet = new LetterSet("NL");
-
-		for(var handLetter : handLetters) {
-			var rnd = _random.nextInt(_symbols.size());
-			var symbol = _symbols.get(rnd);
-			var statement = "INSERT INTO letter (game_id, symbol_letterset_code, symbol) VALUES (" + _currentGame.getGameId() + ", '" + letterSet.getLetterCode() + "', ' " + symbol.getChar() + "')"; 
-			ResultSet rs = null;
-			try {
-				rs = _db.InsertWithReturn(statement);
-				if(rs != null && rs.next()) {
-					var letter = new Letter(rs.getInt(0), _currentGame, letterSet, symbol);
-					handLetter = new HandLetter(_currentGame, _currentTurn, letter);
-					rs.close();
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+	private boolean hasExisitingTurn() {
+		_db = new DatabaseController<Turn>();
+		try {
+			return _db.SelectCount("SELECT COUNT(*) FROM turn WHERE game_id = " + _currentGame.getGameId() + " AND turn_id = " + _currentTurn.getTurnId()) == 1;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
 		}
-		return handLetters;
+	}
+		
+	private HandLetter createHandLetter() {
+		return new HandLetter(_currentGame, _currentTurn, createLetter());
+	}
+	
+	private Letter createLetter() {
+		Letter letter = null;
+		var rndLetter = _letters.get(_random.nextInt(_letters.size()));
+		
+		var statement = "INSERT INTO handletter VALUES (" + _currentGame.getGameId() + ", " + _currentTurn.getTurnId() + ", " + rndLetter.getLetterId() + ")"; 
+		
+		try {
+			if(_db.Insert(statement)) {
+				return rndLetter;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+		}
+		return null;
+	}
+	
+	private Function<ResultSet, Integer> getNewLetter(){
+		return (generatedKeys -> {
+			try {
+				if(generatedKeys != null && generatedKeys.next()) {
+					var letterId = generatedKeys.getInt(0);
+					return letterId;
+				}
+			}catch(SQLException e) {
+				System.out.println(e.getMessage());
+			}
+			return null;
+		});
 	}
 	
 	private Function<ResultSet, ArrayList<HandLetter>> getHandLetter(){
