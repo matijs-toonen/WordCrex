@@ -7,6 +7,15 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class ChatLine {
+	
+	public static final String getQuery(int gameId) {
+		return String.format("SELECT * FROM chatline WHERE game_id = '%d' ORDER BY moment", gameId);
+	}
+	
+	public static final String insertQuery(String username, int gameId, String message) {
+		return String.format("INSERT INTO chatline (username, game_id, moment, message) VALUES ('%s', '%d', NOW(), '%s');", username, gameId, message);
+	}
+	
 	private String _username;
 	private Game _game;
 	private Date _moment;

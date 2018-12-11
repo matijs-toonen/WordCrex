@@ -28,7 +28,7 @@ public class ChatController implements Initializable {
 	
 	// TODO: remove dummy data
 	final String username = "test-player";
-	final int game_id = 500;
+	final int gameId = 500;
 	
 	@FXML
 	private VBox textScreen;
@@ -57,7 +57,7 @@ public class ChatController implements Initializable {
 		}
 		
 		try {
-			String insertStatement = String.format("INSERT INTO chatline (username, game_id, moment, message) VALUES ('%s', '%d', NOW(), '%s');", username, game_id, message);
+			String insertStatement = ChatLine.insertQuery(username, gameId, message);
 			_db.Insert(insertStatement);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -92,7 +92,7 @@ public class ChatController implements Initializable {
 	
 	private void updateChat() {
 		try {
-			String selectStatement = String.format("SELECT * FROM chatline WHERE game_id = '%d' ORDER BY moment", game_id);
+			String selectStatement = ChatLine.getQuery(gameId);
 			_chatLines = (ArrayList<ChatLine>) _db.SelectAll(selectStatement, ChatLine.class);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
