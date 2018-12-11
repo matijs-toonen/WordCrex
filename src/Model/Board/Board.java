@@ -1,7 +1,7 @@
 package Model.Board;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-
 import javafx.util.Pair;
 
 public class Board {
@@ -18,6 +18,14 @@ public class Board {
 	
 	public boolean canPlace(Pair<Integer, Integer> cords) {
 		return _positions.get(cords) == PositionStatus.Open;
+	}
+	
+	public ArrayList<Pair<Integer, Integer>> getOccupiedPositions(){
+		var positions = new ArrayList<Pair<Integer, Integer>>();
+		_positions.entrySet().stream()
+				.filter(pair -> !canPlace(pair.getKey()))
+				.forEach(pair -> positions.add(pair.getKey()));
+		return positions;
 	}
 	
 	private void fillBoard() {
