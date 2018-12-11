@@ -35,50 +35,6 @@ public class Board {
 		return _positions.get(cords) == PositionStatus.Open;
 	}
 	
-	public boolean areConnected(ArrayList<Pair<Integer, Integer>> cords)
-	{		
-		for(int i = 0; i < cords.size(); i++)
-		{ 
-			var connectedRight = i+1 < cords.size() ? areConnected(cords.get(i), cords.get(i+1)) : true;
-			var connectedLeft = i-1 >= 0 ? areConnected(cords.get(i), cords.get(i-1)) : true;
-			
-			if(!connectedRight || !connectedLeft)
-				return false;
-		}
-	
-		return true;
-	}
-	
-	private boolean areConnected(Pair<Integer, Integer> cordA, Pair<Integer, Integer> cordB)
-	{
-		var connectedCords = getConnectedCords(cordA);
-		for(var connectedCoordinate : connectedCords)
-		{
-			if(connectedCoordinate.equals(cordB))
-				return true;
-		}
-	
-		return false;
-	}
-	
-	private ArrayList<Pair<Integer, Integer>> getConnectedCords(Pair<Integer, Integer> cord)
-	{
-		ArrayList<Pair<Integer, Integer>> connectedCords = new ArrayList<Pair<Integer, Integer>>();
-		connectedCords.add(new Pair<>(cord.getKey() -1, cord.getValue()));
-		connectedCords.add(new Pair<>(cord.getKey(), cord.getValue() -1));
-		connectedCords.add(new Pair<>(cord.getKey() +1, cord.getValue()));
-		connectedCords.add(new Pair<>(cord.getKey(), cord.getValue() +1));
-		
-		for(Iterator<Pair<Integer, Integer>> iterator = connectedCords.iterator(); iterator.hasNext();)
-		{	
-			var coordinate = iterator.next();
-			if(_positions.get(coordinate) == null)
-				iterator.remove();
-		}
-		
-		return connectedCords;
-	}
-	
 	private void fillBoard() {
 		for(int i = 0; i < 15; i++) {
 			for(int j = 0; j < 15; j++) {

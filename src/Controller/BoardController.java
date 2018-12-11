@@ -166,16 +166,36 @@ public class BoardController implements Initializable {
 					event.acceptTransferModes(TransferMode.ANY);
 					event.setDropCompleted(true);
 					_board.updateStatus(cords, PositionStatus.Taken);
-					testGetWordCords(cords);
+					// TODO Add word collection from database and do something with the placed words
+					getWords(null, cords);
 					event.consume();	
 				}
 			}
 		});
 	}
-	
-	private void testGetWordCords(Pair<Integer, Integer> cord)
+		
+	private ArrayList<String> getWords(ArrayList<String> words, Pair<Integer, Integer> playedCord)
 	{
-		var test = getWordCords(null, cord);
+		// Dummy data
+		words = new ArrayList<String>() { { add("Beller"); add("Belles"); add("Bellec"); add("Bel"); add("Bell"); } };
+				
+		ArrayList<String> placedWords = new ArrayList<String>();
+		
+		var column = playedCord.getKey();
+		var row = playedCord.getValue();
+		
+		var horWord = getPlacedWordFromChars(createCharArrFromCords(row, true), playedCord, true);
+		var verWord = getPlacedWordFromChars(createCharArrFromCords(column, false), playedCord, false);
+								
+		for(var word : words)
+		{			
+			if(!word.toUpperCase().equals(horWord) && !word.toUpperCase().equals(verWord))
+				continue;
+			
+			placedWords.add(word);
+		}
+		
+		return placedWords;
 	}
 
 	// Horizontal
@@ -211,42 +231,49 @@ public class BoardController implements Initializable {
 		return letters.stream().map(String::valueOf).collect(Collectors.joining()).toCharArray();
 	}
 	
-	private String getPlacedWordFromChars(char[] letters, Pair<Integer, Integer> placedCord)
-	{		
-		var playedChar = _boardTiles.get(new Point(placedCord.getKey(), placedCord.getValue())).getSymbolAsChar();
-				
-		System.out.println("Column: " + placedCord.getKey() + " " + letters[placedCord.getKey()] + " played: " + playedChar);
+	private String getPlacedWordFromChars(char[] letters, Pair<Integer, Integer> placedCord, boolean horizontal)
+	{				
+		var word = "";
 		
-		System.out.println("Row: " + placedCord.getValue() + " " + letters[placedCord.getValue()] + " played: " + playedChar);
-
-		return new String(letters);
+		if(horizontal)			
+			word = collectLettersUntilSeperator(letters, placedCord.getKey(), ' ');
+		else
+			word = collectLettersUntilSeperator(letters, placedCord.getValue(), ' ');
+			
+		return word;
 	}
 	
-	private ArrayList<Point> getWordCords(ArrayList<String> words, Pair<Integer, Integer> playedCord)
+	private String collectLettersUntilSeperator(char[] letters, int index, char seperator)
 	{
-		// Dummy data
-		words = new ArrayList<String>() { { add("Beller"); add("Belles"); add("Bellec"); add("Bel"); add("Bell"); } };
-				
-		ArrayList<Point> wordCords = new ArrayList<Point>();
+		var str = new StringBuilder();
 		
-		var column = playedCord.getKey();
-		var row = playedCord.getValue();
+		var endStr = 0;
 		
-		var horWord = getPlacedWordFromChars(createCharArrFromCords(row, true), playedCord);
-		var verWord = getPlacedWordFromChars(createCharArrFromCords(column, false), playedCord);
+		var startStr = 0;
 		
-		System.out.println("Horizontal: " + horWord);
-		
-		System.out.println("Vertical: " + verWord);
-								
-		for(var word : words)
-		{			
-			if(!word.toUpperCase().equals(horWord) && !word.toUpperCase().equals(verWord))
-				continue;
-			
-			System.out.println(word);
+		for(int i = index; i < letters.length; i++)
+		{
+			if(letters[i] == seperator)
+			{
+				endStr = i;
+				break;
+			}
 		}
 		
-		return wordCords;
+		for(int i = index; i >= 0; i--)
+		{
+			if(letters[i] == seperator)
+			{
+				startStr = i;
+				break;
+			}
+		}
+		
+		for(int i = startStr; i < endStr; i++)
+		{
+			str.append(letters[i]);
+		}
+		
+		return str.toString().trim();
 	}
 }
