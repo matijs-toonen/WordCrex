@@ -27,7 +27,30 @@ public class SetHistoryController implements Initializable {
 		// TODO Auto-generated method stub
 		_db = new DatabaseController<SetHistory>();
 		
-		updateHistory();
+		
+		startHistoryListener();
+	}
+	
+	private void startHistoryListener() {
+		
+		Thread chatThread = new Thread(){
+		    public void run(){
+		    	
+		    	while(true) {
+		    		updateHistory();
+	    			
+	    			try {
+						Thread.sleep(2000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+	    		}
+		    }
+		};
+		
+		chatThread.setDaemon(true);
+		chatThread.start();
+		
 	}
 	
 	private void updateHistory() {
@@ -48,6 +71,7 @@ public class SetHistoryController implements Initializable {
 	}
 	
 	private void showMessages() {
+		itemWrapper.getChildren().clear();
 		for (SetHistory setHistory : _setHistoryItems) {
 			VBox setHistoryItem = listItem(setHistory);
 			itemWrapper.getChildren().add(setHistoryItem);
