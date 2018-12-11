@@ -65,7 +65,11 @@ public class BoardTile extends Pane {
 	}
 	
 	public Character getSymbolAsChar() {
-		return String.valueOf(_symbol.getChar()).toCharArray()[0];
+		
+		if(_symbol != null)
+			return String.valueOf(_symbol.getChar()).toCharArray()[0];
+		else
+			return ' ';
 	}
 	
 	public Pair<Integer, Integer> getCords(){

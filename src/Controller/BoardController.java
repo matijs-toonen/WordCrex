@@ -5,10 +5,12 @@ import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import Model.HandLetter;
 import Model.Letter;
@@ -164,115 +166,63 @@ public class BoardController implements Initializable {
 					event.acceptTransferModes(TransferMode.ANY);
 					event.setDropCompleted(true);
 					_board.updateStatus(cords, PositionStatus.Taken);
-					testGetWordCords(boardTile.getSymbolAsChar(), cords);
+					testGetWordCords(cords);
 					event.consume();	
 				}
 			}
 		});
 	}
 	
-	private void testGetWordCords(char c, Pair<Integer, Integer> cord)
+	private void testGetWordCords(Pair<Integer, Integer> cord)
 	{
-		var test = getWordCords(null,c, cord);
+		var test = getWordCords(null, cord);
 	}
-	
-	private ArrayList<Pair<Integer,Integer>> getOccupiedInlineCords(int column, int row, ArrayList<Pair<Integer,Integer>> occupiedCords)
-	{
-		ArrayList<Pair<Integer, Integer>> inlineCords = new ArrayList<Pair<Integer, Integer>>();
-		
-		// Horizontal left
-		for(int i = column; i >= 0; i--)
-		{
-			if(i != column)
-			{
-				var cord = new Pair<Integer,Integer>(i,row);
-				if(occupiedCords.contains(cord))
-					inlineCords.add(cord);
-//				System.out.println("Left: " + i + "=" + row);
-			}
-		}
-		
-		// Horizontal right
-		for(int i = column; i < 15; i++)
-		{
-			if(i != column)
-			{
-				var cord = new Pair<Integer,Integer>(i,row);
-				if(occupiedCords.contains(cord))
-					inlineCords.add(cord);
-//				System.out.println("Right: " + i + "=" + row);
-			}
-		}
-		
-		// Vertical up
-		for(int i = row; i >= 0; i--)
-		{
-			if(i != row)
-			{
-				var cord = new Pair<Integer,Integer>(column,i);
-				if(occupiedCords.contains(cord))
-					inlineCords.add(cord);
-//				System.out.println("Up: " + column + "=" + i);
-			}
-		}
-		
-		// Vertical down
-		for(int i = row; i < 15; i++)
-		{
-			if(i != row)
-			{
-				var cord = new Pair<Integer,Integer>(column,i);
-				if(occupiedCords.contains(cord))
-					inlineCords.add(cord);
-//				System.out.println("Down: " + column + "=" + i);
-			}
-		}
-		
-		return inlineCords;
-	}
-	
-	private String createWordFromCords(ArrayList<Pair<Integer,Integer>> cords)
+
+	// Horizontal
+	private char[] createCharArrFromCords(int colro, boolean horizontal)
 	{
 		var letters = new ArrayList<Character>();
 		
-		for(var cord : cords)
+		if(horizontal)
 		{
-			if(_boardTiles.get(new Point(cord.getKey(), cord.getValue())) != null)
+			// Horizontal
+			for(int i = 0; i < 15; i++)
 			{
-				var tile = _boardTiles.get(new Point(cord.getKey(), cord.getValue()));
-				letters.add(tile.getSymbolAsChar());
+				if(_boardTiles.containsKey(new Point(i, colro)))
+				{
+					var tile = _boardTiles.get(new Point(i, colro));
+					letters.add(tile.getSymbolAsChar());
+				}
 			}
 		}
-		
-		var word = new StringBuilder(letters.size());
-		
-		for(var c : letters)
+		else
 		{
-			word.append(c);
+			// Vertical
+			for(int i = 0; i < 15; i++)
+			{
+				if(_boardTiles.containsKey(new Point(colro, i)))
+				{
+					var tile = _boardTiles.get(new Point(colro, i));
+					letters.add(tile.getSymbolAsChar());
+				}
+			}	
 		}
 		
-		return word.toString();
+		return letters.stream().map(String::valueOf).collect(Collectors.joining()).toCharArray();
 	}
 	
-	private String checkWordHorVer(String word, char charToAdd, String dictWord)
-	{
-		var tempWord = "";
-		dictWord = dictWord.toUpperCase();
+	private String getPlacedWordFromChars(char[] letters, Pair<Integer, Integer> placedCord)
+	{		
+		var playedChar = _boardTiles.get(new Point(placedCord.getKey(), placedCord.getValue())).getSymbolAsChar();
+				
+		System.out.println("Column: " + placedCord.getKey() + " " + letters[placedCord.getKey()] + " played: " + playedChar);
 		
-		// Vertical up -> down + Horizontal right -> left
-		tempWord = new StringBuilder(word).reverse().append(charToAdd).toString();
-		if(tempWord.equals(dictWord))
-			return tempWord;
-		
-		// Vertical down -> up + Horizontal left -> right
-		tempWord = new StringBuilder(word).insert(0,charToAdd).reverse().toString();
-		if(tempWord.equals(dictWord))
-			return tempWord;
-		
-		return null;
+		System.out.println("Row: " + placedCord.getValue() + " " + letters[placedCord.getValue()] + " played: " + playedChar);
+
+		return new String(letters);
 	}
 	
-	private ArrayList<Point> getWordCords(ArrayList<String> words, char playedChar, Pair<Integer, Integer> playedCord)
+	private ArrayList<Point> getWordCords(ArrayList<String> words, Pair<Integer, Integer> playedCord)
 	{
 		// Dummy data
 		words = new ArrayList<String>() { { add("Beller"); add("Belles"); add("Bellec"); add("Bel"); add("Bell"); } };
@@ -282,14 +232,19 @@ public class BoardController implements Initializable {
 		var column = playedCord.getKey();
 		var row = playedCord.getValue();
 		
-		var connectedOccupiedCords = getOccupiedInlineCords(column, row, _board.getOccupiedPositions());
-						
+		var horWord = getPlacedWordFromChars(createCharArrFromCords(row, true), playedCord);
+		var verWord = getPlacedWordFromChars(createCharArrFromCords(column, false), playedCord);
+		
+		System.out.println("Horizontal: " + horWord);
+		
+		System.out.println("Vertical: " + verWord);
+								
 		for(var word : words)
 		{			
-			if(word.toLowerCase().indexOf(Character.toLowerCase(playedChar)) == -1)
+			if(!word.toUpperCase().equals(horWord) && !word.toUpperCase().equals(verWord))
 				continue;
 			
-			System.out.println(checkWordHorVer(createWordFromCords(connectedOccupiedCords), playedChar, word));
+			System.out.println(word);
 		}
 		
 		return wordCords;
