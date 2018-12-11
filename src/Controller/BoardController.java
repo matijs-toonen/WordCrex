@@ -167,11 +167,21 @@ public class BoardController implements Initializable {
 					event.setDropCompleted(true);
 					_board.updateStatus(cords, PositionStatus.Taken);
 					// TODO Add word collection from database and do something with the placed words
-					getWords(null, cords);
+					showPlacedWords(cords); // Only for testing purposes can remove after
 					event.consume();	
 				}
 			}
 		});
+	}
+	
+	private void showPlacedWords(Pair<Integer, Integer> cords)
+	{
+		var words = getWords(null, cords);
+		
+		for(var word : words)
+		{
+			System.out.println(word);
+		}
 	}
 		
 	private ArrayList<String> getWords(ArrayList<String> words, Pair<Integer, Integer> playedCord)
