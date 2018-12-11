@@ -15,7 +15,7 @@ public class SetHistory {
 	private int _score2;
 	private String _woorddeel2;
 	
-	public static final String getQuery() {
+	public static final String getQuery(int gameId) {
 		String query = "SELECT\r\n" + 
 				"    tp1.game_id,\r\n" + 
 				"    tp1.turn_id,\r\n" + 
@@ -35,7 +35,8 @@ public class SetHistory {
 				"        AND tp1.turn_id = tp2.turn_id\r\n" + 
 				"        INNER JOIN\r\n" + 
 				"    gelegdplayer2 AS gp2 ON tp2.game_id = gp2.game_id\r\n" + 
-				"        AND tp2.turn_id = gp2.turn_id;";
+				"        AND tp2.turn_id = gp2.turn_id\r\n" + 
+				"WHERE tp1.game_id = " + gameId + ";";
 		return query;
 	}
 	
@@ -66,4 +67,27 @@ public class SetHistory {
 		}
 	}
 	
+	public String getPlayer1() {
+		return _player1;
+	}
+	
+	public String getPlayer2() {
+		return _player2;
+	}
+	
+	public int getScore1() {
+		return _score1;
+	}
+	
+	public int getScore2() {
+		return _score2;
+	}
+	
+	public String getWoord1() {
+		return _woorddeel1.replace(",", "").replace(" ", "");
+	}
+	
+	public String getWoord2() {
+		return _woorddeel1.replace(",", "").replace(" ", "");
+	}
 }
