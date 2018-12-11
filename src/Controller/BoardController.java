@@ -176,27 +176,100 @@ public class BoardController implements Initializable {
 		var test = getWordCords(null,c, cord);
 	}
 	
-	private String getWordFromCords(ArrayList<Pair<Integer, Integer>> cords, String word)
+	private ArrayList<Pair<Integer,Integer>> getOccupiedInlineCords(int column, int row, ArrayList<Pair<Integer,Integer>> occupiedCords)
 	{
-		if(!_board.areConnected(cords))
-			return null;
+		ArrayList<Pair<Integer, Integer>> inlineCords = new ArrayList<Pair<Integer, Integer>>();
 		
-		var letters = new ArrayList<Character>();
-		
-		for(Pair<Integer,Integer> coordinate : cords)
+		// Horizontal left
+		for(int i = column; i >= 0; i--)
 		{
-			var tile = _boardTiles.get(new Point(coordinate.getKey(), coordinate.getValue()));
-			letters.add(Character.toLowerCase(tile.getSymbolAsChar()));
+			if(i != column)
+			{
+				var cord = new Pair<Integer,Integer>(i,row);
+				if(occupiedCords.contains(cord))
+					inlineCords.add(cord);
+//				System.out.println("Left: " + i + "=" + row);
+			}
 		}
 		
-		StringBuilder wordFromChar = new StringBuilder(letters.size());
+		// Horizontal right
+		for(int i = column; i < 15; i++)
+		{
+			if(i != column)
+			{
+				var cord = new Pair<Integer,Integer>(i,row);
+				if(occupiedCords.contains(cord))
+					inlineCords.add(cord);
+//				System.out.println("Right: " + i + "=" + row);
+			}
+		}
+		
+		// Vertical up
+		for(int i = row; i >= 0; i--)
+		{
+			if(i != row)
+			{
+				var cord = new Pair<Integer,Integer>(column,i);
+				if(occupiedCords.contains(cord))
+					inlineCords.add(cord);
+//				System.out.println("Up: " + column + "=" + i);
+			}
+		}
+		
+		// Vertical down
+		for(int i = row; i < 15; i++)
+		{
+			if(i != row)
+			{
+				var cord = new Pair<Integer,Integer>(column,i);
+				if(occupiedCords.contains(cord))
+					inlineCords.add(cord);
+//				System.out.println("Down: " + column + "=" + i);
+			}
+		}
+		
+		return inlineCords;
+	}
+	
+	private String createWordFromCords(ArrayList<Pair<Integer,Integer>> cords)
+	{
+		var letters = new ArrayList<Character>();
+		
+		for(var cord : cords)
+		{
+			if(_boardTiles.get(new Point(cord.getKey(), cord.getValue())) != null)
+			{
+				var tile = _boardTiles.get(new Point(cord.getKey(), cord.getValue()));
+				letters.add(tile.getSymbolAsChar());
+			}
+		}
+		
+		var word = new StringBuilder(letters.size());
 		
 		for(var c : letters)
 		{
-			wordFromChar.append(c);
+			word.append(c);
 		}
 		
-		return wordFromChar.toString().toLowerCase();
+		return word.toString();
+	}
+	
+	private String checkWordHorVer(String word, char charToAdd, String dictWord)
+	{
+		var tempWord = "";
+		dictWord = dictWord.toUpperCase();
+		
+		// Vertical up -> down + Horizontal right -> left
+		tempWord = new StringBuilder(word).reverse().append(charToAdd).toString();
+		if(tempWord.equals(dictWord))
+			return tempWord;
+		
+		// Vertical down -> up + Horizontal left -> right
+		tempWord = new StringBuilder(word).insert(0,charToAdd).reverse().toString();
+		if(tempWord.equals(dictWord))
+			return tempWord;
+		
+		return null;
 	}
 	
 	private ArrayList<Point> getWordCords(ArrayList<String> words, char playedChar, Pair<Integer, Integer> playedCord)
@@ -206,74 +279,17 @@ public class BoardController implements Initializable {
 				
 		ArrayList<Point> wordCords = new ArrayList<Point>();
 		
-		var occupiedNodes = _board.getOccupiedPositions();
-				
+		var column = playedCord.getKey();
+		var row = playedCord.getValue();
+		
+		var connectedOccupiedCords = getOccupiedInlineCords(column, row, _board.getOccupiedPositions());
+						
 		for(var word : words)
 		{			
 			if(word.toLowerCase().indexOf(Character.toLowerCase(playedChar)) == -1)
 				continue;
 			
-			var wordChars = word.toCharArray();
-			
-			var reqCharOccurence = wordChars.length;
-			
-			// Horizontal
-			for(int i = 0; i < 15; i++)
-			{
-				int rowOccurrence = 0;
-				var occurenceCords = new ArrayList<Pair<Integer, Integer>>();
-				
-				if(playedCord.getValue() == i)
-				{
-					for(int j = 0; j < 15; j++)
-					{
-						for(var pair : occupiedNodes)
-						{
-							if(pair.getKey() == j && pair.getValue()  == i)
-							{
-								rowOccurrence++;
-								occurenceCords.add(pair);
-								if(rowOccurrence == reqCharOccurence)
-								{
-									// found possible word
-									if(getWordFromCords(occurenceCords, word).equals(word.toLowerCase()))
-										System.out.println("Horizontal: " + word);
-								}
-							}
-						}	
-					}
-				}
-			}
-			
-			// Vertical
-			for(int i = 0; i < 15; i++)
-			{
-				int rowOccurrence = 0;
-				var occurenceCords = new ArrayList<Pair<Integer, Integer>>();
-				
-				if(playedCord.getKey() == i)
-				{
-					for(int j = 0; j < 15; j++)
-					{
-						for(var pair : occupiedNodes)
-						{
-							if(pair.getKey() == i && pair.getValue()  == j)
-							{
-								rowOccurrence++;
-								occurenceCords.add(pair);
-								if(rowOccurrence == reqCharOccurence)
-								{
-									// found possible word
-									if(getWordFromCords(occurenceCords, word).equals(word.toLowerCase()))
-										System.out.println("Vertical: " + word);
-								}
-							}
-						}	
-					}
-				}
-			}
-			
-
+			System.out.println(checkWordHorVer(createWordFromCords(connectedOccupiedCords), playedChar, word));
 		}
 		
 		return wordCords;
