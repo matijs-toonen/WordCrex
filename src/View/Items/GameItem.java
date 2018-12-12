@@ -12,14 +12,14 @@ import javafx.scene.layout.AnchorPane;
 
 public class GameItem extends AnchorPane {
 	
-	private Game currentGame;
+	private Game _currentGame;
 	private Label lblUser = new Label();
 	private Label lblTime = new Label();
 	private ImageView imgStatus = new ImageView();
 	
 	public GameItem(Game game) {
 		super();
-		currentGame = game;
+		_currentGame = game;
 		setUserLabel();
 		setSubLabel();
 		setImage();
@@ -57,13 +57,17 @@ public class GameItem extends AnchorPane {
 	}
 	
 	private void setUserLabel() {
-		lblUser.setText(currentGame.getUser2());
+		lblUser.setText(_currentGame.getUser2());
 		lblUser.getStyleClass().addAll("text", "title");
 	}
 	
 	private void setSubLabel() {
-		lblTime.setText(String.valueOf(currentGame.getSatus()));
+		lblTime.setText(String.valueOf(_currentGame.getSatus()));
 		lblTime.getStyleClass().addAll("text", "subtitle");
+	}
+	
+	public Game getGame() {
+		return _currentGame;
 	}
 
 	public void setUserOnClickEvent(Consumer<MouseEvent> action) {

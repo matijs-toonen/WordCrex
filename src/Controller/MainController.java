@@ -6,14 +6,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
 import Model.Account;
-import Model.Game;
+import View.Items.GameItem;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -104,14 +101,13 @@ public class MainController implements Initializable {
 	@FXML
 	private void loadGames(MouseEvent event)
 	{
-		loadPane("Games");
+		loadPaneWithParam("Games", GameController.class);
 	}
 	
 	@FXML
 	private void loadChallenge(MouseEvent event)
 	{
-		loadPaneWithParam("Challenge");
-//		loadPane("Challenge");
+		loadPaneWithParam("Challenge", ChallengeController.class);
 	}
 	
 	@FXML
@@ -144,22 +140,23 @@ public class MainController implements Initializable {
 		loadPane("Settings");
 	}
 	
-	@FXML
-	private void loadBoard(MouseEvent event) 
-	{
-//		loadPaneWithParam("Board");
-		loadPane("Board");
-	}
-	
-	private void loadPaneWithParam(String paneName) {
+	private <T> void loadPaneWithParam(String paneName, Class<T> controller) {
 		
 		//Parent root = null;
 		AnchorPane pane = null;
 		try {
-			var con = new ChallengeController(rootPane);
+			T con = null;
+			
+			if(controller.equals(ChallengeController.class)) 
+				con = (T) new ChallengeController(rootPane);
+			
+			else if(controller.equals(GameController.class)) 
+				con = (T) new GameController(rootPane);
+			
 			var panes = new FXMLLoader(getClass().getResource("/View/" + paneName + ".fxml"));
 			panes.setController(con);
 			pane = panes.load();
+			
 		}
 		catch(Exception ex) {
 			Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
@@ -170,7 +167,6 @@ public class MainController implements Initializable {
 	
 	private void loadPane(String paneName) {
 		
-		//Parent root = null;
 		AnchorPane pane = null;
 		try {
 			pane = FXMLLoader.load(getClass().getResource("/View/" + paneName + ".fxml"));
