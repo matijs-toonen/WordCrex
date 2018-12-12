@@ -3,6 +3,8 @@ package Model;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.List;
 
 import Model.WordState.*;
 
@@ -54,5 +56,9 @@ public class Word {
 	
 	public static String selectQuery(String username) {
 		return String.format("SELECT * FROM dictionary WHERE username = '%s'", username);
+	}
+	
+	public static List<Word> getAllWordsThatContain (ArrayList<Word> words, String searchText){
+		return words.stream().filter(word -> word.getWord().contains(searchText)).collect(Collectors.toList());
 	}
 }

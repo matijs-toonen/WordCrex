@@ -13,6 +13,7 @@ import Model.WordState.AcceptedWordState;
 import Model.WordState.DeniedWordState;
 import Model.WordState.PendingWordState;
 import Model.WordState.WordState;
+import View.Items.ChallengePlayerItem;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -36,10 +37,19 @@ public class SuggestController implements Initializable{
 	
 	@FXML
 	private VBox wordList;
+	
+	@FXML 
+	private TextField searchBox;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		_db = new DatabaseController<Word>();
+		
+		searchBox.textProperty().addListener((observable) -> {
+			//showPlayersToChallenge();
+			System.out.println("Test");
+			showSuggestedWords();
+		});
 		
 		plusButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) ->  addWord() );
 		showSuggestedWords();
@@ -85,14 +95,12 @@ public class SuggestController implements Initializable{
 			System.out.println(e.getMessage());
 		}
 		
-		for (Word word : _words) {
-			
+		Word.getAllWordsThatContain(_words, searchBox.getText()).forEach(word -> {
 			// TODO: Lars replace pane
 			Label testLabel = new Label();
 			testLabel.setText(word.getWord());
 			wordList.getChildren().add(testLabel);
-			
-		}
+		});
 		
 	}
 	
