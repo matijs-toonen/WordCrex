@@ -44,7 +44,15 @@ public class Word {
 		}
 	}
 	
+	public String getWord() {
+		return _word;
+	}
+	
 	public static String insterQuery(String word, String username) {
 		return String.format("INSERT INTO dictionary (word, letterset_code, state, username) VALUES ('%s', 'NL', 'pending', '%s');", word, username);
+	}
+	
+	public static String selectQuery(String username) {
+		return String.format("SELECT * FROM dictionary WHERE username = '%s'", username);
 	}
 }
