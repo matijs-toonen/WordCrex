@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-
-<AnchorPane prefHeight="576.0" prefWidth="323.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="Controller.SetHistoryController">
+<AnchorPane prefHeight="576.0" prefWidth="323.0" style="-fx-background-color: #FFFFFF;" styleClass="text" stylesheets="@../Application/application.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.SetHistoryController">
    <children>
-      <VBox fx:id="itemWrapper" prefHeight="576.0" prefWidth="323.0" />
+      <Text fill="#5c5e6a" layoutX="95.0" layoutY="47.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Zet geschiedenis">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Text>
+      <VBox fx:id="itemWrapper" layoutY="70.0" prefHeight="500.0" prefWidth="323.0" />
+      <Button layoutX="269.0" layoutY="32.0" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" styleClass="closeButton" />
    </children>
 </AnchorPane>
