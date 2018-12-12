@@ -43,4 +43,8 @@ public class Word {
 			return null;
 		}
 	}
+	
+	public static String insterQuery(String word, String username) {
+		return String.format("INSERT INTO dictionary (word, letterset_code, state, username) VALUES ('%s', 'NL', 'pending', '%s');", word, username);
+	}
 }

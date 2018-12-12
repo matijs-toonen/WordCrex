@@ -56,13 +56,12 @@ public class SuggestController implements Initializable{
 		Word word = new Word(wordValue, letterSet, wordState, account);
 		
 		try {
-			String statement = "INSERT INTO dictionary (word, letterset_code, state, username) VALUES ('" + wordValue +"', 'NL', 'pending', 'test-player');";
+			String statement = Word.insterQuery(wordValue, MainController.getUser().getUsername());
 			_db.Insert(statement);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		
-		System.out.println("Added word to database!");
 		showSuggestedWords();
 	}
 	
@@ -82,6 +81,8 @@ public class SuggestController implements Initializable{
 	
 	private void showSuggestedWords() {
 		// TODO: Lars list loading
+		
+		
 	}
 	
 }
