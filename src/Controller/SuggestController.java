@@ -70,19 +70,6 @@ public class SuggestController implements Initializable{
 		showSuggestedWords();
 	}
 	
-	private WordState getWordState(String state) {
-		switch(state.toLowerCase()) {
-		case "accepted":
-			return new AcceptedWordState();
-		case "denied":
-			return new DeniedWordState();
-		case "pending":
-			return new PendingWordState();
-		default:
-			return null;
-		}
-	}
-	
 	
 	private void showSuggestedWords() {
 		
