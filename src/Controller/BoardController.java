@@ -5,7 +5,9 @@ import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -45,12 +47,13 @@ public class BoardController implements Initializable {
 	private DatabaseController _db;
 	private HashMap<Point, BoardTile> _tiles;
 	private Board _board;
+	private ArrayList<BoardTile> _currentHand;
 	
 	@FXML
 	private Label lblScore1, lblScore2, lblPlayer1, lblPlayer2;
 	
 	@FXML
-	private Button btnTest;
+	private Button btnTest, btnShuffle;
 	
 	@FXML
 	private Pane panePlayField, paneHand;
@@ -58,6 +61,7 @@ public class BoardController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		_tiles = new HashMap<Point, BoardTile>();
+		_currentHand = new ArrayList<BoardTile>();
 		lblPlayer1.setText("SCHRUKTURK");
 		lblPlayer2.setText("BOEDER");
 		lblScore1.setText("1");
@@ -65,6 +69,10 @@ public class BoardController implements Initializable {
 		_board = new Board();
 		createField();
 		createHand();
+	}
+	
+	public void shuffle(){
+		placeHand();
 	}
 	
 	private void createField() {
@@ -89,13 +97,13 @@ public class BoardController implements Initializable {
 	}
 	
 	private void createHand() {
+		_currentHand.clear();
 		_db = new DatabaseController<HandLetter>();
 		try {
 			var count = _db.SelectCount("SELECT COUNT(*) FROM handletter");
 			System.out.println(count);
-			var handLetters = (ArrayList<HandLetter>) _db.SelectWithCustomLogic(getHandLetter(), "SELECT * FROM handletter NATURAL JOIN letter NATURAL JOIN symbol where turn_id = 1");
-			int x = 12;
-			int y = 0;
+			var handLetters = (ArrayList<HandLetter>) _db.SelectWithCustomLogic(getHandLetter(), "SELECT * FROM handletter NATURAL JOIN letter NATURAL JOIN symbol where turn_id = 1 and game_id = 500");
+			
 
 			for(var handLetter : handLetters) {
 				for(var letter : handLetter.getLetters()) {
@@ -103,18 +111,33 @@ public class BoardController implements Initializable {
 					var boardTile = new BoardTile(letter.getSymbol());
 					boardTile.setDraggableEvents();
 					boardTile.setBackground(getBackground(Color.LIGHTPINK));
-					boardTile.setLayoutX(x);
-					boardTile.setLayoutY(y);
-					y += 32;
 					boardTile.setMinWidth(30);
 					boardTile.setMinHeight(30);
-					paneHand.getChildren().add(boardTile);	
+					
+					_currentHand.add(boardTile);
 				}
 			};
-		} catch (SQLException e) {
+			placeHand();
+		} 
+		catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	private void placeHand() {
+		int x = 12;
+		int y = 0;
+		
+		Collections.shuffle(_currentHand);
+		
+		for(var tile : _currentHand) {
+			tile.setLayoutX(x);
+			tile.setLayoutY(y);
+			y += 32;
+			paneHand.getChildren().remove(tile);
+			paneHand.getChildren().add(tile);
+		}	
 	}
 	
 	private Function<ResultSet, ArrayList<HandLetter>> getHandLetter(){
