@@ -5,6 +5,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import Model.Account;
@@ -62,8 +64,21 @@ public class UserManagementController implements Initializable {
 			});
 			
 			var accountItem = new AccountItem(account);
+			accountItem.setUpdateEvent(createUpdateEvent());
 			vboxAccounts.getChildren().add(accountItem);
 		}
+	}
+	
+	private Consumer<String> createUpdateEvent(){
+		return (Query -> {
+			System.out.println(Query);
+			try {
+				boolean succes = _db.Insert(Query);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
 	}
 	
 	//Custom functionality for merging account and role together

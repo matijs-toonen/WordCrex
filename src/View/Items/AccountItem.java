@@ -1,7 +1,10 @@
 package View.Items;
 
 import java.util.ArrayList;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
+import Controller.MainController;
 import Model.Account;
 import Model.AccountRole.AccountRole;
 import javafx.beans.value.ChangeListener;
@@ -15,10 +18,10 @@ public class AccountItem extends AnchorPane {
 	private Account _currentAccount;
 	
 	private Label lblUser = new Label();
-	private CheckBox chbSpeler = new CheckBox("Speler");
 	private CheckBox chbAdministrator = new CheckBox("Administrator");
 	private CheckBox chbModerator = new CheckBox("Moderator");
 	private CheckBox chbObserver = new CheckBox("Observer");
+	private CheckBox chbPlayer = new CheckBox("Speler");
 	
 	public AccountItem(Account account) {
 		super();
@@ -27,17 +30,15 @@ public class AccountItem extends AnchorPane {
 		setUserLabel();
 		setCheckboxes();
 		
-		chbSpeler.selectedProperty().addListener(new ChangeListener<Boolean>() {
-		    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-		        System.out.println("test");
-		    }
-		});
-		
-		this.getChildren().addAll(lblUser);
-		this.getChildren().add(chbSpeler);
-		this.getChildren().add(chbAdministrator);
-		this.getChildren().add(chbModerator);
-		this.getChildren().add(chbObserver);
+//		chbSpeler.selectedProperty().addListener(new ChangeListener<Boolean>() {
+//		    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+////		    	updateUser("Speler");
+//		    	System.out.println(oldValue);
+//		    	System.out.println(newValue);
+//		    }
+//		});
+//		
+		this.getChildren().addAll(lblUser,chbAdministrator,chbModerator,chbObserver,chbPlayer);
 	}
 	
 	private void setUserLabel() {
@@ -54,18 +55,18 @@ public class AccountItem extends AnchorPane {
 		{
 			String _role = role.getAccountType();
 			if(_role.equals("Administrator")) {
-				chbSpeler.setSelected(true);
-			} else if(_role.equals("Moderator")) {
 				chbAdministrator.setSelected(true);
-			} else if(_role.equals("Observer")) {
+			} else if(_role.equals("Moderator")) {
 				chbModerator.setSelected(true);
-			} else if(_role.equals("Player")) {
+			} else if(_role.equals("Observer")) {
 				chbObserver.setSelected(true);
+			} else if(_role.equals("Player")) {
+				chbPlayer.setSelected(true);
 			}
 		}
 		
-		chbSpeler.setLayoutX(200);
-		chbSpeler.setLayoutY(0);
+		chbPlayer.setLayoutX(200);
+		chbPlayer.setLayoutY(0);
 		
 		chbAdministrator.setLayoutX(200);
 		chbAdministrator.setLayoutY(30);
@@ -78,8 +79,59 @@ public class AccountItem extends AnchorPane {
 		
 	}
 
-	private void updateUser(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue)
-	{
-		System.out.println("Test");
+	public void setUpdateEvent(Consumer<String> action) {
+		chbAdministrator.selectedProperty().addListener(new ChangeListener<Boolean>() {
+		    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+		    	
+		    	String Query = null;
+		    	String username = _currentAccount.getUsername();
+		    	if(newValue == false)
+		    		Query = "DELETE FROM accountrole WHERE username = '"+username+"' AND role = 'administrator'";
+		    	else if(newValue == true)
+		    		Query = "INSERT INTO accountrole (username, role) VALUES ('"+username+"','administrator')";
+
+		    	action.accept(Query);
+		    }
+		});
+		chbModerator.selectedProperty().addListener(new ChangeListener<Boolean>() {
+		    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+		    	
+		    	String Query = null;
+		    	String username = _currentAccount.getUsername();
+		    	if(newValue == false)
+		    		Query = "DELETE FROM accountrole WHERE username = '"+username+"' AND role = 'moderator'";
+		    	else if(newValue == true)
+		    		Query = "INSERT INTO accountrole (username, role) VALUES ('"+username+"','moderator')";
+
+		    	action.accept(Query);
+		    }
+		});
+		chbObserver.selectedProperty().addListener(new ChangeListener<Boolean>() {
+		    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+		    	
+		    	String Query = null;
+		    	String username = _currentAccount.getUsername();
+		    	if(newValue == false)
+		    		Query = "DELETE FROM accountrole WHERE username = '"+username+"' AND role = 'observer'";
+		    	else if(newValue == true)
+		    		Query = "INSERT INTO accountrole (username, role) VALUES ('"+username+"','observer')";
+
+		    	action.accept(Query);
+		    }
+		});
+		chbPlayer.selectedProperty().addListener(new ChangeListener<Boolean>() {
+		    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+		    	
+		    	String Query = null;
+		    	String username = _currentAccount.getUsername();
+		    	if(newValue == false)
+		    		Query = "DELETE FROM accountrole WHERE username = '"+username+"' AND role = 'player'";
+		    	else if(newValue == true)
+		    		Query = "INSERT INTO accountrole (username, role) VALUES ('"+username+"','player')";
+
+		    	action.accept(Query);
+		    }
+		});
 	}
+	
 }

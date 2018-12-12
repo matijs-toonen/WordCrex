@@ -16,7 +16,7 @@ public class Account {
 	
 	private String _username;
 	private String _password;
-	private ArrayList<AccountRole> _roles = new ArrayList<AccountRole>();;
+	private ArrayList<AccountRole> _roles = new ArrayList<AccountRole>();
 	
 	public Account(String username) {
 		_username = username;
