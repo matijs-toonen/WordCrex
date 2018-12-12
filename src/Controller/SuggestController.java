@@ -57,6 +57,8 @@ public class SuggestController implements Initializable{
 			return;
 		}
 		
+		wordValue = wordValue.replace(" ", "");
+		
 		textfieldAddWord.setText("");
 		
 		try {
@@ -84,9 +86,12 @@ public class SuggestController implements Initializable{
 		}
 		
 		for (Word word : _words) {
+			
+			// TODO: Lars replace pane
 			Label testLabel = new Label();
 			testLabel.setText(word.getWord());
 			wordList.getChildren().add(testLabel);
+			
 		}
 		
 	}
