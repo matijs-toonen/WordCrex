@@ -21,7 +21,7 @@ public class Startup extends Application {
 			Font.loadFont(getClass().getResource("../Fonts/SourceSansPro-Bold.ttf").toExternalForm(), 10);
 			primaryStage.setScene(scene);
 			
-			Parent mainFrame = FXMLLoader.load(getClass().getResource("/View/Chat.fxml"));
+			Parent mainFrame = FXMLLoader.load(getClass().getResource("/View/SideBar.fxml"));
 			
 //			primaryStage.setMaximized(true);	@ToDo aan einde weer toevoegen !!!
 			primaryStage.getIcons().add(new Image("/Resources/logo.png"));
