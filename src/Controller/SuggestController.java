@@ -22,6 +22,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class SuggestController implements Initializable{
@@ -96,10 +97,34 @@ public class SuggestController implements Initializable{
 		}
 		
 		Word.getAllWordsThatContain(_words, searchBox.getText()).forEach(word -> {
-			// TODO: Lars replace pane
-			Label testLabel = new Label();
-			testLabel.setText(word.getWord());
-			wordList.getChildren().add(testLabel);
+			
+			HBox wordBox = new HBox();
+		
+			Label wordState = new Label();
+			
+			switch (word.getWordState()) {
+			case "accepted":
+				wordState.setText("Goed Gekeurd");
+				wordState.setStyle("-fx-background-color: green");
+				break;
+			case "pending":
+				wordState.setText("In Beoordeling...");
+				wordState.setStyle("-fx-background-color: gray");
+				break;
+			case "denied":
+				wordState.setText("Af Gekeurd");
+				wordState.setStyle("-fx-background-color: red");
+				break;
+			default:
+				break;
+			}
+			
+			Label wordLabel = new Label();
+			wordLabel.setText(word.getWord());
+			
+			wordBox.getChildren().addAll(wordLabel, wordState);
+			
+			wordList.getChildren().add(wordBox);
 		});
 		
 	}
