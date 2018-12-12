@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1000.0" prefWidth="1635.0" style="-fx-background-color: #F0F0F7;" stylesheets="@../Application/application.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1000.0" prefWidth="1635.0" style="-fx-background-color: #F0F0F7;" stylesheets="@../Application/application.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.UserManagementController">
    <children>
       <Text fill="#43425d" layoutX="98.0" layoutY="82.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Gebruikers beheren">
          <font>
@@ -27,10 +29,18 @@
                   </Text>
                </children>
             </AnchorPane>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="371.0" />
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="371.0">
+               <children>
+                  <ScrollPane hbarPolicy="NEVER" prefHeight="317.0" prefWidth="368.0" style="-fx-background-color: transparent;">
+                     <content>
+                        <VBox fx:id="vboxGames" prefHeight="314.0" prefWidth="365.0" style="-fx-background-color: #FFFFFF; -fx-background-insets: -1px;" />
+                     </content>
+                  </ScrollPane>
+                  <VBox fx:id="vboxAccounts" prefHeight="338.0" prefWidth="398.0" style="-fx-background-color: #FFFFFF; -fx-background-insets: -1px;" />
+               </children></AnchorPane>
         </items>
       </SplitPane>
-      <TextField focusTraversable="false" layoutX="799.0" layoutY="49.0" prefHeight="40.0" prefWidth="741.0" promptText="Zoek gebruiker..." style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);" styleClass="search-bar">
+      <TextField fx:id="searchBox" focusTraversable="false" layoutX="799.0" layoutY="49.0" prefHeight="40.0" prefWidth="741.0" promptText="Zoek gebruiker..." style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);" styleClass="search-bar">
          <font>
             <Font name="Source Sans Pro Regular" size="12.0" />
          </font>
