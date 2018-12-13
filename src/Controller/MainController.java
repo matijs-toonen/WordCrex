@@ -24,6 +24,10 @@ public class MainController implements Initializable {
 	@FXML
 	private AnchorPane rootPane;
 	
+	public MainController(Account account) {
+		
+	}
+	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		// TODO Auto-generated method stub
