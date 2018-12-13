@@ -81,6 +81,10 @@ where (g.username_player1 = @username
 GROUP BY g.game_id;
 
 
+select * from game;
+
+
+
 -- gebruikers beherenqqqqqqqqqqqqqq
 
 SELECT 
@@ -121,11 +125,6 @@ WHERE username = @usernamee;
 
 -- history bader
 
-select * from gelegdplayer1;
-
-select * from gelegdplayer2;
-
-select * from gelegd;
 
 
 select tp1.game_id,tp1.turn_id, tp1.username_player1, tp1.score+tp1.bonus as score , gp1.woorddeel 
@@ -145,16 +144,15 @@ tp2.turn_id = gp2.turn_id;
 
 
 -- -- -- -- -- -- -- -- -- -- -- -- 
-
 SELECT 
     tp1.game_id,
     tp1.turn_id,
-    tp1.username_player1,
-    tp1.score + tp1.bonus AS score,
-    gp1.woorddeel,
-    tp2.username_player2,
-    tp2.score + tp2.bonus AS score,
-    gp2.woorddeel
+    tp1.username_player1 AS player1,
+    tp1.score + tp1.bonus AS score1,
+    gp1.woorddeel AS woorddeel1,
+    tp2.username_player2 AS player2,
+    tp2.score + tp2.bonus AS score2,
+    gp2.woorddeel AS woorddeel2
 FROM
     turnplayer1 AS tp1
         INNER JOIN
@@ -165,12 +163,9 @@ FROM
         AND tp1.turn_id = tp2.turn_id
         INNER JOIN
     gelegdplayer2 AS gp2 ON tp2.game_id = gp2.game_id
-        AND tp2.turn_id = gp2.turn_id;
-;
+        AND tp2.turn_id = gp2.turn_id
+WHERE
+    tp1.game_id = 502;
 
-select * from turn;
 
-select * from turnplayer1;
-
-select * from turnplayer2;
 
