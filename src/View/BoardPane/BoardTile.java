@@ -19,22 +19,12 @@ import java.awt.Point;
 
 public class BoardTile extends Pane {
 	private Symbol _symbol;
-	private Point _currentPoint;
 	private Label lblValue = new Label();
 	private Label lblSymbol = new Label();
 
 	public BoardTile(Symbol symbol) {
 		super();
 		init(symbol);
-	}
-	
-	public BoardTile(Point currentPoint, Symbol symbol) {
-		this(symbol);
-		_currentPoint = currentPoint;
-	}	
-	
-	public BoardTile(Point currentPoint) {
-		this(currentPoint, null);
 	}
 	
 	private void init(Symbol symbol) {
@@ -62,41 +52,11 @@ public class BoardTile extends Pane {
 		return _symbol;
 	}
 	
-	public Point getCords(){
-		return _currentPoint;
-	}
-	
 	public void resetTile() {
 		init(null);
 		lblValue.setText("");
 	}
-	
-	public void setCords(Point newPoint) {
-		_currentPoint = newPoint;
-	}
-	
-	public void setDropEvents(Consumer<DragEvent> action) {
-		this.setOnDragOver(new EventHandler<DragEvent>() {
 
-			@Override
-			public void handle(DragEvent event) {
-				
-				if(event.getGestureSource() != event.getTarget()) {
-					event.acceptTransferModes(TransferMode.ANY);
-				}
-				event.consume();
-			}
-		});
-		
-		this.setOnDragDropped(new EventHandler<DragEvent>() {
-
-			@Override
-			public void handle(DragEvent event) {
-				action.accept(event);
-			}
-		});
-	}
-	
 	public void setDraggableEvents() {
 		this.setOnDragDetected(new EventHandler<MouseEvent>() {
 

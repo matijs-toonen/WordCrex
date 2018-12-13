@@ -19,6 +19,7 @@ import Model.Turn;
 import Model.Board.Board;
 import Model.Board.PositionStatus;
 import View.BoardPane.BoardTile;
+import View.BoardPane.BoardTilePane;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -42,7 +43,7 @@ public class BoardController implements Initializable {
 	private ArrayList<Letter> _letters = new ArrayList<Letter>();
 	private Turn _currentTurn;
 	private Game _currentGame;
-	private HashMap<Point, BoardTile> _tiles;
+	private HashMap<Point, BoardTilePane> _tiles;
 	private Board _board;
     private ArrayList<BoardTile> _currentHand;
     private HashMap<Point, BoardTile> _fieldHand;
@@ -58,7 +59,7 @@ public class BoardController implements Initializable {
 	
 	public BoardController(Game game) {
 		_board = new Board();
-		_tiles = new HashMap<Point, BoardTile>();
+		_tiles = new HashMap<Point, BoardTilePane>();
         _currentHand = new ArrayList<BoardTile>();
         _fieldHand = new HashMap<Point, BoardTile>();
 		_currentGame = game;
@@ -94,14 +95,14 @@ public class BoardController implements Initializable {
 		for(int i = 0; i < 15; i++) {
 			int y = 1;
 			for(int j = 0; j < 15; j++) {
-				var tile = new BoardTile(new Point(i, j));
+				var tile = new BoardTilePane(new Point(i, j));
 				tile.setDropEvents(createDropEvents());
 				tile.setBackground(getBackground(Color.CHOCOLATE));
 				tile.setLayoutX(x);
 				tile.setLayoutY(y);
 				tile.setMinWidth(30);
 				tile.setMinHeight(30);
-				tile.createOnClickEvent(creatOnClickEvent());
+//				tile.createOnClickEvent(creatOnClickEvent());
 				_tiles.put(new Point(i, j), tile);
 				y += 32;
 				panePlayField.getChildren().add(tile);
@@ -176,8 +177,8 @@ public class BoardController implements Initializable {
 			var tile = handLetter.getValue();
 			
 			var boardTile = _tiles.get(cords);
-			boardTile.setBackground(getBackground(Color.CHOCOLATE));
-			boardTile.resetTile();
+//			boardTile.setBackground(getBackground(Color.CHOCOLATE));
+//			boardTile.resetTile();
 			_board.updateStatus(cords, PositionStatus.Open);
 			tile.setPaneVisible(true);
 		});	
@@ -275,11 +276,12 @@ public class BoardController implements Initializable {
 	
 	private Consumer<DragEvent> createDropEvents(){
 		return (event -> {
-			if(event.getGestureTarget() instanceof BoardTile) {
-				var boardTile = (BoardTile) event.getGestureTarget();
+			if(event.getGestureTarget() instanceof BoardTilePane) {
+				var boardTile = (BoardTilePane) event.getGestureTarget();
 				var sourceTile = (BoardTile) event.getGestureSource();
 				sourceTile.setCords(boardTile.getCords());
 				boardTile.setDraggableEvents();
+				
 				var symbol = sourceTile.getSymbol();
 				boardTile.setSymbol(symbol);
 				var bg = sourceTile.getBackground();
