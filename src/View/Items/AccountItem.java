@@ -69,15 +69,19 @@ public class AccountItem extends AnchorPane {
 		
 		chbAdministrator.setLayoutX(200);
 		chbAdministrator.setLayoutY(00);
+		chbAdministrator.getStyleClass().add("checkbox");
 		
 		chbModerator.setLayoutX(200);
-		chbModerator.setLayoutY(25);
+		chbModerator.setLayoutY(35);
+		chbModerator.getStyleClass().add("checkbox");
 		
 		chbObserver.setLayoutX(200);
-		chbObserver.setLayoutY(50);
+		chbObserver.setLayoutY(70);
+		chbObserver.getStyleClass().add("checkbox");
 		
 		chbPlayer.setLayoutX(200);
-		chbPlayer.setLayoutY(75);
+		chbPlayer.setLayoutY(105);
+		chbPlayer.getStyleClass().add("checkbox");
 		
 		chbPlayer.setStyle("-fx-padding: 0 0 25 0");
 	}

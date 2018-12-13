@@ -69,7 +69,7 @@ public class UserManagementController implements Initializable {
 	private Consumer<String> createUpdateEvent(){
 		return (Query -> {
 			try {
-				boolean succes = _db.Insert(Query);
+				boolean success = _db.Insert(Query);
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
