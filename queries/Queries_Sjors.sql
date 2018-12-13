@@ -11,8 +11,8 @@ WHERE
 
 -- Uitdaging accepteren
 
-set @username = 'rik';
-set @gameid = 508;
+set @username = 'luc';
+set @gameid = 503;
 
 UPDATE game 
 SET 
@@ -36,8 +36,8 @@ WHERE
 
 -- Speler uitdaging aanmaken
 
-set @player1 = 'ger';
-set @player2 = 'rik';
+set @player1 = 'rik';
+set @player2 = 'luc';
 
 INSERT INTO game (game_state, letterset_code, username_player1, username_player2, answer_player2)
 VALUES ('request','NL',@player1,@player2,'unknown');
@@ -180,6 +180,9 @@ where username_player2 = 'rik' and game_id = @gameid and turn_ID = (select max(t
 -- als er dus een pass aanwezig is dan moet er een nieuwe turn aangemaakt worden(dus aanmaken turn query opnieuw uitvoeren)
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+
+
 select * from game where answer_player2 = 'unknown';
 select * from answer;
 select * from gamestate;
