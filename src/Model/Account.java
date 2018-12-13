@@ -10,9 +10,13 @@ import java.util.stream.Collectors;
 import Model.AccountRole.*;
 
 public class Account {
+	public static final String getAllAccounts() {
+		return ("select username, role from accountrole order by username");
+	}
+	
 	private String _username;
 	private String _password;
-	private ArrayList<AccountRole> _roles = new ArrayList<AccountRole>();;
+	private ArrayList<AccountRole> _roles = new ArrayList<AccountRole>();
 	
 	public static final String updatePassword(String password, String username) {
 		return ("UPDATE account SET password = '" + password + "' WHERE username = '" + username + "'");
@@ -59,11 +63,12 @@ public class Account {
 			return null;
 		}
 	}
-	
+
 	public String getUsername() {
 		return _username;
 	}
-	
+
+  
 	public ArrayList<AccountRole> getRoles()
 	{
 		return _roles;
@@ -81,4 +86,5 @@ public class Account {
 	public static List<Account> getAllAccountsByUsername(ArrayList<Account> accounts, String username){
 		return accounts.stream().filter(account -> account.getUsername().contains(username)).collect(Collectors.toList());
 	}
+	
 }
