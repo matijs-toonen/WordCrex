@@ -58,6 +58,27 @@ public class DatabaseController <T> {
 		return item;
 	}
 	
+	public T SelectFirst(String statement, Class<T> type) throws SQLException {
+		Connection conn = OpenConnection();
+		Statement state = conn.createStatement();
+		ResultSet resultSet = state.executeQuery(statement);
+		
+		T item = null;
+		
+		resultSet.first();
+		
+		try {
+			item = type.getDeclaredConstructor(ResultSet.class, ArrayList.class).newInstance(resultSet, getColumns(resultSet.getMetaData()));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	
+		resultSet.close();
+		CloseConnection(conn, state);
+		
+		return item;
+	}
+	
 	public Collection<T> SelectAll(String statement, Class<T> type) throws SQLException {
 		Connection conn = OpenConnection();
 		Statement state = conn.createStatement();

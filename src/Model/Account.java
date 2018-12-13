@@ -32,10 +32,7 @@ public class Account {
 		try {
 			_username = columns.contains("username") ? rs.getString("username") : null;
 			_password = columns.contains("password") ? rs.getString("password") : null;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} catch (SQLException e) {}
 	}
 	
 	public void addAllRoles(String... roles) {
