@@ -59,10 +59,6 @@ public class UserManagementController implements Initializable {
 		vboxAccounts.getChildren().clear();
 		
 		for(var account : _accounts) {
-			account.getRoles().forEach(role -> {
-				
-			});
-			
 			var accountItem = new AccountItem(account);
 			accountItem.setUpdateEvent(createUpdateEvent());
 			vboxAccounts.getChildren().add(accountItem);
@@ -71,7 +67,6 @@ public class UserManagementController implements Initializable {
 	
 	private Consumer<String> createUpdateEvent(){
 		return (Query -> {
-			System.out.println(Query);
 			try {
 				boolean succes = _db.Insert(Query);
 			} catch (SQLException e) {
