@@ -168,7 +168,6 @@ public class LoginController {
     		root.setController(mainController);
     		BorderPane pane = root.load();
     		loginPane.getChildren().setAll(pane);
-    		System.out.println("Loading Sidebar View");
 			
 		} catch (IOException e) {
 			e.printStackTrace();

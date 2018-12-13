@@ -35,7 +35,7 @@ public class UserManagementController implements Initializable {
 	public void initialize(URL url, ResourceBundle resources) {
 		// TODO Auto-generated method stub
 		getAccounts();
-		
+
 		searchBox.textProperty().addListener((observable) -> {
 			renderAccounts();
 		});
@@ -101,9 +101,9 @@ public class UserManagementController implements Initializable {
 					}
 				}
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
 			return accounts;
 		});
 	}
