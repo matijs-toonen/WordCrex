@@ -33,6 +33,11 @@ public class ChallengeController implements Initializable  {
 	public void initialize(URL location, ResourceBundle resources) {
 		setChallenges();
 		setPlayersToChallenge();
+		
+		searchBox.textProperty().addListener((observable) -> {
+			showPlayersToChallenge();
+			showChallenges();
+		});
 	}
 	
 	private void setChallenges() {
@@ -62,13 +67,10 @@ public class ChallengeController implements Initializable  {
 	private void showPlayersToChallenge() {
 		vboxChallengePlayers.getChildren().clear();
 		
-		
-		_possibleChallenges.forEach(player -> {
-			if(player.getUsername().contains(searchBox.getText())) {
-				var challengeItem = new ChallengePlayerItem(player);
-				vboxChallengePlayers.getChildren().add(challengeItem);
-				challengeItem.setOnClickEvent(onSentChallenge());	
-			}
+		Account.getAllAccountsByUsername(_possibleChallenges, searchBox.getText()).forEach(player -> {
+			var challengeItem = new ChallengePlayerItem(player);
+			vboxChallengePlayers.getChildren().add(challengeItem);
+			challengeItem.setOnClickEvent(onSentChallenge());	
 		});
 	}
 	

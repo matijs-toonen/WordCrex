@@ -51,12 +51,14 @@ public class ChallengeItem extends AnchorPane{
 		btnAccept.setLayoutX(150);
 		btnAccept.setLayoutY(5);
 		btnAccept.setCursor(Cursor.HAND);
-		btnAccept.setStyle("-fx-background-color: #3B86FF; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-width: 80");
+		btnAccept.getStyleClass().add("blueButton");
+		btnAccept.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-pref-width: 80");
 		btnReject.setText(rejectText);
 		btnReject.setLayoutX(240);
 		btnReject.setLayoutY(5);
 		btnReject.setCursor(Cursor.HAND);
-		btnReject.setStyle("-fx-background-color: #FF6565; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-width: 80");
+		btnReject.getStyleClass().add("redButton");
+		btnReject.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-pref-width: 80");
 	}
 	
 	public Game getGame() {
