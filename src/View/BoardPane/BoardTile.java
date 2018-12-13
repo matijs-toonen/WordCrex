@@ -3,6 +3,8 @@ package View.BoardPane;
 import java.util.function.Consumer;
 
 import Model.Symbol;
+import Model.Tile;
+import Model.TileType;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -23,6 +25,7 @@ import javafx.util.Pair;
 
 public class BoardTile extends Pane {
 	private Symbol _symbol;
+	private TileType _type;
 	private int _column;
 	private int _row;
 	private Label lblValue = new Label();
@@ -39,8 +42,7 @@ public class BoardTile extends Pane {
 		lblSymbol.setTextFill(Color.BLUE);
 		
 		if(_symbol == null) {
-//			lblValue.setText("4");
-			lblSymbol.setText("H");
+			lblSymbol.setText("#");
 			
 		}else {
 			lblValue.setText(String.valueOf(_symbol.getValue()));
@@ -54,10 +56,23 @@ public class BoardTile extends Pane {
 		this(symbol);
 		_column = column;
 		_row = row;
-	}	
+	}
+	
+	public BoardTile(int column, int row, TileType type)
+	{
+		this(column, row);
+		_type = type;
+		setTypeAsVisual();
+	}
 	
 	public BoardTile(int column, int row) {
-		this(column, row, null);
+		this(column, row, (Symbol)null);
+	}
+	
+	public BoardTile(Tile tile)
+	{
+		// Index 0
+		this(tile.getX()-1, tile.getY()-1, tile.getType());
 	}
 	
 	public Symbol getSymbol() {
@@ -70,6 +85,16 @@ public class BoardTile extends Pane {
 			return String.valueOf(_symbol.getChar()).toCharArray()[0];
 		else
 			return ' ';
+	}
+	
+	public int getBonusValue()
+	{
+		return _type.getValue();
+	}
+	
+	public char getBonusLetter()
+	{
+		return _type.getLetter();
 	}
 	
 	public Pair<Integer, Integer> getCords(){
@@ -126,6 +151,19 @@ public class BoardTile extends Pane {
 		var params = new SnapshotParameters();
 		params.setFill(Color.TRANSPARENT);
 		return item.snapshot(params, null);
+	}
+	
+	private void setTypeAsVisual()
+	{
+		if(_type != null)
+		{
+			if(_type.getValue() != 0)
+				lblValue.setText(String.valueOf(_type.getValue()));
+			else
+				lblValue.setText("");
+			
+			lblSymbol.setText(String.valueOf(_type.getLetter()));
+		}
 	}
 	
 	public void createOnClickEvent(Consumer<MouseEvent> action) {

@@ -12,8 +12,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import Model.Account;
 import Model.HandLetter;
 import Model.Letter;
+import Model.Tile;
 import Model.Turn;
 import Model.Board.Board;
 import Model.Board.PositionStatus;
@@ -36,7 +38,6 @@ import javafx.util.Pair;
 public class BoardController implements Initializable {
 	
 	private DatabaseController _db;
-	private LinkedHashMap<Point, BoardTile> _tiles;
 	private LinkedHashMap<Point, BoardTile> _boardTiles; // 15 by 15
 	private Board _board;
 	
@@ -51,7 +52,6 @@ public class BoardController implements Initializable {
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		_tiles = new LinkedHashMap<Point, BoardTile>();
 		_boardTiles = new LinkedHashMap<Point, BoardTile>();
 		lblPlayer1.setText("SCHRUKTURK");
 		lblPlayer2.setText("BOEDER");
@@ -62,39 +62,74 @@ public class BoardController implements Initializable {
 		createHand();
 	}
 	
-	private void createField() {
-		int x = 1;
-		for(int i = 0; i < 15; i++) {
-			int y = 1;
-			for(int j = 0; j < 15; j++) {
-				var tile = new BoardTile(i, j);
-				tile.setDropEvents(createDropEvents());
-				tile.setBackground(getBackground(Color.CHOCOLATE));
-				tile.setLayoutX(x);
-				tile.setLayoutY(y);
-				tile.setMinWidth(30);
-				tile.setMinHeight(30);
-				_tiles.put(new Point(x, y), tile);
-				_boardTiles.put(new Point(i, j), tile);
-				y += 32;
-				panePlayField.getChildren().add(tile);
+	private void createField() 
+	{
+		_db = new DatabaseController<Tile>();
+		try 
+		{
+			var allTiles = (ArrayList<Tile>) _db.SelectAll("SELECT * FROM tile", Tile.class);
+			
+			int x = 1;
+			for(int i = 0; i < 15; i++) {
+				int y = 1;
+				for(int j = 0; j < 15; j++) {
+					
+					Tile tile = null;
+					
+					try
+					{
+						tile = getTileFromCollection(allTiles, i+1, j+1);
+					}
+					catch (Exception e)
+					{
+						System.err.println("Tile(s) does/do not not exist");
+					}
+					
+					if(tile == null)
+						throw new Exception("Tile == null");
+						
+					
+					var boardTile = new BoardTile(tile);
+					boardTile.setDropEvents(createDropEvents());
+					boardTile.setBackground(getBackground(Color.CHOCOLATE));
+					boardTile.setLayoutX(x);
+					boardTile.setLayoutY(y);
+					boardTile.setMinWidth(30);
+					boardTile.setMinHeight(30);
+					_boardTiles.put(new Point(i, j), boardTile);
+					y += 32;
+					panePlayField.getChildren().add(boardTile);
+				}
+				x += 32;
 			}
-			x += 32;
+		} 
+		catch (SQLException e) 
+		{
+			System.err.println("SQL Error");
+			e.printStackTrace();
 		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	private Tile getTileFromCollection(ArrayList<Tile> collection, int x, int y)
+	{
+		var allTiles = collection.stream().filter(t -> t.isAtPoint(new Point(x,y))).collect(Collectors.toList());
+		return  allTiles.size() == 1 ? allTiles.get(0) : null;
 	}
 	
 	private void createHand() {
 		_db = new DatabaseController<HandLetter>();
 		try {
 			var count = _db.SelectCount("SELECT COUNT(*) FROM handletter");
-			System.out.println(count);
 			var handLetters = (ArrayList<HandLetter>) _db.SelectWithCustomLogic(getHandLetter(), "SELECT * FROM handletter NATURAL JOIN letter NATURAL JOIN symbol where turn_id = 1");
 			int x = 12;
 			int y = 0;
 
 			for(var handLetter : handLetters) {
 				for(var letter : handLetter.getLetters()) {
-					System.out.println(letter.getSymbol().getChar());
 					var boardTile = new BoardTile(letter.getSymbol());
 					boardTile.setDraggableEvents();
 					boardTile.setBackground(getBackground(Color.LIGHTPINK));
@@ -194,21 +229,29 @@ public class BoardController implements Initializable {
 		var column = playedCord.getKey();
 		var row = playedCord.getValue();
 		
-		var horWord = getPlacedWordFromChars(createCharArrFromCords(row, true), playedCord, true);
-		var verWord = getPlacedWordFromChars(createCharArrFromCords(column, false), playedCord, false);
-								
+		var horWordScore = getPlacedWordFromChars(createCharArrFromCords(row, true), playedCord, true);
+		var verWordScore = getPlacedWordFromChars(createCharArrFromCords(column, false), playedCord, false);
+		
+		var verWord = horWordScore.getKey();
+		var horWord = verWordScore.getKey();
+										
 		for(var word : words)
-		{			
+		{
 			if(!word.toUpperCase().equals(horWord) && !word.toUpperCase().equals(verWord))
 				continue;
 			
-			placedWords.add(word);
+			if(word.toUpperCase().equals(horWord) && word.toUpperCase().equals(verWord))
+			{
+				placedWords.add(word);
+				placedWords.add(word);
+			}
+			else
+				placedWords.add(word);
 		}
 		
 		return placedWords;
 	}
 
-	// Horizontal
 	private char[] createCharArrFromCords(int colro, boolean horizontal)
 	{
 		var letters = new ArrayList<Character>();
@@ -238,22 +281,50 @@ public class BoardController implements Initializable {
 			}	
 		}
 		
-		return letters.stream().map(String::valueOf).collect(Collectors.joining()).toCharArray();
+		return createCharArr(letters);
 	}
 	
-	private String getPlacedWordFromChars(char[] letters, Pair<Integer, Integer> placedCord, boolean horizontal)
-	{				
-		var word = "";
+	private char[] createCharArr(ArrayList<Character> arr)
+	{
+		return arr.stream().map(String::valueOf).collect(Collectors.joining()).toCharArray();
+	}
+	
+	private Pair<String, Integer> getPlacedWordFromChars(char[] letters, Pair<Integer, Integer> placedCord, boolean horizontal)
+	{	
+		Pair<String, Integer> wordWithScore;
 		
 		if(horizontal)			
-			word = collectLettersUntilSeperator(letters, placedCord.getKey(), ' ');
+		{
+			var wordWithStartEnd = collectLettersUntilSeperator(letters, placedCord.getKey(), ' ');
+			var word = wordWithStartEnd.getKey();
+			var score = getWordScore(wordWithStartEnd.getValue(), placedCord.getValue());
+			wordWithScore = new Pair<String, Integer>(word, score);
+		}
 		else
-			word = collectLettersUntilSeperator(letters, placedCord.getValue(), ' ');
+		{
+			var wordWithStartEnd = collectLettersUntilSeperator(letters, placedCord.getValue(), ' ');
+			var word = wordWithStartEnd.getKey();
+			var score = getWordScore(wordWithStartEnd.getValue(), placedCord.getKey());
+			wordWithScore = new Pair<String, Integer>(word, score);
+		}
 			
-		return word;
+		return wordWithScore;
 	}
 	
-	private String collectLettersUntilSeperator(char[] letters, int index, char seperator)
+	private int getWordScore(Pair<Integer,Integer> endStart, int colro)
+	{
+		var start = endStart.getKey();
+		var end = endStart.getValue();
+		
+		for(int i = start; i <= end; i++)
+		{
+			System.out.println(i + "=" + colro);
+		}
+		
+		return 0;
+	}
+	
+	private Pair<String,Pair<Integer,Integer>> collectLettersUntilSeperator(char[] letters, int index, char seperator)
 	{
 		var str = new StringBuilder();
 		
@@ -265,7 +336,7 @@ public class BoardController implements Initializable {
 		{
 			if(letters[i] == seperator)
 			{
-				endStr = i;
+				endStr = i-1;
 				break;
 			}
 		}
@@ -274,16 +345,19 @@ public class BoardController implements Initializable {
 		{
 			if(letters[i] == seperator)
 			{
-				startStr = i;
+				startStr = i+1;
 				break;
 			}
 		}
 		
-		for(int i = startStr; i < endStr; i++)
+		for(int i = startStr; i <= endStr; i++)
 		{
 			str.append(letters[i]);
 		}
 		
-		return str.toString().trim();
+		var wordStartEnd = new Pair<>(startStr, endStr);
+		var word = str.toString().trim();
+		
+		return new Pair<>(word,wordStartEnd);
 	}
 }
