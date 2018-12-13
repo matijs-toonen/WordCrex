@@ -79,6 +79,11 @@ public class LoginController {
 			lblError.setText("Uw username en wachtwoord moet minimaal 5 tekens lang zijn.");
 			lblError.setVisible(true);
 		}
+		else if(_username.length() > 25 || _password.length() > 25)
+		{
+			lblError.setText("Uw username en wachtwoord max maximaal 25 tekens lang zijn.");
+			lblError.setVisible(true);
+		}
 		else 
 		{
 			lblError.setVisible(false);
