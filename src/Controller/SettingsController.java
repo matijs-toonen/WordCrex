@@ -65,7 +65,7 @@ public class SettingsController implements Initializable {
 		
 		btnSavePassword.setOnAction(new EventHandler<ActionEvent>() {
 		    @Override public void handle(ActionEvent e) {
-		    	updatePassword(passwordNew.getText().trim().toString());		    
+		    	updatePassword(passwordNew.getText().trim());		    
 	    	}
 		});
 	}
@@ -73,13 +73,11 @@ public class SettingsController implements Initializable {
 	private void LoadUserData() {
 		var currentUser = MainController.getUser();
 		String username = currentUser.getUsername();
-		ArrayList<String> Roles = new ArrayList<String>();
+		ArrayList<String> roles = new ArrayList<String>();
 		
 		lblUser.setText(username);
-		currentUser.getRoles().forEach(item -> {Roles.add(item.getRole());});
-		lblRoles.setText("");
-		Roles.forEach(item ->{AddRoleText(item);});
-		lblRoles.setText(lblRoles.getText().substring(0, lblRoles.getText().length() -2));
+		currentUser.getRoles().forEach(item -> roles.add(item.getRole()));
+		lblRoles.setText(String.join(", ", roles));
 		btnSavePassword.setDisable(true);
 		
 		tooltip.setText(
@@ -87,13 +85,6 @@ public class SettingsController implements Initializable {
 			    "- Minimaal 5 tekens lang\n"  +
 			    "- Maximaal 25 tekens lang\n"
 			);
-	}
-	
-	private void AddRoleText(String role)
-	{
-		String RolesText = lblRoles.getText();
-		
-		lblRoles.setText(RolesText + role + ", ");
 	}
 	
 	private void updatePassword(String password)
