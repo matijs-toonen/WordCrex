@@ -54,8 +54,6 @@ public class SuggestController implements Initializable{
 		_db = new DatabaseController<Word>();
 		
 		searchBox.textProperty().addListener((observable) -> {
-			//showPlayersToChallenge();
-			System.out.println("Test");
 			showSuggestedWords();
 		});
 		
@@ -80,11 +78,11 @@ public class SuggestController implements Initializable{
 		textfieldAddWord.setText("");
 		
 		try {
-			String statement = Word.insterQuery(wordValue, MainController.getUser().getUsername());
+			String statement = Word.insertQuery(wordValue, MainController.getUser().getUsername());
 			System.out.println(statement);
 			_db.Insert(statement);
 		} catch (SQLException e) {
-			System.out.println("Error");
+			System.err.println(e);
 		}
 		
 		showSuggestedWords();

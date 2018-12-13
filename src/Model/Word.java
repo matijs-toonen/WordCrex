@@ -56,7 +56,7 @@ public class Word {
 		return _word;
 	}
 	
-	public static String insterQuery(String word, String username) {
+	public static String insertQuery(String word, String username) {
 		return String.format("INSERT INTO dictionary (word, letterset_code, state, username) VALUES ('%s', 'NL', 'pending', '%s');", word, username);
 	}
 	
