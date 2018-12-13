@@ -16,7 +16,8 @@ set @gameid = 508;
 
 UPDATE game 
 SET 
-    answer_player2 = 'accepted'
+    answer_player2 = 'accepted',
+    game_state = 'playing'
 WHERE
     username_player2 = @username
         AND game_id = @gameid;
@@ -66,6 +67,18 @@ FROM
     dictionary
 WHERE
     state = 'pending';
+    
+-- Woord suggestie per gebruiker
+
+set @username = 'rik';
+
+SELECT 
+    *
+FROM
+    dictionary
+WHERE
+    state = 'pending'
+		AND username = @username;
 
 -- Woord suggestie toevoegen
 
@@ -115,6 +128,57 @@ WHERE NOT EXISTS (
     SELECT username FROM account WHERE username = @username
 ) LIMIT 1;
 
+insert into accountrole (username, role)
+values (@username,'player');
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- Woord checken
+
+set @wordGuess = 'camping';
+
+select word 
+from dictionary
+where word = @wordGuess;
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- Bord
+-- Turn aanmaken(elke keer als een turn is afgelopen de turn id ophogen)
+
+set @gameid = 500;
+
+INSERT INTO turn (game_id, turn_id)
+VALUES( @gameid, 1);
+
+INSERT INTO turnplayer1 (game_id, turn_id, username_player1)
+VALUES( @gameid, 1, 'ger');
+
+INSERT INTO turnplayer2 (game_id, turn_id, username_player2)
+VALUES( @gameid, 1, 'rik');
+
+-- turn acties verwerken
+-- Als er gewoon gespeeld word
+
+set @gameid = 500;
+
+update turnplayer1
+set turnaction_type = 'play'
+where username_player1 = 'ger' and game_id = @gameid;
+
+update turnplayer2
+set turnaction_type = 'play'
+where username_player2 = 'rik' and game_id = @gameid;
+
+-- Als iemand de beurt passt
+set @gameid = 500;
+
+update turnplayer1
+set turnaction_type = 'play'
+where username_player1 = 'ger' and game_id = @gameid;
+
+update turnplayer2
+set turnaction_type = 'pass'
+where username_player2 = 'rik' and game_id = @gameid and turn_ID = (select max(turn_id) from turn where game_id = @gameid);
+-- als er dus een pass aanwezig is dan moet er een nieuwe turn aangemaakt worden(dus aanmaken turn query opnieuw uitvoeren)
+
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 select * from game where answer_player2 = 'unknown';
 select * from answer;
@@ -122,3 +186,4 @@ select * from gamestate;
 select * from role;
 select * from wordstate;
 select * from account;
+select * from dictionary where word like 't%';
