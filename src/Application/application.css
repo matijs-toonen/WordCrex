@@ -34,6 +34,11 @@
 	-fx-background-color: #e6e6e6;
 }
 
+.grayButton, .grayButton:hover {
+	-fx-background-color: #B4B4C6;
+	-fx-cursor: pointer;
+}
+
 .blueButton {
 	-fx-background-color: #3B86FF;
 }
