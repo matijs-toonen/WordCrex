@@ -3,6 +3,10 @@ package Model;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+
+
+import java.util.List;
 
 import Model.WordState.*;
 
@@ -42,5 +46,25 @@ public class Word {
 		default:
 			return null;
 		}
+	}
+	
+	public String getWordState() {
+		return _state.getState();
+	}
+	
+	public String getWord() {
+		return _word;
+	}
+	
+	public static String insertQuery(String word, String username) {
+		return String.format("INSERT INTO dictionary (word, letterset_code, state, username) VALUES ('%s', 'NL', 'pending', '%s');", word, username);
+	}
+	
+	public static String selectQuery(String username) {
+		return String.format("SELECT * FROM dictionary WHERE username = '%s'", username);
+	}
+	
+	public static List<Word> getAllWordsThatContain (ArrayList<Word> words, String searchText){
+		return words.stream().filter(word -> word.getWord().contains(searchText)).collect(Collectors.toList());
 	}
 }
