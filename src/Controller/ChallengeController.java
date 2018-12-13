@@ -34,10 +34,10 @@ public class ChallengeController implements Initializable  {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		setChallenges();
-		//setPlayersToChallenge();
+		setPlayersToChallenge();
 		
 		searchBox.textProperty().addListener((observable) -> {
-			//showPlayersToChallenge();
+			showPlayersToChallenge();
 			showChallenges();
 		});
 	}
@@ -139,18 +139,22 @@ public class ChallengeController implements Initializable  {
 	private Consumer<ActionEvent> onSentChallenge() {
 		
 		return (event -> {
-	    	var btnReaction = (Button) event.getSource();
+	    	
+			var btnReaction = (Button) event.getSource();
 	    	var challengePlayer = (ChallengePlayerItem) btnReaction.getParent();
 	    	var opponent = challengePlayer.getOpponent().getUsername();
-	    	if(btnReaction.getText().equals(ChallengePlayerItem.challengeText)) {
-	    		var statement = "INSERT INTO game (game_state, letterset_code, username_player1, username_player2, answer_player2) VALUES('request', 'NL', 'ger', '" + opponent + "', 'unknown')"; 
-	    		try {
-	    			//TODO: change to insert when insert is added
-					_dbGame.Update(statement);
-				} catch (SQLException e) {
-					System.out.println(e.getMessage());
-				}
-	    	}
+	    	
+	    	var statement = Game.getRequestGameQuery(MainController.getUser().getUsername(), opponent);
+    		try {
+				_dbGame.Update(statement);
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+			}
+    		
+    		setChallenges();
+    		setPlayersToChallenge();
+    		showChallenges();
+    		showPlayersToChallenge();
 		});
     }
 	

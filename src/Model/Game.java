@@ -50,11 +50,16 @@ public class Game {
 
  	public static final String getUninvitedUsersQuery(String username) {
  		return String.format(
- 				"SELECT * \n" + 
+ 				"SELECT *\n" + 
  				"FROM account\n" + 
- 				"WHERE username NOT IN (SELECT username_player1 FROM game WHERE username_player2 = '%s')\n" + 
- 				"  AND username NOT IN (SELECT username_player2 FROM game WHERE username_player1 = '%s')"
- 				,username, username);
+ 				"WHERE username NOT IN (SELECT username_player1 FROM game WHERE username_player2 = '%s' AND game_state <> 'finished')\n" + 
+ 				"  AND username NOT IN (SELECT username_player2 FROM game WHERE username_player1 = '%s' AND game_state <> 'finished')\n" + 
+ 				"  AND username <> '%s'"
+ 				, username, username, username);
+ 	}
+ 	
+ 	public static final String getRequestGameQuery(String usernameFrom, String usernameTo) {
+ 		return String.format("");
  	}
  	
 	private Integer _gameId, _zetPlayer1, _zetPlayer2;
