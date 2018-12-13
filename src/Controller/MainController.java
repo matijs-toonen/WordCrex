@@ -40,9 +40,6 @@ public class MainController implements Initializable {
 		accountStub();
 		accountRoleStub();
 		loadPane("Games");
-		//Dummy user
-		_currentUser = new Account("jagermeester", "wachtwoord", "player");
-		_currentUser.addAllRoles("observer", "administrator", "moderator");
 	}
 	
 	private void accountStub() {
