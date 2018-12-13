@@ -126,7 +126,7 @@ public class BoardController implements Initializable {
 		_db = new DatabaseController<HandLetter>();
 		try {
 			var count = _db.SelectCount("SELECT COUNT(*) FROM handletter");
-			var handLetters = (ArrayList<HandLetter>) _db.SelectWithCustomLogic(getHandLetter(), "SELECT * FROM handletter NATURAL JOIN letter NATURAL JOIN symbol where turn_id = 1");
+			var handLetters = (ArrayList<HandLetter>) _db.SelectWithCustomLogic(getHandLetter(), "SELECT * FROM handletter NATURAL JOIN letter NATURAL JOIN symbol where turn_id = 1 AND game_id = " + 500);
 			int x = 12;
 			int y = 0;
 
