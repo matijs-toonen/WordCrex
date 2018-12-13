@@ -56,23 +56,18 @@ public class BoardController implements Initializable {
 	@FXML
 	private Pane panePlayField, paneHand;
 	
-	private GridPane titlePane;
-	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		_tiles = new HashMap<Point, BoardTile>();
-		titlePane = new GridPane();
 		
 		lblPlayer1.setText("BaderAli99");
 		lblPlayer1.setStyle("-fx-font-size: 28");
 		lblPlayer2.setText("SchurkTurk");
 		lblPlayer2.setStyle("-fx-font-size: 28");
 		lblScore1.setText("1");
-		lblScore1.setStyle("");
+		lblScore1.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 25 0 0 25");
 		lblScore2.setText("9");
-		lblScore2.setStyle("");
-		
-		
+		lblScore2.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 0 25 25 0");
 		
 		_board = new Board();
 		createField();
