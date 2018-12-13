@@ -40,4 +40,8 @@ public class Symbol {
 	public int getValue() {
 		return _value;
 	}
+	
+	public int getAmount() {
+		return _counted;
+	}
 }
