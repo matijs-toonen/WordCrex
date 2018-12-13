@@ -1,6 +1,8 @@
 package Model.Board;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import javafx.util.Pair;
 
@@ -13,6 +15,7 @@ public class Board {
 	}
 	
 	public void updateStatus(Pair<Integer, Integer> cords, PositionStatus status) {
+		
 		_positions.put(cords, status);
 	}
 	
