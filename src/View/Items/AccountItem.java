@@ -9,14 +9,18 @@ import Model.Account;
 import Model.AccountRole.AccountRole;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.HPos;
+import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.layout.AnchorPane;
 
 public class AccountItem extends AnchorPane {
 
 	private Account _currentAccount;
 	
+	private final Separator separator = new Separator();
 	private Label lblUser = new Label();
 	private CheckBox chbAdministrator = new CheckBox("Administrator");
 	private CheckBox chbModerator = new CheckBox("Moderator");
@@ -26,7 +30,7 @@ public class AccountItem extends AnchorPane {
 	public AccountItem(Account account) {
 		super();
 		_currentAccount = account;
-		
+
 		init();
 	}
 	
@@ -35,13 +39,21 @@ public class AccountItem extends AnchorPane {
 		setUserLabel();
 		setCheckboxes();
 		
-		this.getChildren().addAll(lblUser,chbAdministrator,chbModerator,chbObserver,chbPlayer);
+		this.getChildren().addAll(separator, lblUser,chbAdministrator,chbModerator,chbObserver,chbPlayer);
 	}
 	
 	private void setUserLabel() {
 		var userText = _currentAccount.getUsername();
 		lblUser.setText(userText);
+		lblUser.setLayoutX(20);
+		lblUser.setLayoutY(40);
 		lblUser.getStyleClass().add("text");
+		lblUser.setStyle("-fx-font-size: 14px");
+		
+		separator.setPrefWidth(300);
+		this.setTopAnchor(separator, 0.0);
+	    this.setLeftAnchor(separator, 15.0);
+	    this.setRightAnchor(separator, 30.0);
 	}
 	
 	private void setCheckboxes()
@@ -68,22 +80,22 @@ public class AccountItem extends AnchorPane {
 		}
 		
 		chbAdministrator.setLayoutX(200);
-		chbAdministrator.setLayoutY(00);
+		chbAdministrator.setLayoutY(20);
 		chbAdministrator.getStyleClass().add("checkbox");
 		
 		chbModerator.setLayoutX(200);
-		chbModerator.setLayoutY(35);
+		chbModerator.setLayoutY(55);
 		chbModerator.getStyleClass().add("checkbox");
 		
 		chbObserver.setLayoutX(200);
-		chbObserver.setLayoutY(70);
+		chbObserver.setLayoutY(90);
 		chbObserver.getStyleClass().add("checkbox");
 		
 		chbPlayer.setLayoutX(200);
-		chbPlayer.setLayoutY(105);
+		chbPlayer.setLayoutY(125);
 		chbPlayer.getStyleClass().add("checkbox");
 		
-		chbPlayer.setStyle("-fx-padding: 0 0 25 0");
+		chbPlayer.setStyle("-fx-padding: 0 0 20 0");
 	}
 
 	public void setUpdateEvent(Consumer<String> action) {
