@@ -13,9 +13,9 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane fx:id="loginPane" prefHeight="96.0" prefWidth="160.0" snapToPixel="false" style="-fx-background-color: white;" stylesheets="@../Application/application.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.LoginController">
+<BorderPane fx:id="loginPane" prefHeight="960.0" prefWidth="1600.0" snapToPixel="false" style="-fx-background-color: white;" stylesheets="@../Application/application.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.LoginController">
    <left>
-      <ImageView fitHeight="96.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
+      <ImageView fitHeight="960.0" fitWidth="800.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
          <image>
             <Image url="https://cdn.wallscloud.net/converted/3637731710-vector-leaves-art-0gq3-800x960-MM-100.jpg" />
          </image>
