@@ -17,8 +17,8 @@ public class Startup extends Application {
 			BorderPane root = new BorderPane();
 			Scene scene = new Scene(root,700,700);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-			Font.loadFont(getClass().getResource("../Fonts/SourceSansPro-Regular.ttf").toExternalForm(), 10);
-			Font.loadFont(getClass().getResource("../Fonts/SourceSansPro-Bold.ttf").toExternalForm(), 10);
+			Font.loadFont(getClass().getResourceAsStream("../Fonts/SourceSansPro-Regular.ttf"), 10);	
+			Font.loadFont(getClass().getResourceAsStream("../Fonts/SourceSansPro-Bold.ttf"), 10);
 			primaryStage.setScene(scene);
 			
 			Parent mainFrame = FXMLLoader.load(getClass().getResource("/View/Sidebar.fxml"));

@@ -30,14 +30,16 @@ public class MainController implements Initializable {
 	@FXML
 	private AnchorPane rootPane;
 	
+	public MainController(Account account) {
+		_currentUser = account;
+	}
+	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		// TODO Auto-generated method stub
 		accountStub();
 		accountRoleStub();
-		//Dummy user
-		_currentUser = new Account("jagermeester", "wachtwoord", "player");
-		_currentUser.addAllRoles("observer", "administrator", "moderator");
+		loadPane("Games");
 	}
 	
 	private void accountStub() {

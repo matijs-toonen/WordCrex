@@ -18,16 +18,18 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
 public class ChallengeController implements Initializable  {
-	
-	private DatabaseController _db;
-	private ArrayList<Game> _challenges;
-	private ArrayList<Account> _possibleChallenges;
+
+	private ArrayList<Game> _gameChallenges;
+	private ArrayList<Account> _uninvitedPlayers;
+	private DatabaseController<Game> _dbGame = new DatabaseController<Game>();
+	private DatabaseController<Account> _dbAccount = new DatabaseController<Account>();
 	
 	@FXML
 	private VBox vboxChallenges, vboxChallengePlayers;
 	
 	@FXML 
 	private TextField searchBox;
+	
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -40,93 +42,122 @@ public class ChallengeController implements Initializable  {
 		});
 	}
 	
+	/**
+	 * Load all challenges where user is involved
+	 */
 	private void setChallenges() {
-		_db = new DatabaseController<Game>();
-		String gameCommand = "SELECT * FROM game";
+		String challengeQuery = Game.getChallengeQuery(MainController.getUser().getUsername());
+		
 		try {
-			_challenges = (ArrayList<Game>) _db.SelectAll(gameCommand, Game.class);
+			_gameChallenges = (ArrayList<Game>) _dbGame.SelectAll(challengeQuery, Game.class);
 			showChallenges();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
 		}
 	}
 	
+	/**
+	 * Load all players that have no open invitation
+	 */
 	private void setPlayersToChallenge() {
-		_db = new DatabaseController<Account>();
-		String gameCommand = "SELECT * FROM account";
+		
+		String playerQuery = Game.getUninvitedUsersQuery(MainController.getUser().getUsername());
 		try {
-			_possibleChallenges = (ArrayList<Account>) _db.SelectAll(gameCommand, Account.class);
+			_uninvitedPlayers = (ArrayList<Account>) _dbAccount.SelectAll(playerQuery, Account.class);
 			showPlayersToChallenge();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
 		}
 	}
 	
+	
+	/**
+	 * Show challenges in the view
+	 */
+	private void showChallenges() {
+		vboxChallenges.getChildren().clear();
+		
+		Game.hasGameWithUsername(_gameChallenges, searchBox.getText()).forEach(gameChallenge -> {
+			System.out.println(gameChallenge.getGameId());
+			var challengeItem = new ChallengeItem(gameChallenge);
+			vboxChallenges.getChildren().add(challengeItem);
+			challengeItem.setOnClickEvent(onHandleChallengeClick());
+		});
+	}
+	
+	/**
+	 * Show players in the view
+	 */
 	private void showPlayersToChallenge() {
 		vboxChallengePlayers.getChildren().clear();
 		
-		Account.getAllAccountsByUsername(_possibleChallenges, searchBox.getText()).forEach(player -> {
+		Account.getAllAccountsByUsername(_uninvitedPlayers, searchBox.getText()).forEach(player -> {
 			var challengeItem = new ChallengePlayerItem(player);
 			vboxChallengePlayers.getChildren().add(challengeItem);
 			challengeItem.setOnClickEvent(onSentChallenge());	
 		});
 	}
 	
-	//Custom function for handeling the onmouseclickEvent
-	private Consumer<ActionEvent> onSentChallenge() {
-		return (event -> {
-	    	var btnReaction = (Button) event.getSource();
-	    	var challengePlayer = (ChallengePlayerItem) btnReaction.getParent();
-	    	var opponent = challengePlayer.getOpponent().getUsername();
-	    	if(btnReaction.getText().equals(ChallengePlayerItem.challengeText)) {
-	    		var statement = "INSERT INTO game (game_state, letterset_code, username_player1, username_player2, answer_player2) VALUES('request', 'NL', 'ger', '" + opponent + "', 'unknown')"; 
-	    		try {
-	    			//TODO: change to insert when insert is added
-					_db.Update(statement);
-				} catch (SQLException e) {
-					System.out.println(e.getMessage());
-				}
-	    	}
-	        System.out.println("mouse click detected! " + btnReaction.getText());
-		});
-    }
-
 	
-	private void showChallenges() {
-		vboxChallenges.getChildren().clear();
-		
-		Game.hasGameWithUsername(_challenges, searchBox.getText()).forEach(challenge -> {
-			var challengeItem = new ChallengeItem(challenge);
-			vboxChallenges.getChildren().add(challengeItem);
-			challengeItem.setOnClickEvent(onHandleChallengeClick());
-		});
-	}
-	
-	//Custom function for handeling the onmouseclickEvent
+	/**
+	 * Click handler that handels accept and reject
+	 * in the challengeItem
+	 * 
+	 * @return
+	 */
 	private Consumer<ActionEvent> onHandleChallengeClick() {
+		
 		return (event -> {
+			
+			// get item values
 	    	var btnReaction = (Button) event.getSource();
 	    	var challengeItem = (ChallengeItem) btnReaction.getParent();
 	    	var gameId = challengeItem.getGame().getGameId();
 	    	var type = btnReaction.getText();
+	    	
+	    	// get awnser value
+	    	String awnser = "";
 	    	if(type.equals(ChallengeItem.acceptText)) {
-	    		var statement = "UPDATE game SET answer_player2 = 'accepted' WHERE game_id = " + gameId; 
-	    		try {
-					_db.Update(statement);
-				} catch (SQLException e) {
-					System.out.println(e.getMessage());
-				}
+	    		awnser = "accepted";
 	    	}else if(type.equals(ChallengeItem.rejectText)) {
-	    		var statement = "UPDATE game SET answer_player2 = 'rejected' WHERE game_id = " + gameId; 
-	    		try {
-					_db.Update(statement);
-				} catch (SQLException e) {
-					System.out.println(e.getMessage());
-				}
+	    		awnser = "rejected";
 	    	}
-	        System.out.println("mouse click detected! " + btnReaction.getText());
+	    	
+	    	// update in database
+	    	var statement = Game.getChallengeAwnserQuery(gameId, awnser);
+    		try {
+				_dbGame.Update(statement);
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+			}
+    		
+    		setChallenges();
+    		showChallenges();
 		});
     }
+	
+	private Consumer<ActionEvent> onSentChallenge() {
+		
+		return (event -> {
+	    	
+			var btnReaction = (Button) event.getSource();
+	    	var challengePlayer = (ChallengePlayerItem) btnReaction.getParent();
+	    	var opponent = challengePlayer.getOpponent().getUsername();
+	    	
+	    	var statement = Game.getRequestGameQuery(MainController.getUser().getUsername(), opponent);
+    		try {
+				_dbGame.Update(statement);
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+			}
+    		
+    		setChallenges();
+    		setPlayersToChallenge();
+    		showChallenges();
+    		showPlayersToChallenge();
+		});
+    }
+	
+	
+	
 }

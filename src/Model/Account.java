@@ -18,6 +18,10 @@ public class Account {
 	private String _password;
 	private ArrayList<AccountRole> _roles = new ArrayList<AccountRole>();
 	
+	public static final String updatePassword(String password, String username) {
+		return ("UPDATE account SET password = '" + password + "' WHERE username = '" + username + "'");
+	}
+	
 	public Account(String username) {
 		_username = username;
 	}
@@ -36,10 +40,7 @@ public class Account {
 		try {
 			_username = columns.contains("username") ? rs.getString("username") : null;
 			_password = columns.contains("password") ? rs.getString("password") : null;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} catch (SQLException e) {}
 	}
 	
 	public void addAllRoles(String... roles) {
@@ -66,9 +67,16 @@ public class Account {
 	public String getUsername() {
 		return _username;
 	}
-	
-	public ArrayList<AccountRole> getRoles(){
+
+  
+	public ArrayList<AccountRole> getRoles()
+	{
 		return _roles;
+	}
+	
+	public String getPassword() 
+	{
+		return _password;
 	}
 	
 	public static Optional<Account> getAccountByUsername(ArrayList<Account> accounts, String username){

@@ -56,6 +56,10 @@ public class ChallengePlayerItem extends AnchorPane{
 		return _challengePlayer;
 	}
 	
+	/**
+	 * On Label Click
+	 * @param action
+	 */
 	public void setOnClickEvent(Consumer<ActionEvent> action) {
 		btnChallenge.setOnAction(new EventHandler<ActionEvent>() {
 

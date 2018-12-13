@@ -1,7 +1,7 @@
 package Model.AccountRole;
 
 public class AdministratorRole extends AccountRole {
-	public String getAccountType() {
+	public String getRole(){
 		return "Administrator";
 	};
 }

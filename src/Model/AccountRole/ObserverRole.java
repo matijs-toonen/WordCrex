@@ -1,7 +1,7 @@
 package Model.AccountRole;
 
 public class ObserverRole extends AccountRole{
-	public String getAccountType() {
+	public String getRole(){
 		return "Observer";
 	};
 }
