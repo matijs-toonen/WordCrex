@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import Model.Game;
+import Model.GameStatus;
 import View.Items.GameItem;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,11 +23,12 @@ import javafx.scene.layout.VBox;
 public class GameController implements Initializable{
 	
 	private DatabaseController<Game> _db;
-	private ArrayList<Game> _games;
+	private ArrayList<Game> _activeGames;
 	private AnchorPane _rootPane;
+	private ArrayList<Game> _finishedGames;
 	
 	@FXML
-	private VBox vboxGames;
+	private VBox vboxGames, vboxFinishedGames;
 	
 	@FXML 
 	private TextField searchBox;
@@ -46,9 +48,17 @@ public class GameController implements Initializable{
 	
 	private void getGames() {
 		_db = new DatabaseController<Game>();
-		String gameCommand = "SELECT * FROM game";
+		
+		var user = MainController.getUser();
+		String username = user.getUsername();
+		
+		String gameCommandFinished = Game.getWinnerQuery(username); 
+		String gameCommandActive = Game.getAcitveQuery(username);
+
 		try {
-			this._games = (ArrayList<Game>) _db.SelectAll(gameCommand, Game.class);
+			_activeGames = (ArrayList<Game>) _db.SelectAll(gameCommandActive, Game.class);
+			_finishedGames = (ArrayList<Game>) _db.SelectAll(gameCommandFinished, Game.class);
+	
 			renderGames();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -58,8 +68,15 @@ public class GameController implements Initializable{
 	
 	private void renderGames() {
 		vboxGames.getChildren().clear();
+		vboxFinishedGames.getChildren().clear();
 		
-		Game.hasGameWithUsername(_games, searchBox.getText()).forEach(game -> {
+		Game.hasWinnerWithUsername(_finishedGames, searchBox.getText()).forEach(game -> {
+			var gameItem = new GameItem(game);
+			vboxFinishedGames.getChildren().add(gameItem);
+			gameItem.setUserOnClickEvent(onLabelClick());
+		});
+		
+		Game.hasGameWithUsername(_activeGames, searchBox.getText()).forEach(game -> {
 			var gameItem = new GameItem(game);
 			vboxGames.getChildren().add(gameItem);
 			gameItem.setUserOnClickEvent(onLabelClick());

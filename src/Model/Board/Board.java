@@ -3,6 +3,7 @@ package Model.Board;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.awt.Point;
+import java.util.Iterator;
 
 public class Board {
 	private HashMap<Point, PositionStatus> _positions;
@@ -13,6 +14,7 @@ public class Board {
 	}
 	
 	public void updateStatus(Point cords, PositionStatus status) {
+		
 		_positions.put(cords, status);
 	}
 	

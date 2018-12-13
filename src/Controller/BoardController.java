@@ -5,19 +5,26 @@ import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.LinkedHashMap;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import Model.Game;
 import Model.HandLetter;
 import Model.Letter;
+import Model.Tile;
+import Model.LetterSet;
 import Model.Symbol;
 import Model.Turn;
+import Model.Word;
 import Model.Board.Board;
 import Model.Board.PositionStatus;
+import Model.WordState.WordState;
 import View.BoardPane.BoardTile;
 import View.BoardPane.BoardTilePane;
 import javafx.event.EventHandler;
@@ -35,6 +42,7 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.util.Pair;
 
 public class BoardController implements Initializable {
 	
@@ -43,7 +51,7 @@ public class BoardController implements Initializable {
 	private ArrayList<Letter> _letters = new ArrayList<Letter>();
 	private Turn _currentTurn;
 	private Game _currentGame;
-	private HashMap<Point, BoardTilePane> _tiles;
+	private HashMap<Point, BoardTilePane> _boardTiles;
 	private Board _board;
     private ArrayList<BoardTile> _currentHand;
     private HashMap<Point, BoardTile> _fieldHand;
@@ -59,7 +67,7 @@ public class BoardController implements Initializable {
 	
 	public BoardController(Game game) {
 		_board = new Board();
-		_tiles = new HashMap<Point, BoardTilePane>();
+		_boardTiles = new HashMap<Point, BoardTilePane>();
         _currentHand = new ArrayList<BoardTile>();
         _fieldHand = new HashMap<Point, BoardTile>();
 		_currentGame = game;
@@ -81,6 +89,7 @@ public class BoardController implements Initializable {
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+		_boardTiles = new HashMap<Point, BoardTilePane>();
 		lblPlayer1.setText("SCHRUKTURK");
 		lblPlayer2.setText("BOEDER");
 		lblScore1.setText("1");
@@ -90,25 +99,62 @@ public class BoardController implements Initializable {
 		createOnButtonTestClick();
 	}
 	
-	private void createField() {
-		int x = 1;
-		for(int i = 0; i < 15; i++) {
-			int y = 1;
-			for(int j = 0; j < 15; j++) {
-				var tile = new BoardTilePane(new Point(i, j));
-				tile.setDropEvents(createDropEvents());
-				tile.setBackground(getBackground(Color.CHOCOLATE));
-				tile.setLayoutX(x);
-				tile.setLayoutY(y);
-				tile.setMinWidth(30);
-				tile.setMinHeight(30);
-//				tile.createOnClickEvent(creatOnClickEvent());
-				_tiles.put(new Point(i, j), tile);
-				y += 32;
-				panePlayField.getChildren().add(tile);
+	private void createField() 
+	{
+		_db = new DatabaseController<Tile>();
+		try 
+		{
+			var allTiles = (ArrayList<Tile>) _db.SelectAll("SELECT * FROM tile", Tile.class);
+			
+			int x = 1;
+			for(int i = 0; i < 15; i++) {
+				int y = 1;
+				for(int j = 0; j < 15; j++) {
+				var tilelelle = new BoardTilePane(new Point(i, j));
+					Tile tile = null;
+					
+					try
+					{
+						tile = getTileFromCollection(allTiles, i+1, j+1);
+					}
+					catch (Exception e)
+					{
+						System.err.println("Tile(s) does/do not not exist");
+					}
+					
+					if(tile == null)
+						throw new Exception("Tile == null");
+						
+					
+					var boardTile = new BoardTile(tile);
+//					boardTile.setDropEvents(createDropEvents());
+					boardTile.setBackground(getBackground(Color.CHOCOLATE));
+					boardTile.setLayoutX(x);
+					boardTile.setLayoutY(y);
+					boardTile.setMinWidth(30);
+					boardTile.setMinHeight(30);
+					_boardTiles.put(new Point(i, j), tilelelle);
+					y += 32;
+					panePlayField.getChildren().add(boardTile);
+				}
+				x += 32;
 			}
-			x += 32;
+		} 
+		catch (SQLException e) 
+		{
+			System.err.println("SQL Error");
+			e.printStackTrace();
 		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	private Tile getTileFromCollection(ArrayList<Tile> collection, int x, int y)
+	{
+		var allTiles = collection.stream().filter(t -> t.isAtPoint(new Point(x,y))).collect(Collectors.toList());
+		return  allTiles.size() == 1 ? allTiles.get(0) : null;
 	}
 	
 	private void createHand() {
@@ -120,7 +166,6 @@ public class BoardController implements Initializable {
 
 		for(var handLetter : handLetters) {
 			for(var letter : handLetter.getLetters()) {
-				System.out.println(letter.getSymbol().getChar());
 				var boardTile = new BoardTile(letter.getSymbol());
 				boardTile.setDraggableEvents();
 				boardTile.setBackground(getBackground(Color.LIGHTPINK));
@@ -176,7 +221,7 @@ public class BoardController implements Initializable {
 			var cords = handLetter.getKey();
 			var tile = handLetter.getValue();
 			
-			var boardTile = _tiles.get(cords);
+			var boardTile = _boardTiles.get(cords);
 //			boardTile.setBackground(getBackground(Color.CHOCOLATE));
 //			boardTile.resetTile();
 			_board.updateStatus(cords, PositionStatus.Open);
@@ -277,7 +322,14 @@ public class BoardController implements Initializable {
 	private Consumer<DragEvent> createDropEvents(){
 		return (event -> {
 			if(event.getGestureTarget() instanceof BoardTilePane) {
+				var tile = (BoardTilePane) event.getSource();
 				var boardTile = (BoardTilePane) event.getGestureTarget();
+
+				var cords = boardTile.getCords();
+				
+				if(!_board.canPlace(cords))
+					return;
+				
 				var sourceTile = (BoardTile) event.getGestureSource();
 //				sourceTile.setCords(boardTile.getCords());
 //				boardTile.setDraggableEvents();
@@ -287,27 +339,37 @@ public class BoardController implements Initializable {
 				var bg = sourceTile.getBackground();
 				boardTile.setBackground(bg);
 				_fieldHand.put(boardTile.getCords(), sourceTile);
-			}
-			
-			Dragboard db = event.getDragboard();
-			if(db.hasString()) {
-				event.acceptTransferModes(TransferMode.ANY);
-				event.setDropCompleted(true);
-				event.consume();	
+				
+				Dragboard db = event.getDragboard();
+				
+				if(db.hasString()) {
+					event.acceptTransferModes(TransferMode.ANY);
+					event.setDropCompleted(true);
+					_board.updateStatus(cords, PositionStatus.Taken);
+					// TODO Add word collection from database and do something with the placed words
+//					showPlacedWords(cords); // Only for testing purposes can remove after
+					event.consume();	
+				}
 			}
 		});
 	}
 	
-	private Consumer<MouseEvent> creatOnClickEvent(){
-		return (event -> {
-			var tile = (BoardTilePane) event.getSource();
-			var cords = tile.getCords();
-			if(!_board.canPlace(cords))
-				return;
+	private void showPlacedWords(Pair<Integer, Integer> cords)
+	{
+		try
+		{
+			var words = getPlacedWordsWithScore(cords);
 			
-			_board.updateStatus(cords, PositionStatus.Taken);
-			tile.setBackground(getBackground(Color.YELLOW));
-		});
+			for(var word : words)
+			{
+				System.out.println("Word: " + word.getKey() + " Score: " + word.getValue());
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+
 	}
 	
 	//Dummy
@@ -319,5 +381,201 @@ public class BoardController implements Initializable {
 				resetHand();
 			}
 		});
+	}
+		
+	private ArrayList<Pair<String, Integer>> getPlacedWordsWithScore(Pair<Integer, Integer> playedCord)
+	{
+		_db = new DatabaseController<Word>();
+				
+		ArrayList<Pair<String, Integer>> placedWords = new ArrayList<Pair<String, Integer>>();
+		
+		var column = playedCord.getKey();
+		var row = playedCord.getValue();
+		
+		var horWordScore = getPlacedWordFromChars(createCharArrFromCords(row, true), playedCord, true);
+		var verWordScore = getPlacedWordFromChars(createCharArrFromCords(column, false), playedCord, false);
+		
+		var wordsWithScore = new ArrayList<Pair<String, Integer>>() { 
+			{ add(new Pair<>(verWordScore.getKey(), verWordScore.getValue()));
+				add(new Pair<>(horWordScore.getKey(), horWordScore.getValue())); } };
+		
+		for(var wordWithScore : wordsWithScore)
+		{
+			try 
+			{
+				var word = wordWithScore.getKey();
+				var score = wordWithScore.getValue();
+				
+				var statement = String.format("SELECT word, state FROM dictionary "
+						+ "WHERE word = '%s'", word);
+				
+				var dictWordArr = (ArrayList<Word>) _db.SelectAll(statement, Word.class);
+												
+				if(dictWordArr.size() != 1)
+					continue;
+				else
+				{
+					var dictWord = dictWordArr.get(0);
+										
+					if(dictWord.getWord().equals(word.toLowerCase()) 
+							&& dictWord.getWordState().equals("accepted"))
+						placedWords.add(new Pair<>(dictWord.getWord(), score));
+				}	
+			} 
+			catch (SQLException e) 
+			{
+				e.printStackTrace();
+			}
+		}
+									
+		return placedWords;
+	}
+
+	private char[] createCharArrFromCords(int colro, boolean horizontal)
+	{
+		var letters = new ArrayList<Character>();
+		
+		if(horizontal)
+		{
+			// Horizontal
+			for(int i = 0; i < 15; i++)
+			{
+				if(_boardTiles.containsKey(new Point(i, colro)))
+				{
+					var tile = _boardTiles.get(new Point(i, colro));
+					letters.add(tile.getBoardTile().getSymbolAsChar());
+				}
+			}
+		}
+		else
+		{
+			// Vertical
+			for(int i = 0; i < 15; i++)
+			{
+				if(_boardTiles.containsKey(new Point(colro, i)))
+				{
+					var tile = _boardTiles.get(new Point(colro, i));
+					letters.add(tile.getBoardTile().getSymbolAsChar());
+				}
+			}	
+		}
+		
+		return createCharArr(letters);
+	}
+	
+	private char[] createCharArr(ArrayList<Character> arr)
+	{
+		return arr.stream().map(String::valueOf).collect(Collectors.joining()).toCharArray();
+	}
+	
+	private Pair<String, Integer> getPlacedWordFromChars(char[] letters, Pair<Integer, Integer> placedCord, boolean horizontal)
+	{	
+		Pair<String, Integer> wordWithScore;
+		
+		if(horizontal)			
+		{
+			var wordWithStartEnd = collectLettersUntilSeperator(letters, placedCord.getKey(), ' ');
+			var word = wordWithStartEnd.getKey();
+			var score = getWordScore(wordWithStartEnd.getValue(), placedCord.getValue(), horizontal);
+			wordWithScore = new Pair<String, Integer>(word, score);
+		}
+		else
+		{
+			var wordWithStartEnd = collectLettersUntilSeperator(letters, placedCord.getValue(), ' ');
+			var word = wordWithStartEnd.getKey();
+			var score = getWordScore(wordWithStartEnd.getValue(), placedCord.getKey(), horizontal);
+			wordWithScore = new Pair<String, Integer>(word, score);
+		}
+			
+		return wordWithScore;
+	}
+	
+	public int getWordScore(Pair<Integer,Integer> endStart, int colro, boolean horizontal)
+	{
+		var start = endStart.getKey();
+		var end = endStart.getValue();
+		
+		var score = 0;
+		
+		var hasWordMulti = false;
+		
+		var wordMultiTiles = new ArrayList<BoardTile>();
+		
+		for(int i = start; i <= end; i++)
+		{
+			Point cord = null;
+			
+			if(horizontal)
+				cord = new Point(i, colro);
+			else
+				cord = new Point(colro, i);
+			
+			if(_boardTiles.containsKey(cord))
+			{
+				var tile = _boardTiles.get(cord);
+				
+				var letterScore = tile.getBoardTile().getSymbol().getValue();
+				var bonusLetter = tile.getBoardTile().getBonusLetter();
+				var bonusMulti = tile.getBoardTile().getBonusValue();
+				
+				if(bonusMulti != 0 && bonusLetter != 'W')
+					score += letterScore * bonusMulti;
+				else
+					score += letterScore;
+					
+				if (bonusLetter == 'W')
+				{
+					hasWordMulti = true;
+					wordMultiTiles.add(tile.getBoardTile());
+				}
+			}
+		}
+		
+		if(hasWordMulti)
+		{
+			for(var tile : wordMultiTiles)
+			{
+				score += score * tile.getBonusValue();
+			}
+		}
+		
+		return score;
+	}
+	
+	private Pair<String,Pair<Integer,Integer>> collectLettersUntilSeperator(char[] letters, int index, char seperator)
+	{
+		var str = new StringBuilder();
+		
+		var endStr = 0;
+		
+		var startStr = 0;
+		
+		for(int i = index; i < letters.length; i++)
+		{
+			if(letters[i] == seperator)
+			{
+				endStr = i-1;
+				break;
+			}
+		}
+		
+		for(int i = index; i >= 0; i--)
+		{
+			if(letters[i] == seperator)
+			{
+				startStr = i+1;
+				break;
+			}
+		}
+		
+		for(int i = startStr; i <= endStr; i++)
+		{
+			str.append(letters[i]);
+		}
+		
+		var wordStartEnd = new Pair<>(startStr, endStr);
+		var word = str.toString().trim();
+		
+		return new Pair<>(word,wordStartEnd);
 	}
 }

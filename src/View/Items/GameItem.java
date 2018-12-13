@@ -2,7 +2,10 @@ package View.Items;
 
 import java.io.InputStream;
 import java.util.function.Consumer;
+
+import Controller.MainController;
 import Model.Game;
+import Model.GameStatus;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -27,43 +30,81 @@ public class GameItem extends AnchorPane {
 	}
 	
 	private void setImage() {
-		InputStream is = null;
 		
-		switch (lblTime.getText().toLowerCase()) {
-		case "requested":
-			is = this.getClass().getResourceAsStream("/Resources/request.png");
-			lblTime.setText("Wachten op een zet...");
-			break;
-		case "playing":
-			is = this.getClass().getResourceAsStream("/Resources/playing.png");
-			lblTime.setText("Plaats een zet!");
-			break;
-		case "resigned":
-			is = this.getClass().getResourceAsStream("/Resources/resigned.png");
-			lblTime.setText("Spel is afgelopen.");
-			break;
-		case "finished":
-			is = this.getClass().getResourceAsStream("/Resources/finished.png");
-			lblTime.setText("Spel is afgelopen.");
-			break;
-		default:
-			is = this.getClass().getResourceAsStream("/Resources/playing.png");
+		Image image = null;
+		if(_currentGame.getSatus() == GameStatus.Playing) {
+			image = getActiveImage();
+		}
+		else {
+			image = getPlayedImage();
 		}
 		
-		var image = new Image(is);
 		imgStatus.setFitHeight(40);
 		imgStatus.setFitWidth(40);
+		imgStatus.setStyle("-fx-height: 10px; -fx-width: 10px");
 		imgStatus.setImage(image);
 	}
 	
-	private void setUserLabel() {
-		lblUser.setText(_currentGame.getUser2());
-		lblUser.getStyleClass().addAll("text", "title");
+	private Image getActiveImage() {
+		InputStream is = null;
+		
+		var currentPlayer = MainController.getUser();
+		String username = currentPlayer.getUsername();
+		int zetUser1, zetUser2; //User1 will always be the user who's logged in, User2 is always his opponent.
+		String opponent = _currentGame.getOpponent();
+	
+		if(_currentGame.getUser1().equals(username)) {
+			zetUser1 = _currentGame.getZettenPlayer1();
+			zetUser2 = _currentGame.getZettenPlayer2();
+		}
+		else {
+			zetUser1 = _currentGame.getZettenPlayer2();
+			zetUser2 = _currentGame.getZettenPlayer1();
+		}
+		
+		if(zetUser1 <= zetUser2){
+			is = this.getClass().getResourceAsStream("/Resources/request.png");
+			lblTime.setText(opponent + " wacht op jou...");
+		}
+		else {
+			is = this.getClass().getResourceAsStream("/Resources/playing.png");
+			lblTime.setText("We wachten op " + opponent);
+		}
+    
+		return new Image(is);
+	}
+	
+	private Image getPlayedImage() {
+		InputStream is = null;
+		
+		var currentPlayer = MainController.getUser();
+		String username = currentPlayer.getUsername();
+		String winner = _currentGame.getWinner();
+		
+		//Determine won/lost
+		if(username.equals(winner)) {
+			is = this.getClass().getResourceAsStream("/Resources/finished.png");
+			lblTime.setText("Je hebt gewonnen!");
+		}
+		else
+		{
+			is = this.getClass().getResourceAsStream("/Resources/resigned.png");
+			lblTime.setText("Je hebt verloren..");
+		}
+		
+		return new Image(is);
+	}
+	
+	private void setUserLabel() { 
+		var userText = _currentGame.getOpponent();
+		lblUser.setText(userText);
+		lblUser.getStyleClass().add("text");
+		lblUser.setStyle("-fx-padding: 0 0 0 50; -fx-font-size: 14px; -fx-text-fill: #4D4F5C; -fx-font-weight: bold;");
 	}
 	
 	private void setSubLabel() {
-		lblTime.setText(String.valueOf(_currentGame.getSatus()));
-		lblTime.getStyleClass().addAll("text", "subtitle");
+		lblUser.getStyleClass().add("text");
+		lblTime.setStyle("-fx-padding: 20 0 40 50; -fx-font-size: 13px; -fx-text-fill: #ABABB1");
 	}
 	
 	public Game getGame() {

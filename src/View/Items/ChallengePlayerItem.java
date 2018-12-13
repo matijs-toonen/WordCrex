@@ -48,13 +48,18 @@ public class ChallengePlayerItem extends AnchorPane{
 		btnChallenge.setLayoutX(240);
 		btnChallenge.setLayoutY(5);
 		btnChallenge.setCursor(Cursor.HAND);
-		btnChallenge.setStyle("-fx-background-color: #3B86FF; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-width: 80");
+		btnChallenge.getStyleClass().add("blueButton");
+		btnChallenge.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-pref-width: 80");
 	}
 	
 	public Account getOpponent() {
 		return _challengePlayer;
 	}
 	
+	/**
+	 * On Label Click
+	 * @param action
+	 */
 	public void setOnClickEvent(Consumer<ActionEvent> action) {
 		btnChallenge.setOnAction(new EventHandler<ActionEvent>() {
 

@@ -16,86 +16,25 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 
 public class MainController implements Initializable {
+	private static Account _currentUser;
+	
+	public static Account getUser() {
+		return _currentUser;
+	}
 	
 	@FXML
 	private AnchorPane rootPane;
 	
+	public MainController(Account account) {
+		_currentUser = account;
+	}
+	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		// TODO Auto-generated method stub
-		accountStub();
-		accountRoleStub();
-	}
-	
-	private void accountStub() {
-		//Dummy
-		var accounts = new ArrayList<Account>();
-		accounts.add(new Account("henk"));
-		var acc = Account.getAccountByUsername(accounts, "henk");
-		
-		if(acc.isPresent()) 
-			System.out.println(acc.get().getUsername());
-		
-		//With db
-		var db = new DatabaseController<Account>();
-		try {
-			accounts = (ArrayList<Account>) db.SelectAll("SELECT * FROM account", Account.class);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	private void accountRoleStub() {
-		//Dummy
-		var accounts = new ArrayList<Account>();
-		accounts.add(new Account("henk"));
-		var acc = Account.getAccountByUsername(accounts, "henk");
-		
-		if(acc.isPresent()) 
-			acc.get().addRole("player");
-		
-		//With db
-		var db = new DatabaseController<Account>();
-		try {
-			accounts = (ArrayList<Account>) db.SelectWithCustomLogic(getAccountRole(), "SELECT * FROM accountrole");
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	//Custom functionality for merging account and role together
-	private Function<ResultSet, ArrayList<Account>> getAccountRole(){
-		return (resultSet -> {
-			ArrayList<Account> accounts = new ArrayList<Account>();
-			
-			try {
-				while(resultSet.next()) {	
-					var columns = DatabaseController.getColumns(resultSet.getMetaData());
-					if(columns.contains("username")) {
-						var account = Account.getAccountByUsername(accounts, resultSet.getString("username"));
-						if(columns.contains("role")) {
-							if(account.isPresent()) {		
-								account.get().addRole(resultSet.getString("role"));
-							}else {
-								var newAccount = new Account(resultSet, columns);
-								newAccount.addRole(resultSet.getString("role"));
-								accounts.add(newAccount);		
-							}	
-						}else {
-							accounts.add(new Account(resultSet, columns));
-						}
-					}
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return accounts;
-		});
+		loadPane("Games");
 	}
 	
 	@FXML
@@ -166,7 +105,6 @@ public class MainController implements Initializable {
 	}
 	
 	private void loadPane(String paneName) {
-		
 		AnchorPane pane = null;
 		try {
 			pane = FXMLLoader.load(getClass().getResource("/View/" + paneName + ".fxml"));

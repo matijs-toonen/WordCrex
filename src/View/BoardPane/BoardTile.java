@@ -3,6 +3,8 @@ package View.BoardPane;
 import java.util.function.Consumer;
 
 import Model.Symbol;
+import Model.Tile;
+import Model.TileType;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
@@ -19,6 +21,7 @@ import java.awt.Point;
 
 public class BoardTile extends Pane {
 	private Symbol _symbol;
+	private TileType _type;
 	private Label lblValue = new Label();
 	private Label lblSymbol = new Label();
 
@@ -37,7 +40,7 @@ public class BoardTile extends Pane {
 		lblSymbol.setTextFill(Color.BLUE);
 		
 		if(_symbol == null) {
-			lblSymbol.setText("H");
+			lblSymbol.setText("#");
 			
 		}else {
 			lblValue.setText(String.valueOf(_symbol.getValue()));
@@ -48,6 +51,19 @@ public class BoardTile extends Pane {
 		getChildren().addAll(lblValue, lblSymbol);
 	}
 	
+	public BoardTile(int column, int row, TileType type)
+	{
+		this((Symbol)null);
+		_type = type;
+		setTypeAsVisual();
+	}
+	
+	public BoardTile(Tile tile)
+	{
+		// Index 0
+		this(tile.getX()-1, tile.getY()-1, tile.getType());
+	}
+	
 	public Symbol getSymbol() {
 		return _symbol;
 	}
@@ -55,6 +71,24 @@ public class BoardTile extends Pane {
 	public void resetTile() {
 		init(null);
 		lblValue.setText("");
+	};
+	
+	public Character getSymbolAsChar() {
+		
+		if(_symbol != null)
+			return String.valueOf(_symbol.getChar()).toCharArray()[0];
+		else
+			return ' ';
+	}
+	
+	public int getBonusValue()
+	{
+		return _type.getValue();
+	}
+	
+	public char getBonusLetter()
+	{
+		return _type.getLetter();
 	}
 
 	public void setDraggableEvents() {
@@ -88,6 +122,7 @@ public class BoardTile extends Pane {
 	}
 	
 	public void setSymbol(Symbol symbol) {
+		_symbol = symbol;
 		lblSymbol.setTextFill(Color.BLUE);
 		lblSymbol.setText(String.valueOf(symbol.getChar()));
 		lblValue.setText(String.valueOf(symbol.getValue()));
@@ -101,6 +136,19 @@ public class BoardTile extends Pane {
 	
 	public void setPaneVisible(boolean visible) {
 		setVisible(visible);
+	}
+	
+	private void setTypeAsVisual()
+	{
+		if(_type != null)
+		{
+			if(_type.getValue() != 0)
+				lblValue.setText(String.valueOf(_type.getValue()));
+			else
+				lblValue.setText("");
+			
+			lblSymbol.setText(String.valueOf(_type.getLetter()));
+		}
 	}
 	
 	public void createOnClickEvent(Consumer<MouseEvent> action) {

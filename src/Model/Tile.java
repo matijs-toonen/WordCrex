@@ -1,5 +1,6 @@
 package Model;
 
+import java.awt.Point;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -28,5 +29,25 @@ public class Tile {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+		
+	public int getX()
+	{
+		return _x;
+	}
+	
+	public int getY()
+	{
+		return _y;
+	}
+	
+	public TileType getType()
+	{
+		return _tileType;
+	}
+	
+	public boolean isAtPoint(Point point)
+	{
+		return point.equals(new Point(getX(), getY()));
 	}
 }
