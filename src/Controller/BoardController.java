@@ -17,8 +17,10 @@ import Model.HandLetter;
 import Model.Letter;
 import Model.Tile;
 import Model.Turn;
+import Model.Word;
 import Model.Board.Board;
 import Model.Board.PositionStatus;
+import Model.WordState.WordState;
 import View.BoardPane.BoardTile;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -211,18 +213,25 @@ public class BoardController implements Initializable {
 	
 	private void showPlacedWords(Pair<Integer, Integer> cords)
 	{
-		var words = getWords(null, cords);
-		
-		for(var word : words)
+		try
 		{
-			System.out.println(word);
+			var words = getWords(cords);
+			
+			for(var word : words)
+			{
+				System.out.println(word + " in dictionary");
+			}
 		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+
 	}
 		
-	private ArrayList<String> getWords(ArrayList<String> words, Pair<Integer, Integer> playedCord)
+	private ArrayList<String> getWords(Pair<Integer, Integer> playedCord)
 	{
-		// Dummy data
-		words = new ArrayList<String>() { { add("Beller"); add("Belles"); add("Bellec"); add("Bel"); add("Bell"); } };
+		_db = new DatabaseController<Word>();
 				
 		ArrayList<String> placedWords = new ArrayList<String>();
 		
@@ -234,21 +243,35 @@ public class BoardController implements Initializable {
 		
 		var verWord = horWordScore.getKey();
 		var horWord = verWordScore.getKey();
-										
+		
+		var words = new ArrayList<String>() { { add(verWord); add(horWord); } };
+		
 		for(var word : words)
 		{
-			if(!word.toUpperCase().equals(horWord) && !word.toUpperCase().equals(verWord))
-				continue;
-			
-			if(word.toUpperCase().equals(horWord) && word.toUpperCase().equals(verWord))
+			try 
 			{
-				placedWords.add(word);
-				placedWords.add(word);
+				var statement = String.format("SELECT word, state FROM dictionary "
+						+ "WHERE word = '%s'", word);
+				
+				var dictWordArr = (ArrayList<Word>) _db.SelectAll(statement, Word.class);
+												
+				if(dictWordArr.size() != 1)
+					continue;
+				else
+				{
+					var dictWord = dictWordArr.get(0);
+										
+					if(dictWord.getWord().equals(word.toLowerCase()) 
+							&& dictWord.getWordState().getState().equals("accepted"))
+						placedWords.add(dictWord.getWord());
+				}	
+			} 
+			catch (SQLException e) 
+			{
+				e.printStackTrace();
 			}
-			else
-				placedWords.add(word);
 		}
-		
+									
 		return placedWords;
 	}
 
@@ -297,31 +320,71 @@ public class BoardController implements Initializable {
 		{
 			var wordWithStartEnd = collectLettersUntilSeperator(letters, placedCord.getKey(), ' ');
 			var word = wordWithStartEnd.getKey();
-			var score = getWordScore(wordWithStartEnd.getValue(), placedCord.getValue());
+			var score = getWordScore(wordWithStartEnd.getValue(), placedCord.getValue(), horizontal);
 			wordWithScore = new Pair<String, Integer>(word, score);
 		}
 		else
 		{
 			var wordWithStartEnd = collectLettersUntilSeperator(letters, placedCord.getValue(), ' ');
 			var word = wordWithStartEnd.getKey();
-			var score = getWordScore(wordWithStartEnd.getValue(), placedCord.getKey());
+			var score = getWordScore(wordWithStartEnd.getValue(), placedCord.getKey(), horizontal);
 			wordWithScore = new Pair<String, Integer>(word, score);
 		}
 			
 		return wordWithScore;
 	}
 	
-	private int getWordScore(Pair<Integer,Integer> endStart, int colro)
+	public int getWordScore(Pair<Integer,Integer> endStart, int colro, boolean horizontal)
 	{
 		var start = endStart.getKey();
 		var end = endStart.getValue();
 		
+		var score = 0;
+		
+		var hasWordMulti = false;
+		
+		var wordMultiTiles = new ArrayList<BoardTile>();
+		
 		for(int i = start; i <= end; i++)
 		{
-			System.out.println(i + "=" + colro);
+			Point cord = null;
+			
+			if(horizontal)
+				cord = new Point(i, colro);
+			else
+				cord = new Point(colro, i);
+			
+			if(_boardTiles.containsKey(cord))
+			{
+				var tile = _boardTiles.get(cord);
+				
+				var letterScore = tile.getSymbol().getValue();
+				var bonusLetter = tile.getBonusLetter();
+				var bonusMulti = tile.getBonusValue();
+								
+
+				if(bonusMulti != 0)
+					score += letterScore * bonusMulti;
+				else
+					score += letterScore;
+					
+				if (bonusLetter == 'W')
+				{
+					hasWordMulti = true;
+					wordMultiTiles.add(tile);
+				}
+			}
 		}
 		
-		return 0;
+		if(hasWordMulti)
+		{
+			for(var tile : wordMultiTiles)
+			{
+				score += score * tile.getBonusValue();
+			}
+		}
+		
+		return score;
 	}
 	
 	private Pair<String,Pair<Integer,Integer>> collectLettersUntilSeperator(char[] letters, int index, char seperator)
