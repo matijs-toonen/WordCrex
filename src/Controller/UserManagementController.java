@@ -13,6 +13,7 @@ import Model.Account;
 import Model.Game;
 import Model.AccountRole.AdministratorRole;
 import View.Items.AccountItem;
+import View.Items.ChallengePlayerItem;
 import View.Items.GameItem;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -58,11 +59,11 @@ public class UserManagementController implements Initializable {
 	private void renderAccounts() {
 		vboxAccounts.getChildren().clear();
 		
-		for(var account : _accounts) {
+		Account.getAllAccountsByUsername(_accounts, searchBox.getText()).forEach(account -> {
 			var accountItem = new AccountItem(account);
 			accountItem.setUpdateEvent(createUpdateEvent());
 			vboxAccounts.getChildren().add(accountItem);
-		}
+		});
 	}
 	
 	private Consumer<String> createUpdateEvent(){
