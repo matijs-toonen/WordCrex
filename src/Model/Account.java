@@ -14,6 +14,10 @@ public class Account {
 	private String _password;
 	private ArrayList<AccountRole> _roles = new ArrayList<AccountRole>();;
 	
+	public static final String updatePassword(String password, String username) {
+		return ("UPDATE account SET password = '" + password + "' WHERE username = '" + username + "'");
+	}
+	
 	public Account(String username) {
 		_username = username;
 	}
@@ -61,6 +65,11 @@ public class Account {
 	
 	public String getUsername() {
 		return _username;
+	}
+	
+	public ArrayList<AccountRole> getRoles()
+	{
+		return _roles;
 	}
 	
 	public static Optional<Account> getAccountByUsername(ArrayList<Account> accounts, String username){
