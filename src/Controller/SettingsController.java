@@ -20,7 +20,6 @@ import javafx.scene.text.Text;
 
 public class SettingsController implements Initializable {
 
-	PasswordValidation pass = new PasswordValidation();
 	private DatabaseController<Account> _db = new DatabaseController<Account>();
 	
 	@FXML
@@ -46,7 +45,7 @@ public class SettingsController implements Initializable {
 		LoadUserData();
 		
 		passwordNew.textProperty().addListener((observable, oldValue, newValue) -> {
-			if(!pass.isValid(newValue)) {
+			if(!PasswordValidation.isValid(newValue)) {
 				if(!passwordNew.getStyleClass().contains("Invalid")) {
 					passwordNew.getStyleClass().remove("Valid");
 					passwordNew.getStyleClass().add("Invalid");
@@ -55,15 +54,13 @@ public class SettingsController implements Initializable {
 					btnSavePassword.setDisable(true);
 				}
 			}
-			else if(pass.isValid(newValue)) {
-				if(passwordNew.getStyleClass().contains("Invalid")) {
+			else if(passwordNew.getStyleClass().contains("Invalid")) {
 					passwordNew.getStyleClass().remove("Invalid");
 					passwordNew.getStyleClass().add("Valid");
 					passwordNew.setTooltip(null);
 					
 					btnSavePassword.setDisable(false);
 				}
-			}
 		});
 		
 		btnSavePassword.setOnAction(new EventHandler<ActionEvent>() {
