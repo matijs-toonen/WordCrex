@@ -27,17 +27,14 @@ public class AccountItem extends AnchorPane {
 		super();
 		_currentAccount = account;
 		
+		init();
+	}
+	
+	private void init()
+	{
 		setUserLabel();
 		setCheckboxes();
 		
-//		chbSpeler.selectedProperty().addListener(new ChangeListener<Boolean>() {
-//		    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-////		    	updateUser("Speler");
-//		    	System.out.println(oldValue);
-//		    	System.out.println(newValue);
-//		    }
-//		});
-//		
 		this.getChildren().addAll(lblUser,chbAdministrator,chbModerator,chbObserver,chbPlayer);
 	}
 	
@@ -65,18 +62,24 @@ public class AccountItem extends AnchorPane {
 			}
 		}
 		
-		chbPlayer.setLayoutX(200);
-		chbPlayer.setLayoutY(0);
+		if(chbAdministrator.isSelected()) {
+			chbAdministrator.setDisable(true);
+			chbAdministrator.getStyleClass().add("disabled");
+		}
 		
 		chbAdministrator.setLayoutX(200);
-		chbAdministrator.setLayoutY(30);
+		chbAdministrator.setLayoutY(00);
 		
 		chbModerator.setLayoutX(200);
-		chbModerator.setLayoutY(60);
+		chbModerator.setLayoutY(25);
 		
 		chbObserver.setLayoutX(200);
-		chbObserver.setLayoutY(90);
+		chbObserver.setLayoutY(50);
 		
+		chbPlayer.setLayoutX(200);
+		chbPlayer.setLayoutY(75);
+		
+		chbPlayer.setStyle("-fx-padding: 0 0 25 0");
 	}
 
 	public void setUpdateEvent(Consumer<String> action) {
@@ -91,6 +94,9 @@ public class AccountItem extends AnchorPane {
 		    		Query = "INSERT INTO accountrole (username, role) VALUES ('"+username+"','administrator')";
 
 		    	action.accept(Query);
+		    	
+		    	chbAdministrator.setDisable(true);
+				chbAdministrator.getStyleClass().add("disabled");
 		    }
 		});
 		chbModerator.selectedProperty().addListener(new ChangeListener<Boolean>() {
