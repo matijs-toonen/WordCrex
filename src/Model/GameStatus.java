@@ -20,4 +20,19 @@ public enum GameStatus {
 			return null;
 		}
 	}
+	
+	public static String getGameStatus(GameStatus state) {
+		switch(state) {
+		case Requested:
+			return "request";
+		case Playing:
+			return "playing";
+		case Finished:
+			return "finished";
+		case Resigned:
+			return "resigned";
+		default:
+			return null;
+		}
+	}
 }

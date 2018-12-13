@@ -16,10 +16,16 @@ import Model.Account;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.control.SplitPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 
 public class MainController implements Initializable {
+	private static Account _currentUser;
+	
+	public static Account getUser() {
+		return _currentUser;
+	}
 	
 	@FXML
 	private AnchorPane rootPane;
@@ -29,6 +35,9 @@ public class MainController implements Initializable {
 		// TODO Auto-generated method stub
 		accountStub();
 		accountRoleStub();
+		//Dummy user
+		_currentUser = new Account("jagermeester", "wachtwoord", "player");
+		_currentUser.addAllRoles("observer", "administrator", "moderator");
 	}
 	
 	private void accountStub() {
@@ -57,7 +66,7 @@ public class MainController implements Initializable {
 		var acc = Account.getAccountByUsername(accounts, "henk");
 		
 		if(acc.isPresent()) 
-			acc.get().addRole("player");
+			acc.get().addAllRoles("player");
 		
 		//With db
 		var db = new DatabaseController<Account>();
@@ -81,10 +90,10 @@ public class MainController implements Initializable {
 						var account = Account.getAccountByUsername(accounts, resultSet.getString("username"));
 						if(columns.contains("role")) {
 							if(account.isPresent()) {		
-								account.get().addRole(resultSet.getString("role"));
+								account.get().addAllRoles(resultSet.getString("role"));
 							}else {
 								var newAccount = new Account(resultSet, columns);
-								newAccount.addRole(resultSet.getString("role"));
+								newAccount.addAllRoles(resultSet.getString("role"));
 								accounts.add(newAccount);		
 							}	
 						}else {
@@ -149,7 +158,6 @@ public class MainController implements Initializable {
 	}
 	
 	private void loadPane(String paneName) {
-		
 		//Parent root = null;
 		AnchorPane pane = null;
 		try {

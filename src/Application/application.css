@@ -34,6 +34,40 @@
 	-fx-background-color: #e6e6e6;
 }
 
+.blueButton {
+	-fx-background-color: #3B86FF;
+}
+
+.blueButton:hover {
+	-fx-background-color: #1a71ff;
+}
+
+.redButton {
+	-fx-background-color: #FF6565;
+}
+
+.redButton:hover {
+	-fx-background-color: #ff3333;
+}
+
+.submitButton {
+	-fx-background-image: url('../Resources/submitArrow.png');
+	-fx-background-repeat: no-repeat;
+}
+
+.submitButton:hover {
+	-fx-background-color: transparent;
+}
+
+.closeButton {
+	-fx-background-image: url('../Resources/close.png');
+	-fx-background-repeat: no-repeat;
+}
+
+.closeButton:hover {
+	-fx-background-color: transparent;
+}
+
 .active {
 	-fx-background-color: #3C3B54;
 	-fx-padding: 0 0 5px 0;
@@ -126,4 +160,8 @@
     -fx-background-color :derive(black,90.0%);
     -fx-background-insets : 2.0, 0.0, 0.0;
     -fx-background-radius : 2.0em;
+}
+
+.backPanel{
+	-fx-background-color: white;
 }
