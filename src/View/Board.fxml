@@ -50,7 +50,7 @@
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </ImageView>
-                  <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="12.0" layoutY="199.0" pickOnBounds="true" preserveRatio="true" styleClass="optionButton">
+                  <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="12.0" layoutY="199.0" onMouseClicked="#openHistory" pickOnBounds="true" preserveRatio="true" styleClass="optionButton">
                      <image>
                         <Image url="@../Resources/history.png" />
                      </image>

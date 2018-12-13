@@ -54,6 +54,7 @@ public class BoardController implements Initializable {
 	private Board _board;
 	private ArrayList<BoardTile> _currentHand;
 	private boolean _chatVisible;
+	private boolean _historyVisible;
 	
 	@FXML
 	private Label lblScore1, lblScore2, lblPlayer1, lblPlayer2;
@@ -89,6 +90,19 @@ public class BoardController implements Initializable {
 	
 	public void reset() {
 		reset.setVisible(false);
+	}
+	
+	public void openHistory() throws IOException{
+		if(!_historyVisible) {
+			Parent historyFrame = FXMLLoader.load(getClass().getResource("/View/SetHistory.fxml"));
+			
+			rightBarAnchor.getChildren().setAll(historyFrame);
+			_historyVisible = true;
+		}
+		else {
+			rightBarAnchor.getChildren().clear();
+			_historyVisible = false;
+		}
 	}
 	
 	public void openChat() throws IOException {
@@ -210,6 +224,7 @@ public class BoardController implements Initializable {
 				var symbol = sourceTile.getSymbol();
 				boardTile.setSymbol(symbol);
 				boardTile.setBackground(getBackground(Color.PINK));
+				reset.setVisible(true);
 			}
 			
 			Dragboard db = event.getDragboard();
