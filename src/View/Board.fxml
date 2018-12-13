@@ -34,14 +34,6 @@
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </ImageView>
-                  <ImageView fx:id="shuffle" fitHeight="40.0" fitWidth="40.0" layoutX="12.0" layoutY="55.0" onMouseClicked="#shuffle" pickOnBounds="true" preserveRatio="true" styleClass="optionButton">
-                     <image>
-                        <Image url="@../Resources/shuffle.png" />
-                     </image>
-                     <cursor>
-                        <Cursor fx:constant="HAND" />
-                     </cursor>
-                  </ImageView>
                   <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="12.0" layoutY="103.0" pickOnBounds="true" preserveRatio="true" styleClass="optionButton">
                      <image>
                         <Image url="@../Resources/skip.png" />
@@ -50,7 +42,7 @@
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </ImageView>
-                  <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="12.0" layoutY="152.0" pickOnBounds="true" preserveRatio="true" styleClass="optionButton">
+                  <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="12.0" layoutY="152.0" onMouseClicked="#openChat" pickOnBounds="true" preserveRatio="true" styleClass="optionButton">
                      <image>
                         <Image url="@../Resources/chat.png" />
                      </image>
@@ -66,8 +58,25 @@
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </ImageView>
+                  <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="12.0" layoutY="55.0" onMouseClicked="#shuffle" pickOnBounds="true" preserveRatio="true" styleClass="optionButton">
+                     <image>
+                        <Image url="@../Resources/shuffle.png" />
+                     </image>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ImageView>
+                  <ImageView fx:id="reset" fitHeight="40.0" fitWidth="40.0" layoutX="12.0" layoutY="55.0" onMouseClicked="#reset" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../Resources/reset.png" />
+                     </image>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ImageView>
                </children>
             </Pane>
+            <AnchorPane fx:id="rightBarAnchor" layoutX="636.0" prefHeight="612.0" prefWidth="159.0" />
          </children>
       </Pane>
    </children>

@@ -1,6 +1,7 @@
 package Controller;
 
 import java.awt.Point;
+import java.io.IOException;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,18 +25,22 @@ import Model.Board.PositionStatus;
 import View.BoardPane.BoardTile;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -48,6 +53,7 @@ public class BoardController implements Initializable {
 	private HashMap<Point, BoardTile> _tiles;
 	private Board _board;
 	private ArrayList<BoardTile> _currentHand;
+	private boolean _chatVisible;
 	
 	@FXML
 	private Label lblScore1, lblScore2, lblPlayer1, lblPlayer2;
@@ -57,6 +63,12 @@ public class BoardController implements Initializable {
 	
 	@FXML
 	private Pane panePlayField, paneHand;
+	
+	@FXML
+	private AnchorPane rightBarAnchor;
+	
+	@FXML
+	private ImageView reset;
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -75,6 +87,23 @@ public class BoardController implements Initializable {
 		placeHand();
 	}
 	
+	public void reset() {
+		reset.setVisible(false);
+	}
+	
+	public void openChat() throws IOException {
+		if(!_chatVisible) {
+			Parent chatFrame = FXMLLoader.load(getClass().getResource("/View/Chat.fxml"));
+			
+			rightBarAnchor.getChildren().setAll(chatFrame);
+			_chatVisible = true;
+		}
+		else {
+			rightBarAnchor.getChildren().clear();
+			_chatVisible = false;
+		}
+	}
+	
 	private void createField() {
 		int x = 1;
 		for(int i = 0; i < 15; i++) {
@@ -91,7 +120,8 @@ public class BoardController implements Initializable {
 				_tiles.put(new Point(x, y), tile);
 				y += 32;
 				panePlayField.getChildren().add(tile);
-			}
+				//rightBarAnchor.getChildren().setAll(pane);	
+				}
 			x += 32;
 		}
 	}

@@ -9,19 +9,14 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<SplitPane dividerPositions="0.5, 0.5" orientation="VERTICAL" prefHeight="900.0" prefWidth="337.0" stylesheets="@../Application/application.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.ChatController">
+<SplitPane dividerPositions="0.07540983606557378, 0.9081967213114754" orientation="VERTICAL" prefHeight="630.0" prefWidth="337.0" stylesheets="@../Application/application.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.ChatController">
    <items>
       <AnchorPane maxHeight="-Infinity" prefHeight="50.0" prefWidth="335.0" style="-fx-border-width: 0 0 1 0; -fx-background-color: white; -fx-border-color: #E8E9EC;">
          <children>
             <Text layoutX="141.0" layoutY="29.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username" />
-            <Button layoutX="305.0" layoutY="18.0" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" styleClass="closeButton">
-               <cursor>
-                  <Cursor fx:constant="HAND" />
-               </cursor>
-            </Button>
          </children>
       </AnchorPane>
-      <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white;">
+      <AnchorPane prefHeight="175.0" prefWidth="200.0" style="-fx-background-color: white;">
          <children>
             <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="335.0">
                <children>
@@ -33,7 +28,7 @@
             <Insets />
          </opaqueInsets>
       </AnchorPane>
-      <AnchorPane maxHeight="-Infinity" prefHeight="50.0" prefWidth="200.0" style="-fx-border-width: 1 0 0 0; -fx-background-color: white; -fx-border-color: #E8E9EC;">
+      <AnchorPane maxHeight="-Infinity" prefHeight="75.0" prefWidth="200.0" style="-fx-border-width: 1 0 0 0; -fx-background-color: white; -fx-border-color: #E8E9EC;">
          <children>
             <TextField fx:id="chatInput" layoutX="15.0" layoutY="13.0" onAction="#submitChatInput" prefHeight="25.0" prefWidth="270.0" promptText="Typ hier uw bericht..." style="-fx-prompt-text-fill: #3B86FF;" />
             <Button layoutX="300.0" layoutY="13.0" mnemonicParsing="false" onAction="#submitChatInput" prefHeight="25.0" prefWidth="25.0" styleClass="submitButton">
