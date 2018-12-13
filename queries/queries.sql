@@ -230,4 +230,25 @@ where turn_id = (select max(turn_id) from turnplayer1);
 UPDATE turnplayer2
 SET bonus = 5 
 where turn_id = (select max(turn_id) from turnplayer2);
+-- 
+
+-- als de game klaar is the winnar bepalen
+
+
+SET @gameid = 502;
+
+SELECT 
+    game_id,
+    game_state,
+    (SELECT 
+            IF(score1 > score2,
+                    username_player1,
+                    username_player2)
+        ) AS 'winner'
+FROM
+    score
+WHERE
+    (game_state = 'finished'
+        OR game_state = 'resigned')
+        AND (game_id = 502);
 
