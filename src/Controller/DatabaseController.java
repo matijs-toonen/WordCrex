@@ -130,7 +130,7 @@ public class DatabaseController <T> {
 	public static ArrayList<String> getColumns(ResultSetMetaData metaData) throws SQLException{
 		ArrayList<String> columns = new ArrayList<String>();
 		for(int i = 1; i <= metaData.getColumnCount(); i++) {
-			columns.add(metaData.getColumnName(i));
+			columns.add(metaData.getColumnLabel(i));
 		}
 		 
 		return columns;
