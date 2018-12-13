@@ -14,6 +14,32 @@ public class Account {
 		return ("select username, role from accountrole order by username");
 	}
 	
+	public static final String getLoginQuery(String username, String password) {
+		return String.format("SELECT username FROM account WHERE username = '%s' AND password = '%s'", username, password);
+	}
+	
+	public static final String getNewUserQuery(String username, String password) {
+		return String.format(
+				"INSERT INTO account (username, password)\n" + 
+				"SELECT *\n" + 
+				"FROM (SELECT '%s', '%s') AS tmp\n" + 
+				"WHERE NOT EXISTS(SELECT username FROM account WHERE username = '%s')\n" + 
+				"LIMIT 1;"
+				, username, password, username);
+	}
+	
+	public static final String getInsertDefaultRoleQuery(String username) {
+		return String.format("INSERT INTO accountrole (username, role) VALUES ('%s','player')", username);
+	}
+	
+	public static final String getRolesFromUserQuery(String username) {
+		return String.format("SELECT * FROM accountrole WHERE username = '%s'", username);
+	}
+	
+	public static final String getRolesQuery() {
+		return "SELECT * FROM accountrole";
+	}
+	
 	private String _username;
 	private String _password;
 	private ArrayList<AccountRole> _roles = new ArrayList<AccountRole>();

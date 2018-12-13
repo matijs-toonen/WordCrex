@@ -18,12 +18,19 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
 public class ChallengeController implements Initializable  {
-
+	
+	/*
+	 * PROPS
+	 */
 	private ArrayList<Game> _gameChallenges;
 	private ArrayList<Account> _uninvitedPlayers;
 	private DatabaseController<Game> _dbGame = new DatabaseController<Game>();
 	private DatabaseController<Account> _dbAccount = new DatabaseController<Account>();
 	
+	
+	/*
+	 * FIELDS
+	 */
 	@FXML
 	private VBox vboxChallenges, vboxChallengePlayers;
 	
@@ -42,6 +49,7 @@ public class ChallengeController implements Initializable  {
 		});
 	}
 	
+	
 	/**
 	 * Load all challenges where user is involved
 	 */
@@ -55,6 +63,7 @@ public class ChallengeController implements Initializable  {
 			System.out.println(e.getMessage());
 		}
 	}
+	
 	
 	/**
 	 * Load all players that have no open invitation
@@ -84,6 +93,7 @@ public class ChallengeController implements Initializable  {
 			challengeItem.setOnClickEvent(onHandleChallengeClick());
 		});
 	}
+	
 	
 	/**
 	 * Show players in the view
@@ -136,6 +146,11 @@ public class ChallengeController implements Initializable  {
 		});
     }
 	
+	
+	/**
+	 * Click when user send inventation to other player
+	 * @return
+	 */
 	private Consumer<ActionEvent> onSentChallenge() {
 		
 		return (event -> {
