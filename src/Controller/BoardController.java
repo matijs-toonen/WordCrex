@@ -34,7 +34,6 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.util.Pair;
 
 public class BoardController implements Initializable {
 	
@@ -46,7 +45,7 @@ public class BoardController implements Initializable {
 	private HashMap<Point, BoardTile> _tiles;
 	private Board _board;
     private ArrayList<BoardTile> _currentHand;
-    private ArrayList<Point> _fieldHand;
+    private HashMap<Point, BoardTile> _fieldHand;
 	
 	@FXML
 	private Label lblScore1, lblScore2, lblPlayer1, lblPlayer2;
@@ -61,7 +60,7 @@ public class BoardController implements Initializable {
 		_board = new Board();
 		_tiles = new HashMap<Point, BoardTile>();
         _currentHand = new ArrayList<BoardTile>();
-        _fieldHand = new ArrayList<Point>();
+        _fieldHand = new HashMap<Point, BoardTile>();
 		_currentGame = game;
 		_currentTurn = new Turn(1);
 		getLetters();
@@ -95,7 +94,7 @@ public class BoardController implements Initializable {
 		for(int i = 0; i < 15; i++) {
 			int y = 1;
 			for(int j = 0; j < 15; j++) {
-				var tile = new BoardTile(i, j);
+				var tile = new BoardTile(new Point(i, j));
 				tile.setDropEvents(createDropEvents());
 				tile.setBackground(getBackground(Color.CHOCOLATE));
 				tile.setLayoutX(x);
@@ -103,7 +102,7 @@ public class BoardController implements Initializable {
 				tile.setMinWidth(30);
 				tile.setMinHeight(30);
 				tile.createOnClickEvent(creatOnClickEvent());
-				_tiles.put(new Point(x, y), tile);
+				_tiles.put(new Point(i, j), tile);
 				y += 32;
 				panePlayField.getChildren().add(tile);
 			}
@@ -172,11 +171,16 @@ public class BoardController implements Initializable {
 	}
 	
 	private void resetHand() {
-		for(var handLetter : _currentHand) {
-//			_board.updateStatus(handLetter, PositionStatus.Open);
-			var tile = _tiles.get(handLetter);
+		_fieldHand.entrySet().forEach(handLetter -> {
+			var cords = handLetter.getKey();
+			var tile = handLetter.getValue();
+			
+			var boardTile = _tiles.get(cords);
+			boardTile.setBackground(getBackground(Color.CHOCOLATE));
+			boardTile.resetTile();
+			_board.updateStatus(cords, PositionStatus.Open);
 			tile.setPaneVisible(true);
-		}
+		});	
 	}
 	
 	private void addTurn() {
@@ -274,9 +278,13 @@ public class BoardController implements Initializable {
 			if(event.getGestureTarget() instanceof BoardTile) {
 				var boardTile = (BoardTile) event.getGestureTarget();
 				var sourceTile = (BoardTile) event.getGestureSource();
+				sourceTile.setCords(boardTile.getCords());
+				boardTile.setDraggableEvents();
 				var symbol = sourceTile.getSymbol();
 				boardTile.setSymbol(symbol);
-				boardTile.setBackground(getBackground(Color.PINK));
+				var bg = sourceTile.getBackground();
+				boardTile.setBackground(bg);
+				_fieldHand.put(boardTile.getCords(), sourceTile);
 			}
 			
 			Dragboard db = event.getDragboard();

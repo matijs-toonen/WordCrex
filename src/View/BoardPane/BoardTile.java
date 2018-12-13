@@ -19,13 +19,25 @@ import java.awt.Point;
 
 public class BoardTile extends Pane {
 	private Symbol _symbol;
-	private int _column;
-	private int _row;
+	private Point _currentPoint;
 	private Label lblValue = new Label();
 	private Label lblSymbol = new Label();
 
 	public BoardTile(Symbol symbol) {
 		super();
+		init(symbol);
+	}
+	
+	public BoardTile(Point currentPoint, Symbol symbol) {
+		this(symbol);
+		_currentPoint = currentPoint;
+	}	
+	
+	public BoardTile(Point currentPoint) {
+		this(currentPoint, null);
+	}
+	
+	private void init(Symbol symbol) {
 		_symbol = symbol;
 		lblValue.setLayoutX(20);
 		lblValue.setTextFill(Color.GREEN);
@@ -35,7 +47,6 @@ public class BoardTile extends Pane {
 		lblSymbol.setTextFill(Color.BLUE);
 		
 		if(_symbol == null) {
-//			lblValue.setText("4");
 			lblSymbol.setText("H");
 			
 		}else {
@@ -43,17 +54,8 @@ public class BoardTile extends Pane {
 			lblSymbol.setText(String.valueOf(_symbol.getChar()));
 		}
 
+		getChildren().removeAll(lblValue, lblSymbol);
 		getChildren().addAll(lblValue, lblSymbol);
-	}
-	
-	public BoardTile(int column, int row, Symbol symbol) {
-		this(symbol);
-		_column = column;
-		_row = row;
-	}	
-	
-	public BoardTile(int column, int row) {
-		this(column, row, null);
 	}
 	
 	public Symbol getSymbol() {
@@ -61,7 +63,16 @@ public class BoardTile extends Pane {
 	}
 	
 	public Point getCords(){
-		return new Point(_column, _row);
+		return _currentPoint;
+	}
+	
+	public void resetTile() {
+		init(null);
+		lblValue.setText("");
+	}
+	
+	public void setCords(Point newPoint) {
+		_currentPoint = newPoint;
 	}
 	
 	public void setDropEvents(Consumer<DragEvent> action) {

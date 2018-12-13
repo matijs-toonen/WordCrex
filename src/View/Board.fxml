@@ -18,7 +18,7 @@
             <Pane fx:id="panePlayField" layoutX="51.0" layoutY="84.0" prefHeight="480.0" prefWidth="480.0" style="-fx-border-color: black;" />
             <Pane fx:id="paneHand" layoutX="549.0" layoutY="84.0" prefHeight="265.0" prefWidth="87.0">
                <children>
-                  <Button fx:id="btnTest" layoutX="12.0" layoutY="226.0" mnemonicParsing="false" prefWidth="63.0" style="-fx-background-color: yellow;" text="DragTest" />
+                  <Button fx:id="btnTest" layoutX="12.0" layoutY="226.0" mnemonicParsing="false" prefWidth="63.0" style="-fx-background-color: yellow;" text="Clear" />
                </children>
             </Pane>
          </children>
