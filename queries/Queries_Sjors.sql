@@ -2,12 +2,14 @@
 set @username = 'rik';
 
 SELECT 
-    username_player1, answer_player2
+    username_player1, username_player2, answer_player2
 FROM
     game
 WHERE
     username_player2 = @username
+        OR username_player1 = @username
         AND answer_player2 = 'unknown';
+        
 
 -- Uitdaging accepteren
 
@@ -37,7 +39,7 @@ WHERE
 -- Speler uitdaging aanmaken
 
 set @player1 = 'rik';
-set @player2 = 'luc';
+set @player2 = 'allrights';
 
 INSERT INTO game (game_state, letterset_code, username_player1, username_player2, answer_player2)
 VALUES ('request','NL',@player1,@player2,'unknown');
@@ -146,13 +148,13 @@ where word = @wordGuess;
 set @gameid = 500;
 
 INSERT INTO turn (game_id, turn_id)
-VALUES( @gameid, 1);
+VALUES( @gameid, (select max(turn_id) + 1 from turn where game_id = @gameid));
 
-INSERT INTO turnplayer1 (game_id, turn_id, username_player1)
-VALUES( @gameid, 1, 'ger');
+INSERT INTO turnplayer1 (game_id, turn_id, username_player1, turnaction_type)
+VALUES( @gameid, (select max(turn_id) + 1 from turn where game_id = @gameid), 'ger', 'play');
 
-INSERT INTO turnplayer2 (game_id, turn_id, username_player2)
-VALUES( @gameid, 1, 'rik');
+INSERT INTO turnplayer2 (game_id, turn_id, username_player2, turnaction_type)
+VALUES( @gameid, (select max(turn_id) + 1 from turn where game_id = @gameid), 'rik', 'play');
 
 -- turn acties verwerken
 -- Als er gewoon gespeeld word
@@ -177,7 +179,26 @@ where username_player1 = 'ger' and game_id = @gameid;
 update turnplayer2
 set turnaction_type = 'pass'
 where username_player2 = 'rik' and game_id = @gameid and turn_ID = (select max(turn_id) from turn where game_id = @gameid);
--- als er dus een pass aanwezig is dan moet er een nieuwe turn aangemaakt worden(dus aanmaken turn query opnieuw uitvoeren)
+-- check of er een pass aanwezig is in de huidige turn
+set @gameid = 500;
+
+
+UPDATE game 
+SET 
+    game_state = 'resigned'
+WHERE
+    game_id = (SELECT 
+            g.game_id
+        FROM
+            game AS g
+                JOIN
+            turnplayer1 AS p1 ON p1.game_id = g.game_id
+                JOIN
+            turnplayer2 AS p2 ON p2.game_id = g.game_id
+        WHERE
+            p1.turnaction_type = 'resign'
+                OR p2.turnaction_type = 'resign'
+                AND g.game_id = 500); 
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
@@ -190,3 +211,4 @@ select * from role;
 select * from wordstate;
 select * from account;
 select * from dictionary where word like 't%';
+select * from turn where game_id = 500;
