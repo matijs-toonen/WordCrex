@@ -155,8 +155,7 @@ public class MainController implements Initializable {
 		//Parent root = null;
 		AnchorPane pane = null;
 		try {
-			var nog = getClass().getResource("/View/" + paneName + ".fxml");
-			pane = FXMLLoader.load(nog);
+			pane = FXMLLoader.load(getClass().getResource("/View/" + paneName + ".fxml"));
 		}
 		catch(IOException ex) {
 			Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
