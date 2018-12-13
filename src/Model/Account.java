@@ -3,14 +3,24 @@ package Model;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import Model.AccountRole.*;
 
 public class Account {
+	public static final String getAllAccounts() {
+		return ("select username, role from accountrole order by username");
+	}
+	
 	private String _username;
 	private String _password;
-	private ArrayList<AccountRole> _roles = new ArrayList<AccountRole>();;
+	private ArrayList<AccountRole> _roles = new ArrayList<AccountRole>();
+	
+	public static final String updatePassword(String password, String username) {
+		return ("UPDATE account SET password = '" + password + "' WHERE username = '" + username + "'");
+	}
 	
 	public Account(String username) {
 		_username = username;
@@ -21,23 +31,22 @@ public class Account {
 		_password = password;
 	}
 	
-	public Account(String username, String password, String role) {
+	public Account(String username, String password, String... roles) {
 		this(username, password);
-		addRole(role);
+		addAllRoles(roles);
 	}
 	
 	public Account(ResultSet rs, ArrayList<String> columns) {
 		try {
 			_username = columns.contains("username") ? rs.getString("username") : null;
 			_password = columns.contains("password") ? rs.getString("password") : null;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} catch (SQLException e) {}
 	}
 	
-	public void addRole(String role) {
-		_roles.add(role == null ? new PlayerRole() : getRole(role));
+	public void addAllRoles(String... roles) {
+		for(var role : roles) {
+			_roles.add(role == null ? new PlayerRole() : getRole(role));	
+		}
 	}
 	
 	private AccountRole getRole(String role) {
@@ -54,12 +63,28 @@ public class Account {
 			return null;
 		}
 	}
-	
+
 	public String getUsername() {
 		return _username;
+	}
+
+  
+	public ArrayList<AccountRole> getRoles()
+	{
+		return _roles;
+	}
+	
+	public String getPassword() 
+	{
+		return _password;
 	}
 	
 	public static Optional<Account> getAccountByUsername(ArrayList<Account> accounts, String username){
 		return accounts.stream().filter(account -> account.getUsername().equals(username)).findFirst();
 	}
+	
+	public static List<Account> getAllAccountsByUsername(ArrayList<Account> accounts, String username){
+		return accounts.stream().filter(account -> account.getUsername().contains(username)).collect(Collectors.toList());
+	}
+	
 }

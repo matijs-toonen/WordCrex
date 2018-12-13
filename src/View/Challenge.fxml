@@ -60,7 +60,7 @@
                </children></AnchorPane>
          </items>
       </SplitPane>
-      <TextField fx:id="searchBox" focusTraversable="false" layoutX="799.0" layoutY="49.0" prefHeight="40.0" prefWidth="741.0" promptText="Zoek speler..." style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);" styleClass="search-bar">
+      <TextField fx:id="searchBox" focusTraversable="false" layoutX="534.0" layoutY="47.0" prefHeight="40.0" prefWidth="398.0" promptText="Zoek speler..." style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);" styleClass="search-bar">
          <font>
             <Font name="Source Sans Pro Regular" size="12.0" />
          </font>
@@ -68,7 +68,7 @@
             <Insets left="50.0" />
          </padding>
       </TextField>
-      <ImageView fitHeight="23.0" fitWidth="17.0" layoutX="818.0" layoutY="61.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fitHeight="23.0" fitWidth="17.0" layoutX="553.0" layoutY="59.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../Resources/search.png" />
          </image>
