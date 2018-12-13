@@ -6,27 +6,14 @@ import java.awt.Point;
 
 public class Board {
 	private HashMap<Point, PositionStatus> _positions;
-	private ArrayList<Pair<Integer, Integer>> _occupiedPositions;
 	
 	public Board() {
 		_positions = new HashMap<Point, PositionStatus>();
-		_occupiedPositions = new ArrayList<Pair<Integer, Integer>>();
 		fillBoard();
 	}
 	
-	public void updateStatus(Point cords, PositionStatus status) {
-		
-		if(status == PositionStatus.Open)
-			_occupiedPositions.remove(cords);
-		else
-			_occupiedPositions.add(cords);
-		
+	public void updateStatus(Point cords, PositionStatus status) {		
 		_positions.put(cords, status);
-	}
-	
-	public ArrayList<Pair<Integer,Integer>> getOccupiedPositions()
-	{
-		return _occupiedPositions;
 	}
 	
 	public boolean canPlace(Point cords) {

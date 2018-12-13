@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.function.Consumer;
 
 import Model.Symbol;
+import Model.TileType;
 import javafx.event.EventHandler;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
@@ -12,10 +13,18 @@ import javafx.scene.layout.Pane;
 public class BoardTilePane extends Pane{
 	private BoardTile _boardTile;
 	private Point _currentPoint;
+	private TileType _type;
 	
 	public BoardTilePane(Point point) {
 		super();
 		_currentPoint = point;
+	}
+	
+	public BoardTilePane(Point point, TileType type)
+	{
+		this(point);
+		_type = type;
+		setTypeAsVisual();
 	}
 	
 	public BoardTilePane(BoardTile boardTile, Point point) {

@@ -51,21 +51,20 @@ public class BoardTile extends Pane {
 		getChildren().addAll(lblValue, lblSymbol);
 	}
 	
-	}
-	public BoardTile(int column, int row, TileType type)
+	
+	public BoardTile(TileType type)
 	{
-		this(column, row);
+		this(null);
 		_type = type;
 		setTypeAsVisual();
-	}
-	
-		this(column, row, null);
 	}
 	
 	public BoardTile(Tile tile)
 	{
 		// Index 0
 		this(tile.getX()-1, tile.getY()-1, tile.getType());
+		
+	}
 	public Symbol getSymbol() {
 		return _symbol;
 	}
@@ -73,12 +72,14 @@ public class BoardTile extends Pane {
 	public Character getSymbolAsChar() {
 		
 		if(_symbol != null)
-	public void resetTile() {
-		init(null);
-		lblValue.setText("");
 			return String.valueOf(_symbol.getChar()).toCharArray()[0];
 		else
 			return ' ';
+	}
+	
+	public void resetTile() {
+		init(null);
+		lblValue.setText("");
 	}
 	
 	public int getBonusValue()
@@ -91,7 +92,7 @@ public class BoardTile extends Pane {
 		return _type.getLetter();
 	}
 	
-	}
+	
 
 	public void setDraggableEvents() {
 		this.setOnDragDetected(new EventHandler<MouseEvent>() {
@@ -136,10 +137,12 @@ public class BoardTile extends Pane {
 		return item.snapshot(params, null);
 	}
 	
-	private void setTypeAsVisual()
-	{
 	public void setPaneVisible(boolean visible) {
 		setVisible(visible);
+	}
+	
+	private void setTypeAsVisual()
+	{
 		if(_type != null)
 		{
 			if(_type.getValue() != 0)
