@@ -44,6 +44,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
@@ -74,11 +75,17 @@ public class BoardController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		_tiles = new HashMap<Point, BoardTile>();
-		_currentHand = new ArrayList<BoardTile>();
-		lblPlayer1.setText("SCHRUKTURK");
-		lblPlayer2.setText("BOEDER");
+
+		lblPlayer1.setText("BaderAli99");
+		lblPlayer1.setStyle("-fx-font-size: 28");
+		lblPlayer2.setText("SchurkTurk");
+		lblPlayer2.setStyle("-fx-font-size: 28");
 		lblScore1.setText("1");
+		lblScore1.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 25 0 0 25");
 		lblScore2.setText("9");
+		lblScore2.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 0 25 25 0");
+    
+		_currentHand = new ArrayList<BoardTile>();
 		_board = new Board();
 		createField();
 		createHand();
@@ -119,24 +126,24 @@ public class BoardController implements Initializable {
 	}
 	
 	private void createField() {
-		int x = 1;
+		int x = 13;
 		for(int i = 0; i < 15; i++) {
-			int y = 1;
+			int y = 13;
 			for(int j = 0; j < 15; j++) {
 				var tile = new BoardTile(i, j);
 				tile.setDropEvents(createDropEvents());
 				tile.setBackground(getBackground(Color.CHOCOLATE));
 				tile.setLayoutX(x);
 				tile.setLayoutY(y);
-				tile.setMinWidth(30);
-				tile.setMinHeight(30);
+				tile.setMinWidth(39);
+				tile.setMinHeight(39);
+				tile.setStyle("-fx-background-color: #E8E9EC; -fx-background-radius: 6");
 				tile.createOnClickEvent(creatOnClickEvent());
 				_tiles.put(new Point(x, y), tile);
-				y += 32;
+				y += 44.5;
 				panePlayField.getChildren().add(tile);
-				//rightBarAnchor.getChildren().setAll(pane);	
-				}
-			x += 32;
+			}
+			x += 44.5;
 		}
 	}
 	
@@ -146,18 +153,23 @@ public class BoardController implements Initializable {
 		try {
 			var count = _db.SelectCount("SELECT COUNT(*) FROM handletter");
 			System.out.println(count);
-			var handLetters = (ArrayList<HandLetter>) _db.SelectWithCustomLogic(getHandLetter(), "SELECT * FROM handletter NATURAL JOIN letter NATURAL JOIN symbol where turn_id = 1 and game_id = 500");
-			
+			var handLetters = (ArrayList<HandLetter>) _db.SelectWithCustomLogic(getHandLetter(), "SELECT * FROM handletter NATURAL JOIN letter NATURAL JOIN symbol where turn_id = 1 AND game_id = 500");
+			int x = 10;
+			int y = 13;
 
 			for(var handLetter : handLetters) {
 				for(var letter : handLetter.getLetters()) {
 					System.out.println(letter.getSymbol().getChar());
 					var boardTile = new BoardTile(letter.getSymbol());
 					boardTile.setDraggableEvents();
-					boardTile.setBackground(getBackground(Color.LIGHTPINK));
-					boardTile.setMinWidth(30);
-					boardTile.setMinHeight(30);
-					
+					boardTile.setLayoutX(x);
+					boardTile.setLayoutY(y);
+					boardTile.setStyle("-fx-background-color: pink; -fx-background-radius: 6");
+					y += 44.5;
+					boardTile.setMinWidth(39);
+					boardTile.setMinHeight(39);
+					paneHand.getChildren().add(boardTile);	
+          
 					_currentHand.add(boardTile);
 				}
 			};
@@ -223,7 +235,7 @@ public class BoardController implements Initializable {
 				var sourceTile = (BoardTile) event.getGestureSource();
 				var symbol = sourceTile.getSymbol();
 				boardTile.setSymbol(symbol);
-				boardTile.setBackground(getBackground(Color.PINK));
+				boardTile.setStyle("-fx-background-color: pink; -fx-background-radius: 6");
 				reset.setVisible(true);
 			}
 			
