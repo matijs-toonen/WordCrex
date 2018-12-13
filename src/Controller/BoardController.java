@@ -7,10 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Random;
-import java.util.LinkedHashMap;
 import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
@@ -21,13 +18,11 @@ import Model.Game;
 import Model.HandLetter;
 import Model.Letter;
 import Model.Tile;
-import Model.LetterSet;
 import Model.Symbol;
 import Model.Turn;
 import Model.Word;
 import Model.Board.Board;
 import Model.Board.PositionStatus;
-import Model.WordState.WordState;
 import View.BoardPane.BoardTile;
 import View.BoardPane.BoardTilePane;
 import javafx.event.EventHandler;
@@ -47,7 +42,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
@@ -63,7 +57,6 @@ public class BoardController implements Initializable {
 	private Board _board;
     private ArrayList<BoardTile> _currentHand;
     private HashMap<Point, BoardTile> _fieldHand;
-	private ArrayList<BoardTile> _currentHand;
 	private boolean _chatVisible;
 	private boolean _historyVisible;
 	
@@ -234,8 +227,8 @@ public class BoardController implements Initializable {
 		_currentHand.clear();
 		_db = new DatabaseController<HandLetter>();
 		var handLetters = getHandLetters();
-			int x = 0;
-			int y = 13;
+		int x = 0;
+		int y = 13;
 
 		for(var handLetter : handLetters) {
 			for(var letter : handLetter.getLetters()) {
@@ -244,21 +237,15 @@ public class BoardController implements Initializable {
 				boardTile.setBackground(getBackground(Color.LIGHTPINK));
 				boardTile.setLayoutX(x);
 				boardTile.setLayoutY(y);
-					boardTile.setStyle("-fx-background-color: pink; -fx-background-radius: 6");
-					y += 44.5;
-					boardTile.setMinWidth(39);
-					boardTile.setMinHeight(39);
+				boardTile.setStyle("-fx-background-color: pink; -fx-background-radius: 6");
+				y += 44.5;
+				boardTile.setMinWidth(39);
+				boardTile.setMinHeight(39);
 				paneHand.getChildren().add(boardTile);
 					_currentHand.add(boardTile);
 			}
 		};
-			placeHand();
-		} 
-		catch (SQLException e) {
-					// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	
+		placeHand();
 	}
 	
 	private ArrayList<HandLetter> getHandLetters() {
