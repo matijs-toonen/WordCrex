@@ -59,7 +59,10 @@ public class Game {
  	}
  	
  	public static final String getRequestGameQuery(String usernameFrom, String usernameTo) {
- 		return String.format("");
+ 		return String.format(
+ 				"INSERT INTO game (game_state, letterset_code, username_player1, username_player2, answer_player2)\n" + 
+ 				"VALUES ('request', 'NL', '%s', '%s', 'unknown');"
+ 				, usernameFrom, usernameTo);
  	}
  	
 	private Integer _gameId, _zetPlayer1, _zetPlayer2;
