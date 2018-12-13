@@ -1,6 +1,9 @@
 package Controller;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.function.Function;
 
 import Model.Account;
 import javafx.event.ActionEvent;
@@ -127,7 +130,8 @@ public class LoginController {
     {        
     	BorderPane pane = null;         
     	
-    	try {             
+    	try {     
+    		test();
 	    		var con = new MainController(_account);             
 	    		var panes = new FXMLLoader(getClass().getResource("/View/Sidebar.fxml"));             
 	    		panes.setController(con);             
@@ -138,4 +142,46 @@ public class LoginController {
     		}             	
     	loginPane.getChildren().setAll(pane);
     }
+    
+    private void test() {
+		//With db
+		var db = new DatabaseController<String>();
+		try {
+			var roles = (ArrayList<String>) db.SelectWithCustomLogic(getAccountRole(), "SELECT * FROM accountrole WHERE username = '" + _account.getUsername() + "'");
+			roles.forEach(role -> {
+				_account.addAllRoles(role);
+			});
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
+	//Custom functionality for merging account and role together
+	private Function<ResultSet, ArrayList<String>> getAccountRole(){
+		return (resultSet -> {
+			var roles = new ArrayList<String>();
+			var accounts = new ArrayList<Account>();
+			
+			try {
+				while(resultSet.next()) {	
+					var columns = DatabaseController.getColumns(resultSet.getMetaData());
+					if(columns.contains("username")) {
+						var account = Account.getAccountByUsername(accounts, resultSet.getString("username"));
+						if(account.isPresent()) {	
+							roles.add(resultSet.getString("role"));
+						}else {
+							var newAccount = new Account(resultSet, columns);
+							accounts.add(newAccount);
+							roles.add(resultSet.getString("role"));
+						}	
+					}
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return roles;
+		});
+	}
 }

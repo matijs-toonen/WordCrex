@@ -69,6 +69,11 @@ public class Account {
 		return _roles;
 	}
 	
+	public String getPassword() 
+	{
+		return _password;
+	}
+	
 	public static Optional<Account> getAccountByUsername(ArrayList<Account> accounts, String username){
 		return accounts.stream().filter(account -> account.getUsername().equals(username)).findFirst();
 	}
