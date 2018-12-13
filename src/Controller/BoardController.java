@@ -279,8 +279,8 @@ public class BoardController implements Initializable {
 			if(event.getGestureTarget() instanceof BoardTilePane) {
 				var boardTile = (BoardTilePane) event.getGestureTarget();
 				var sourceTile = (BoardTile) event.getGestureSource();
-				sourceTile.setCords(boardTile.getCords());
-				boardTile.setDraggableEvents();
+//				sourceTile.setCords(boardTile.getCords());
+//				boardTile.setDraggableEvents();
 				
 				var symbol = sourceTile.getSymbol();
 				boardTile.setSymbol(symbol);
@@ -300,7 +300,7 @@ public class BoardController implements Initializable {
 	
 	private Consumer<MouseEvent> creatOnClickEvent(){
 		return (event -> {
-			var tile = (BoardTile) event.getSource();
+			var tile = (BoardTilePane) event.getSource();
 			var cords = tile.getCords();
 			if(!_board.canPlace(cords))
 				return;

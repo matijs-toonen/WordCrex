@@ -3,6 +3,7 @@ package View.BoardPane;
 import java.awt.Point;
 import java.util.function.Consumer;
 
+import Model.Symbol;
 import javafx.event.EventHandler;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
@@ -28,6 +29,10 @@ public class BoardTilePane extends Pane{
 	
 	public Point getCords(){
 		return _currentPoint;
+	}
+	
+	public void setSymbol(Symbol symbol) {
+		_boardTile.setSymbol(symbol);
 	}
 	
 	public void setBoardTile(BoardTile newBoardTile) {
