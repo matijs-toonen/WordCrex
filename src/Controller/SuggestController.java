@@ -18,12 +18,19 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 
 public class SuggestController implements Initializable{
 	
@@ -99,21 +106,26 @@ public class SuggestController implements Initializable{
 		Word.getAllWordsThatContain(_words, searchBox.getText()).forEach(word -> {
 			
 			HBox wordBox = new HBox();
+			
+			GridPane contentGrid = new GridPane();
 		
 			Label wordState = new Label();
 			
+			wordState.setPrefWidth(150);
+			wordState.setAlignment(Pos.CENTER);
+			
 			switch (word.getWordState()) {
 			case "accepted":
-				wordState.setText("Goed Gekeurd");
-				wordState.setStyle("-fx-background-color: green");
+				wordState.setText("Goedgekeurd");
+				wordState.setStyle("-fx-padding: 5 0; -fx-background-color: #E0F9EC; -fx-background-radius: 25; -fx-font-size: 15px; -fx-font-family: 'Source Sans Pro'");
 				break;
 			case "pending":
-				wordState.setText("In Beoordeling...");
-				wordState.setStyle("-fx-background-color: gray");
+				wordState.setText("In beoordeling");
+				wordState.setStyle("-fx-padding: 5 0; -fx-background-color: #b3b3b3; -fx-background-radius: 25; -fx-font-size: 15px; -fx-font-family: 'Source Sans Pro'");
 				break;
 			case "denied":
-				wordState.setText("Af Gekeurd");
-				wordState.setStyle("-fx-background-color: red");
+				wordState.setText("Afgekeurd");
+				wordState.setStyle("-fx-padding: 5 0; -fx-background-color: #FFE2E6; -fx-background-radius: 25; -fx-font-size: 15px; -fx-font-family: 'Source Sans Pro'");
 				break;
 			default:
 				break;
@@ -121,10 +133,23 @@ public class SuggestController implements Initializable{
 			
 			Label wordLabel = new Label();
 			wordLabel.setText(word.getWord());
+			wordLabel.setStyle("-fx-padding: 30 20; -fx-font-size: 15px; -fx-font-family: 'Source Sans Pro';"); 
 			
 			wordBox.getChildren().addAll(wordLabel, wordState);
 			
-			wordList.getChildren().add(wordBox);
+			contentGrid.add(wordLabel, 0, 0);
+			contentGrid.add(wordState, 1, 0);
+			
+			contentGrid.setHalignment(wordState, HPos.RIGHT);
+			
+			ColumnConstraints cc = new ColumnConstraints();
+			 
+			cc.setPercentWidth(50);
+			cc.setHgrow(Priority.ALWAYS);
+			contentGrid.getColumnConstraints().add(cc);
+			contentGrid.getColumnConstraints().add(cc);
+			
+			wordList.getChildren().add(contentGrid);
 		});
 		
 	}

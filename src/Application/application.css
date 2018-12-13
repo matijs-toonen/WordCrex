@@ -118,6 +118,14 @@
 	-fx-width: 10px;
 }
 
+.scroll-pane > .viewport {
+	-fx-background-color: transparent;
+}
+
+.scroll-pane {
+	-fx-background-color: transparent;
+}
+
 .scroll-bar:horizontal .track,
 .scroll-bar:vertical .track{
     -fx-background-color :white;
