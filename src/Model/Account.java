@@ -127,4 +127,12 @@ public class Account {
 		return ("UPDATE account SET password = '" + password + "' WHERE username = '" + username + "'");
 	}
 	
+	public static final String getAddRoleQuery(String username, String role) {
+		return String.format("INSERT INTO accountrole (username, role) VALUES ('%s','%s')", username, role);
+	}
+	
+	public static final String getRemoveRoleQuery(String username, String role) {
+		return String.format("DELETE FROM accountrole WHERE username = '%s' AND role = '%s'", username, role);
+	}
+	
 }
