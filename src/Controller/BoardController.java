@@ -215,11 +215,11 @@ public class BoardController implements Initializable {
 	{
 		try
 		{
-			var words = getWords(cords);
+			var words = getPlacedWordsWithScore(cords);
 			
 			for(var word : words)
 			{
-				System.out.println(word + " in dictionary");
+				System.out.println("Word: " + word.getKey() + " Score: " + word.getValue());
 			}
 		}
 		catch(Exception e)
@@ -229,11 +229,11 @@ public class BoardController implements Initializable {
 
 	}
 		
-	private ArrayList<String> getWords(Pair<Integer, Integer> playedCord)
+	private ArrayList<Pair<String, Integer>> getPlacedWordsWithScore(Pair<Integer, Integer> playedCord)
 	{
 		_db = new DatabaseController<Word>();
 				
-		ArrayList<String> placedWords = new ArrayList<String>();
+		ArrayList<Pair<String, Integer>> placedWords = new ArrayList<Pair<String, Integer>>();
 		
 		var column = playedCord.getKey();
 		var row = playedCord.getValue();
@@ -241,15 +241,17 @@ public class BoardController implements Initializable {
 		var horWordScore = getPlacedWordFromChars(createCharArrFromCords(row, true), playedCord, true);
 		var verWordScore = getPlacedWordFromChars(createCharArrFromCords(column, false), playedCord, false);
 		
-		var verWord = horWordScore.getKey();
-		var horWord = verWordScore.getKey();
+		var wordsWithScore = new ArrayList<Pair<String, Integer>>() { 
+			{ add(new Pair<>(verWordScore.getKey(), verWordScore.getValue()));
+				add(new Pair<>(horWordScore.getKey(), horWordScore.getValue())); } };
 		
-		var words = new ArrayList<String>() { { add(verWord); add(horWord); } };
-		
-		for(var word : words)
+		for(var wordWithScore : wordsWithScore)
 		{
 			try 
 			{
+				var word = wordWithScore.getKey();
+				var score = wordWithScore.getValue();
+				
 				var statement = String.format("SELECT word, state FROM dictionary "
 						+ "WHERE word = '%s'", word);
 				
@@ -263,7 +265,7 @@ public class BoardController implements Initializable {
 										
 					if(dictWord.getWord().equals(word.toLowerCase()) 
 							&& dictWord.getWordState().getState().equals("accepted"))
-						placedWords.add(dictWord.getWord());
+						placedWords.add(new Pair<>(dictWord.getWord(), score));
 				}	
 			} 
 			catch (SQLException e) 
@@ -361,9 +363,8 @@ public class BoardController implements Initializable {
 				var letterScore = tile.getSymbol().getValue();
 				var bonusLetter = tile.getBonusLetter();
 				var bonusMulti = tile.getBonusValue();
-								
-
-				if(bonusMulti != 0)
+				
+				if(bonusMulti != 0 && bonusLetter != 'W')
 					score += letterScore * bonusMulti;
 				else
 					score += letterScore;
