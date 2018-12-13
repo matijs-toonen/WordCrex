@@ -11,6 +11,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
@@ -98,7 +99,20 @@ public class BoardTile extends Pane {
 				db.setDragView(createSnapshot(node));
 				content.putString(lblSymbol.getText());
 				db.setContent(content);
+				setPaneVisible(false);
 				event.consume();
+			}
+		});
+		
+		this.setOnDragDone(new EventHandler<DragEvent>() {
+
+			@Override
+			public void handle(DragEvent event) {
+				var target = event.getGestureTarget();
+				if(!(target instanceof BoardTile)) {
+					setPaneVisible(true);
+					event.consume();
+				}
 			}
 		});
 	}
@@ -113,6 +127,10 @@ public class BoardTile extends Pane {
 		var params = new SnapshotParameters();
 		params.setFill(Color.TRANSPARENT);
 		return item.snapshot(params, null);
+	}
+	
+	public void setPaneVisible(boolean visible) {
+		setVisible(visible);
 	}
 	
 	public void createOnClickEvent(Consumer<MouseEvent> action) {
