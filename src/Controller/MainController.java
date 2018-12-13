@@ -39,6 +39,7 @@ public class MainController implements Initializable {
 		// TODO Auto-generated method stub
 		accountStub();
 		accountRoleStub();
+		loadPane("Games");
 	}
 	
 	private void accountStub() {
