@@ -2,26 +2,26 @@ package Model.Board;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import javafx.util.Pair;
+import java.awt.Point;
 
 public class Board {
-	private HashMap<Pair<Integer, Integer>, PositionStatus> _positions;
+	private HashMap<Point, PositionStatus> _positions;
 	
 	public Board() {
-		_positions = new HashMap<Pair<Integer,Integer>, PositionStatus>();
+		_positions = new HashMap<Point, PositionStatus>();
 		fillBoard();
 	}
 	
-	public void updateStatus(Pair<Integer, Integer> cords, PositionStatus status) {
+	public void updateStatus(Point cords, PositionStatus status) {
 		_positions.put(cords, status);
 	}
 	
-	public boolean canPlace(Pair<Integer, Integer> cords) {
+	public boolean canPlace(Point cords) {
 		return _positions.get(cords) == PositionStatus.Open;
 	}
 	
-	public ArrayList<Pair<Integer, Integer>> getOccupiedPositions(){
-		var positions = new ArrayList<Pair<Integer, Integer>>();
+	public ArrayList<Point> getOccupiedPositions(){
+		var positions = new ArrayList<Point>();
 		_positions.entrySet().stream()
 				.filter(pair -> !canPlace(pair.getKey()))
 				.forEach(pair -> positions.add(pair.getKey()));
@@ -31,7 +31,7 @@ public class Board {
 	private void fillBoard() {
 		for(int i = 0; i < 15; i++) {
 			for(int j = 0; j < 15; j++) {
-				_positions.put(new Pair<Integer, Integer>(i, j), PositionStatus.Open);
+				_positions.put(new Point(i, j), PositionStatus.Open);
 			}
 		}
 	}

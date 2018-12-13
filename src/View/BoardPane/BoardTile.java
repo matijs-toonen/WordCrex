@@ -11,12 +11,11 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.util.Pair;
+import java.awt.Point;
 
 public class BoardTile extends Pane {
 	private Symbol _symbol;
@@ -61,8 +60,8 @@ public class BoardTile extends Pane {
 		return _symbol;
 	}
 	
-	public Pair<Integer, Integer> getCords(){
-		return new Pair<Integer, Integer>(_column, _row);
+	public Point getCords(){
+		return new Point(_column, _row);
 	}
 	
 	public void setDropEvents(Consumer<DragEvent> action) {

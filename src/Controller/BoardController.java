@@ -11,11 +11,9 @@ import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import Model.Account;
 import Model.Game;
 import Model.HandLetter;
 import Model.Letter;
-import Model.LetterSet;
 import Model.Symbol;
 import Model.Turn;
 import Model.Board.Board;
@@ -25,12 +23,8 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.WritableImage;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
@@ -40,6 +34,7 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.util.Pair;
 
 public class BoardController implements Initializable {
 	
@@ -50,6 +45,8 @@ public class BoardController implements Initializable {
 	private Game _currentGame;
 	private HashMap<Point, BoardTile> _tiles;
 	private Board _board;
+    private ArrayList<BoardTile> _currentHand;
+    private ArrayList<Point> _fieldHand;
 	
 	@FXML
 	private Label lblScore1, lblScore2, lblPlayer1, lblPlayer2;
@@ -63,6 +60,8 @@ public class BoardController implements Initializable {
 	public BoardController(Game game) {
 		_board = new Board();
 		_tiles = new HashMap<Point, BoardTile>();
+        _currentHand = new ArrayList<BoardTile>();
+        _fieldHand = new ArrayList<Point>();
 		_currentGame = game;
 		_currentTurn = new Turn(1);
 		getLetters();
@@ -88,6 +87,7 @@ public class BoardController implements Initializable {
 		lblScore2.setText("9");
 		createField();
 		createHand();
+		createOnButtonTestClick();
 	}
 	
 	private void createField() {
@@ -112,6 +112,7 @@ public class BoardController implements Initializable {
 	}
 	
 	private void createHand() {
+        _currentHand.clear();
 		_db = new DatabaseController<HandLetter>();
 		var handLetters = getHandLetters();
 		int x = 12;
@@ -128,7 +129,8 @@ public class BoardController implements Initializable {
 				y += 32;
 				boardTile.setMinWidth(30);
 				boardTile.setMinHeight(30);
-				paneHand.getChildren().add(boardTile);	
+				paneHand.getChildren().add(boardTile);
+				_currentHand.add(boardTile);
 			}
 		};
 	}
@@ -167,6 +169,14 @@ public class BoardController implements Initializable {
 		}
 		
 		return handLetters;
+	}
+	
+	private void resetHand() {
+		for(var handLetter : _currentHand) {
+//			_board.updateStatus(handLetter, PositionStatus.Open);
+			var tile = _tiles.get(handLetter);
+			tile.setPaneVisible(true);
+		}
 	}
 	
 	private void addTurn() {
@@ -287,6 +297,17 @@ public class BoardController implements Initializable {
 			
 			_board.updateStatus(cords, PositionStatus.Taken);
 			tile.setBackground(getBackground(Color.YELLOW));
+		});
+	}
+	
+	//Dummy
+	private void createOnButtonTestClick() {
+		btnTest.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				resetHand();
+			}
 		});
 	}
 }
