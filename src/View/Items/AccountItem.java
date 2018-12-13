@@ -62,7 +62,7 @@ public class AccountItem extends AnchorPane {
 		
 		for(var role : _roles)
 		{
-			String _role = role.getAccountType();
+			String _role = role.getRole();
 			if(_role.equals("Administrator")) {
 				chbAdministrator.setSelected(true);
 			} else if(_role.equals("Moderator")) {
