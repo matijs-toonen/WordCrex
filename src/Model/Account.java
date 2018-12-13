@@ -32,7 +32,7 @@ public class Account {
 			_password = columns.contains("password") ? rs.getString("password") : null;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 	}
 	

@@ -1,7 +1,6 @@
 package Controller;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import Model.Account;
 import javafx.event.ActionEvent;
@@ -59,7 +58,7 @@ public class LoginController {
 			e.printStackTrace();
 		}
 		
-		if(!_account.isEmpty())
+		if(_account.getUsername() != null)
 			return true;
 
 		return false;
@@ -97,7 +96,7 @@ public class LoginController {
 	private boolean register() {
 		var db = new DatabaseController<Account>();
 		String sqlStatement = "INSERT INTO account (username, password) SELECT * FROM (SELECT '" + _username + "', '" + _password + "') AS tmp WHERE NOT EXISTS ( SELECT username FROM account WHERE username = '" + _username + "' ) LIMIT 1";
-		boolean register = false, role = false;
+		boolean register = false;
 		
 		try {
 			register = db.Insert(sqlStatement);
@@ -124,7 +123,7 @@ public class LoginController {
     	BorderPane pane = null;         
     	
     	try {             
-	    		var con = new MainController();             
+	    		var con = new MainController(_account);             
 	    		var panes = new FXMLLoader(getClass().getResource("/View/Sidebar.fxml"));             
 	    		panes.setController(con);             
 	    		pane = panes.load();         

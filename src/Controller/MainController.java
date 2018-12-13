@@ -21,11 +21,17 @@ import javafx.scene.layout.AnchorPane;
 
 public class MainController implements Initializable {
 	
+	private static Account _currentUser;
+	
+	public static Account getUser() {
+		return _currentUser;
+	}
+	
 	@FXML
 	private AnchorPane rootPane;
 	
 	public MainController(Account account) {
-		
+		_currentUser = account;
 	}
 	
 	@Override
