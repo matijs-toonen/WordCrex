@@ -78,6 +78,11 @@ public class BoardTilePane extends Pane {
 		showBoardTile();
 	}
 	
+	public void removeBoardTile() {
+		_boardTile = null;
+		showBoardTile();
+	}
+	
 	public Point getCords(){
 		return _currentPoint;
 	}

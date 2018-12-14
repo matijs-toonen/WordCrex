@@ -110,7 +110,6 @@ public class BoardController implements Initializable {
 
 		createField();
 		createHand();
-//		createOnButtonTestClick();
 	}
 
 	public void shuffle(){
@@ -118,6 +117,7 @@ public class BoardController implements Initializable {
 	}
 	
 	public void reset() {
+		resetHand();
 		reset.setVisible(false);
 	}
 	
@@ -289,9 +289,9 @@ public class BoardController implements Initializable {
 			var cords = handLetter.getKey();
 			var tile = handLetter.getValue();
 			
-			var boardTile = _boardTiles.get(cords);
-//			boardTile.setBackground(getBackground(Color.CHOCOLATE));
-//			boardTile.resetTile();
+			var tilePane = _boardTiles.get(cords);
+			tilePane.setBackground(getBackground(Color.CHOCOLATE));
+			tilePane.removeBoardTile();
 			_board.updateStatus(cords, PositionStatus.Open);
 			tile.setPaneVisible(true);
 		});	
@@ -454,17 +454,6 @@ public class BoardController implements Initializable {
 			e.printStackTrace();
 		}
 
-	}
-	
-	//Dummy
-	private void createOnButtonTestClick() {
-		btnTest.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
-			@Override
-			public void handle(MouseEvent event) {
-				resetHand();
-			}
-		});
 	}
 		
 	private ArrayList<Pair<String, Integer>> getPlacedWordsWithScore(Pair<Integer, Integer> playedCord)
