@@ -112,7 +112,7 @@
                   <Cursor fx:constant="HAND" />
                </cursor>
             </Button>
-            <Button alignment="BASELINE_LEFT" layoutY="460.0" mnemonicParsing="false" onMouseClicked="#loadLogin" prefHeight="65.0" prefWidth="285.0" styleClass="menu-text" text="Uitloggen" textFill="WHITE">
+            <Button fx:id="logoutButton" alignment="BASELINE_LEFT" layoutY="460.0" mnemonicParsing="false" onMouseClicked="#loadLogin" prefHeight="65.0" prefWidth="285.0" styleClass="menu-text" text="Uitloggen" textFill="WHITE">
                <font>
                   <Font name="Source Sans Pro Regular" size="18.0" />
                </font>
