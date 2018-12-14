@@ -379,20 +379,6 @@ public class BoardController implements Initializable {
 		return null;
 	}
 	
-	private Function<ResultSet, Integer> getNewLetter(){
-		return (generatedKeys -> {
-			try {
-				if(generatedKeys != null && generatedKeys.next()) {
-					var letterId = generatedKeys.getInt(0);
-					return letterId;
-				}
-			}catch(SQLException e) {
-				System.out.println(e.getMessage());
-			}
-			return null;
-		});
-	}
-	
 	private Function<ResultSet, ArrayList<HandLetter>> getHandLetter(){
 		return (resultSet -> {
 			var handLetters = new ArrayList<HandLetter>();
