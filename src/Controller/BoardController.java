@@ -98,6 +98,7 @@ public class BoardController implements Initializable {
 			
 			rightBarAnchor.getChildren().setAll(historyFrame);
 			_historyVisible = true;
+			_chatVisible = false;
 		}
 		else {
 			rightBarAnchor.getChildren().clear();
@@ -111,6 +112,7 @@ public class BoardController implements Initializable {
 			
 			rightBarAnchor.getChildren().setAll(chatFrame);
 			_chatVisible = true;
+			_historyVisible = false;
 		}
 		else {
 			rightBarAnchor.getChildren().clear();
