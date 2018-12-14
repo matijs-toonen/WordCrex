@@ -66,6 +66,10 @@ public class Word {
 		return _word;
 	}
 	
+	public static List<Word> getWordsThatContain(ArrayList<Word> words, String search){
+		return words.stream().filter(word -> word.getWord().contains(search)).collect(Collectors.toList());
+	}
+	
 	
 	/*
 	 * Queries

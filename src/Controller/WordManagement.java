@@ -41,7 +41,7 @@ public class WordManagement implements Initializable {
 		init();
 
 		searchBox.textProperty().addListener((observable) -> {
-			
+			renderWords();
 		});
 	}
 	
@@ -68,13 +68,13 @@ public class WordManagement implements Initializable {
 		WordsNeedJugding.getChildren().clear();
 		JudgedWords.getChildren().clear();
 		
-		_wordsNeedJugding.forEach(Word -> {
+		Word.getWordsThatContain(_wordsNeedJugding, searchBox.getText()).forEach(Word -> {
 			var wordItem = new WordItem(Word);
 			wordItem.setOnClickEvent(onHandleChallengeClick());
 			WordsNeedJugding.getChildren().add(wordItem);
 		});
 		
-		_wordsJugded.forEach(Word -> {
+		Word.getWordsThatContain(_wordsJugded, searchBox.getText()).forEach(Word -> {
 			var wordItem = new WordItem(Word);
 			JudgedWords.getChildren().add(wordItem);
 		});
