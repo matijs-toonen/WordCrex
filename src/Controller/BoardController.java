@@ -191,13 +191,6 @@ public class BoardController implements Initializable {
 					tilePane.setMinWidth(39);
 					tilePane.setMinHeight(39);
 					tilePane.setStyle("-fx-background-color: #E8E9EC; -fx-background-radius: 6");
-					
-//					var boardTile = new BoardTile(tile);
-//					boardTile.setMinWidth(35);
-//					boardTile.setMinHeight(35);
-//					boardTile.setBackground(getBackground(Color.CHOCOLATE));
-					
-//					tilePane.setBoardTile(boardTile);
 
 					_boardTiles.put(new Point(i, j), tilePane);
 					panePlayField.getChildren().add(tilePane);
@@ -321,7 +314,8 @@ public class BoardController implements Initializable {
 			paneHand.getChildren().remove(tile);
 			paneHand.getChildren().add(tile);
 		}
-		}	
+	}	
+	
 	private boolean hasExisitingTurn() {
 		_db = new DatabaseController<Turn>();
 		try {
@@ -402,17 +396,22 @@ public class BoardController implements Initializable {
 	}
 	
 	private Consumer<DragEvent> createDropEvents(){
+//		var boardTile = new BoardTile(tile);
+//		boardTile.setMinWidth(35);
+//		boardTile.setMinHeight(35);
+//		boardTile.setBackground(getBackground(Color.CHOCOLATE));
+		
+//		tilePane.setBoardTile(boardTile);
 		return (event -> {
 			if(event.getGestureTarget() instanceof BoardTilePane) {
-				var tile = (BoardTilePane) event.getSource();
+				var sourceTile = (BoardTile) event.getGestureSource();
 				var boardTile = (BoardTilePane) event.getGestureTarget();
 
 				var cords = boardTile.getCords();
 				
 				if(!_board.canPlace(cords))
 					return;
-				
-				var sourceTile = (BoardTile) event.getGestureSource();
+
 //				sourceTile.setCords(boardTile.getCords());
 //				boardTile.setDraggableEvents();
 				
