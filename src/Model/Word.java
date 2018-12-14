@@ -78,6 +78,14 @@ public class Word {
 		return String.format("SELECT * FROM dictionary WHERE username = '%s'", username);
 	}
 	
+	public static String selectAllQuery() {
+		return ("SELECT * FROM dictionary WHERE state != 'accepted'");
+	}
+	
+	public static String selectAllJugded() {
+		return ("SELECT word, state FROM dictionary WHERE state != 'pending' AND username != 'bookowner'");
+	}
+	
 	public static List<Word> getAllWordsThatContain (ArrayList<Word> words, String searchText){
 		return words.stream().filter(word -> word.getWord().contains(searchText)).collect(Collectors.toList());
 	}
