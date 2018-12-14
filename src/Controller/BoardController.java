@@ -51,8 +51,10 @@ public class BoardController implements Initializable {
 	private LinkedHashMap<Point, BoardTile> _boardTiles; // 15 by 15
 	private Board _board;
 	private ArrayList<BoardTile> _currentHand;
+	private Turn _currentTurn;
 	private boolean _chatVisible;
 	private boolean _historyVisible;
+	private boolean _firstPlacedWord = false;
 	
 	@FXML
 	private Label lblScore1, lblScore2, lblPlayer1, lblPlayer2;
@@ -92,6 +94,11 @@ public class BoardController implements Initializable {
 			
 	public void shuffle(){
 		placeHand();
+	}
+	
+	public void playTurn()
+	{
+		System.out.println("test");
 	}
 	
 	public void reset() {
@@ -434,7 +441,7 @@ public class BoardController implements Initializable {
 	{
 		var start = endStart.getKey();
 		var end = endStart.getValue();
-		
+		_currentTurn = new Turn(1);
 		var score = 0;
 		
 		var hasWordMulti = false;
@@ -449,6 +456,17 @@ public class BoardController implements Initializable {
 				cord = new Point(i, colro);
 			else
 				cord = new Point(colro, i);
+			
+			// Coordinate altijd horizontaal coordinaat
+			System.out.println(cord.getX() + " " + cord.getY() );
+			
+			if(_currentTurn.getTurnId() == 1)
+			{
+				if(cord.equals(new Point(7,7)))
+				{
+					_firstPlacedWord = true;
+				}
+			}
 			
 			if(_boardTiles.containsKey(cord))
 			{
