@@ -52,7 +52,7 @@ public class GameController implements Initializable{
 		String username = MainController.getUser().getUsername();
 		
 		String gameCommandFinished = Game.getWinnerQuery(username); 
-		String gameCommandActive = Game.getAcitveQuery(username);
+		String gameCommandActive = Game.getActiveQuery(username);
 
 		try {
 			_activeGames = (ArrayList<Game>) _db.SelectAll(gameCommandActive, Game.class);

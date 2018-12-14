@@ -42,7 +42,7 @@ public class GameObserverController implements Initializable{
 		_db = new DatabaseController<Game>();
 		
 		String gameCommandFinished = Game.getWinnerQueryObserver(); 
-		String gameCommandActive = Game.getAcitveQueryObserver();
+		String gameCommandActive = Game.getActiveQueryObserver();
 
 		try {
 			_activeGames = (ArrayList<Game>) _db.SelectAll(gameCommandActive, Game.class);
