@@ -7,30 +7,28 @@ import Model.Symbol;
 import Model.Tile;
 import Model.TileType;
 import javafx.event.EventHandler;
+import javafx.scene.control.Label;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 
 public class BoardTilePane extends Pane {
 	private BoardTile _boardTile;
 	private Point _currentPoint;
 	private TileType _type;
-	
-	public BoardTilePane(Background color) {
-		super();
-		setBackground(color);
-	}
-	
-	public BoardTilePane(Point point) {
-		super();
-		_currentPoint = point;
-	}
+	private Label lblValue = new Label();
+	private Label lblSymbol = new Label();
 	
 	public BoardTilePane(Point point, TileType type, BoardTile boardTile) {
-		this(point);
+		super();
+		_currentPoint = point;
 		_boardTile = boardTile;
 		_type = type;
+		showBoardTile();
+		setTypeAsVisual();
+		init();
 	}
 	
 	public BoardTilePane(Tile tile)
@@ -39,12 +37,45 @@ public class BoardTilePane extends Pane {
 		this(new Point(tile.getX()-1, tile.getY()-1), tile.getType(), null);
 	}
 	
+	private void init() {
+		lblValue.setLayoutX(20);
+		lblValue.setTextFill(Color.GREEN);
+
+		lblSymbol.setLayoutX(12);
+		lblSymbol.setLayoutY(8);
+		lblSymbol.setTextFill(Color.BLUE);
+
+		getChildren().removeAll(lblValue, lblSymbol);
+		getChildren().addAll(lblValue, lblSymbol);
+	}
+	
+	private void setTypeAsVisual()
+	{
+		if(_type != null)
+		{
+			if(_type.getValue() != 0)
+				lblValue.setText(String.valueOf(_type.getValue()));
+			else
+				lblValue.setText("");
+			
+			lblSymbol.setText(String.valueOf(_type.getLetter()));
+		}
+	}
+	
+	private void showBoardTile() {
+		getChildren().remove(_boardTile);
+		
+		if(_boardTile != null)
+			getChildren().add(_boardTile);
+	}
+	
 	public BoardTile getBoardTile() {
 		return _boardTile;
 	}
 	
 	public void setBoardTile(BoardTile newBoardTile) {
 		_boardTile = newBoardTile;
+		showBoardTile();
 	}
 	
 	public Point getCords(){

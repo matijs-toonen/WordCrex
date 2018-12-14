@@ -192,15 +192,12 @@ public class BoardController implements Initializable {
 					tilePane.setMinHeight(39);
 					tilePane.setStyle("-fx-background-color: #E8E9EC; -fx-background-radius: 6");
 					
-					var boardTile = new BoardTile(tile);
-					boardTile.setLayoutX(x);
-					boardTile.setLayoutY(y);
-					boardTile.setMinWidth(35);
-					boardTile.setMinHeight(35);
-					boardTile.setBackground(getBackground(Color.CHOCOLATE));
+//					var boardTile = new BoardTile(tile);
+//					boardTile.setMinWidth(35);
+//					boardTile.setMinHeight(35);
+//					boardTile.setBackground(getBackground(Color.CHOCOLATE));
 					
-					tilePane.setBoardTile(boardTile);
-
+//					tilePane.setBoardTile(boardTile);
 
 					_boardTiles.put(new Point(i, j), tilePane);
 					panePlayField.getChildren().add(tilePane);
@@ -245,7 +242,7 @@ public class BoardController implements Initializable {
 				boardTile.setMinWidth(39);
 				boardTile.setMinHeight(39);
 				paneHand.getChildren().add(boardTile);
-					_currentHand.add(boardTile);
+				_currentHand.add(boardTile);
 			}
 		};
 		placeHand();
