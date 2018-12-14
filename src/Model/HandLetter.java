@@ -5,10 +5,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class HandLetter {
+	
+	/*
+	 * Props
+	 */
 	private Game _game;
 	private Turn _turn;
 	private Letter _letter;
 	
+	
+	/*
+	 * Const
+	 */
 	public HandLetter(Game game, Turn turn, Letter letter) {
 		_game = game;
 		_turn = turn;
@@ -21,7 +29,6 @@ public class HandLetter {
 			_turn = columns.contains("turn_id") ? new Turn(rs.getInt("turn_id")) : null;
 			_letter = columns.contains("letter_id") ? new Letter(rs.getInt("letter_id")) : null;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

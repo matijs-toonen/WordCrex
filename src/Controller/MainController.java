@@ -2,24 +2,24 @@ package Controller;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import Model.Account;
+import Model.AccountRole.AccountRole;
+import Model.AccountRole.AdministratorRole;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.SplitPane;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
@@ -31,7 +31,35 @@ public class MainController implements Initializable {
 	}
 	
 	@FXML
+	private VBox menuWrapper;
+	
+	@FXML
 	private AnchorPane rootPane;
+	
+	@FXML
+	private Button gameButton;
+	
+	@FXML
+	private Button challengeButton;
+	
+	@FXML
+	private Button suggestButton;
+	
+	@FXML
+	private Button watchGameButton;
+	
+	@FXML
+	private Button judgeButton;
+	
+	@FXML
+	private Button usersButton;
+	
+	@FXML
+	private Button settingsButton;
+	
+	@FXML
+	private Button logoutButton;
+	
 	
 	public MainController(Account account) {
 		_currentUser = account;
@@ -39,79 +67,30 @@ public class MainController implements Initializable {
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		// TODO Auto-generated method stub
-		accountStub();
-		accountRoleStub();
 		loadPane("Games");
-	}
-	
-	private void accountStub() {
-		//Dummy
-		var accounts = new ArrayList<Account>();
-		accounts.add(new Account("henk"));
-		var acc = Account.getAccountByUsername(accounts, "henk");
 		
-		if(acc.isPresent()) 
-			System.out.println(acc.get().getUsername());
+		menuWrapper.getChildren().clear();
 		
-		//With db
-		var db = new DatabaseController<Account>();
-		try {
-			accounts = (ArrayList<Account>) db.SelectAll("SELECT * FROM account", Account.class);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if (userHasRole("Player")) {
+			menuWrapper.getChildren().add(gameButton);
+			menuWrapper.getChildren().add(challengeButton);
+			menuWrapper.getChildren().add(suggestButton);
 		}
-	}
-	
-	private void accountRoleStub() {
-		//Dummy
-		var accounts = new ArrayList<Account>();
-		accounts.add(new Account("henk"));
-		var acc = Account.getAccountByUsername(accounts, "henk");
 		
-		if(acc.isPresent()) 
-			acc.get().addAllRoles("player");
-		
-		//With db
-		var db = new DatabaseController<Account>();
-		try {
-			accounts = (ArrayList<Account>) db.SelectWithCustomLogic(getAccountRole(), "SELECT * FROM accountrole");
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if (userHasRole("Observer")) {
+			menuWrapper.getChildren().add(watchGameButton);
 		}
-	}
-	
-	//Custom functionality for merging account and role together
-	private Function<ResultSet, ArrayList<Account>> getAccountRole(){
-		return (resultSet -> {
-			ArrayList<Account> accounts = new ArrayList<Account>();
-			
-			try {
-				while(resultSet.next()) {	
-					var columns = DatabaseController.getColumns(resultSet.getMetaData());
-					if(columns.contains("username")) {
-						var account = Account.getAccountByUsername(accounts, resultSet.getString("username"));
-						if(columns.contains("role")) {
-							if(account.isPresent()) {		
-								account.get().addAllRoles(resultSet.getString("role"));
-							}else {
-								var newAccount = new Account(resultSet, columns);
-								newAccount.addAllRoles(resultSet.getString("role"));
-								accounts.add(newAccount);		
-							}	
-						}else {
-							accounts.add(new Account(resultSet, columns));
-						}
-					}
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return accounts;
-		});
+		
+		if (userHasRole("Moderator")) {
+			menuWrapper.getChildren().add(judgeButton);
+		}
+		
+		if (userHasRole("Administrator")) {
+			menuWrapper.getChildren().add(usersButton);
+		}
+		
+		menuWrapper.getChildren().add(settingsButton);
+		menuWrapper.getChildren().add(logoutButton);
 	}
 	
 	@FXML
@@ -189,5 +168,14 @@ public class MainController implements Initializable {
 		}
 		//borderPane.setCenter(root);
 		rootPane.getChildren().setAll(pane);
+	}
+	
+	private boolean userHasRole(String role) {
+		for (AccountRole userRole : _currentUser.getRoles()) {
+			if (role.equals(userRole.getRole())){
+				return true;
+			}
+		}
+		return false;
 	}
 }

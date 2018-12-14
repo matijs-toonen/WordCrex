@@ -123,6 +123,18 @@
 	-fx-width: 10px;
 }
 
+.checkbox > .box {
+	-fx-padding: 7;
+	-fx-background-color: transparent;
+	-fx-border-color: #C3DAFF;
+	-fx-border-width: 2px;
+	-fx-border-radius: 5;
+}
+
+.checkbox:selected > .box {
+	-fx-border-color: #3B86FF;
+}
+
 .scroll-pane > .viewport {
 	-fx-background-color: transparent;
 }

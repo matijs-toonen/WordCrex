@@ -17,21 +17,21 @@
       </Text>
       <SplitPane dividerPositions="0.3" layoutX="100.0" layoutY="125.0" orientation="VERTICAL" prefHeight="265.0" prefWidth="650.0" style="-fx-background-color: white;">
         <items>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="98.0" prefWidth="649.0">
                <children>
-                  <Text fx:id="lblUser" layoutX="25.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Gebruiker">
+                  <Text fx:id="lblUser" layoutX="25.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Gebruiker">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font>
                   </Text>
-                  <Text fx:id="lblRoles" fill="#abaab7" layoutX="25.0" layoutY="79.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Rollen: ">
+                  <Text fx:id="lblRoles" fill="#abaab7" layoutX="25.0" layoutY="72.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Rollen: ">
                      <font>
                         <Font size="18.0" />
                      </font>
                   </Text>
                </children>
             </AnchorPane>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="213.0" prefWidth="649.0">
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="159.0" prefWidth="649.0">
                <children>
                   <TextField fx:id="passwordNew" layoutX="24.0" layoutY="33.0" prefHeight="40.0" prefWidth="300.0" promptText="Nieuw wachtwoord" style="-fx-background-colo-fx-background-colorr: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0); -fx-border-color: #EAEBEE; -fx-font-size: 13;" styleClass="text-field" />
                   <Button fx:id="btnSavePassword" layoutX="24.0" layoutY="112.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="150.0" style="-fx-text-fill: white; -fx-font-weight: 700; -fx-pref-width: 170; -fx-pref-height: 25; -fx-font-size: 16;" styleClass="blueButton" text="Opslaan">

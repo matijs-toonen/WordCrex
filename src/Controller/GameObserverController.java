@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import Model.Game;
 import Model.GameStatus;
 import View.Items.GameItem;
+import View.Items.GameItemObserver;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -15,24 +16,17 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
-public class GameController implements Initializable{
+public class GameObserverController implements Initializable{
 	
-	/*
-	 * PROPS
-	 */
-	private DatabaseController<Game> _db = new DatabaseController<Game>();;
+	private DatabaseController<Game> _db;
 	private ArrayList<Game> _activeGames;
 	private ArrayList<Game> _finishedGames;
 	
-	/*
-	 * FIELDS
-	 */
 	@FXML
 	private VBox vboxGames, vboxFinishedGames;
 	
 	@FXML 
 	private TextField searchBox;
-	
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resources) {
@@ -44,15 +38,11 @@ public class GameController implements Initializable{
 		});
 	}
 	
-	
-	/**
-	 * Get all games from database
-	 */
 	private void getGames() {
-		String username = MainController.getUser().getUsername();
+		_db = new DatabaseController<Game>();
 		
-		String gameCommandFinished = Game.getWinnerQuery(username); 
-		String gameCommandActive = Game.getActiveQuery(username);
+		String gameCommandFinished = Game.getWinnerQueryObserver(); 
+		String gameCommandActive = Game.getActiveQueryObserver();
 
 		try {
 			_activeGames = (ArrayList<Game>) _db.SelectAll(gameCommandActive, Game.class);
@@ -60,37 +50,31 @@ public class GameController implements Initializable{
 	
 			renderGames();
 		} catch (SQLException e) {
+			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
 		}
 	}
 	
-	
-	/**
-	 * Render games in view
-	 */
 	private void renderGames() {
 		vboxGames.getChildren().clear();
 		vboxFinishedGames.getChildren().clear();
 		
-		Game.hasWinnerWithUsername(_finishedGames, searchBox.getText()).forEach(game -> {
-			var gameItem = new GameItem(game);
-			vboxFinishedGames.getChildren().add(gameItem);
-			gameItem.setUserOnClickEvent(onLabelClick());
+		Game.hasGameWithUsername(_finishedGames, searchBox.getText()).forEach(game -> {
+			var GameItemObserver = new GameItemObserver(game);
+			vboxFinishedGames.getChildren().add(GameItemObserver);
+			GameItemObserver.setUserOnClickEvent(onLabelClick());
 		});
 		
 		Game.hasGameWithUsername(_activeGames, searchBox.getText()).forEach(game -> {
-			var gameItem = new GameItem(game);
-			vboxGames.getChildren().add(gameItem);
-			gameItem.setUserOnClickEvent(onLabelClick());
+			var GameItemObserver = new GameItemObserver(game);
+			vboxGames.getChildren().add(GameItemObserver);
+			GameItemObserver.setUserOnClickEvent(onLabelClick());
 		});
 	}
 	
 
-	/**
-	 * Handles user click
-	 * @return
-	 */
-	private Consumer<MouseEvent> onLabelClick() {
+	//Custom function for handeling the onmouseclickEvent
+	public Consumer<MouseEvent> onLabelClick() {
 		return (event -> {
 	    	var userLabel = (Label) event.getSource();
 	        System.out.println("mouse click detected! " + userLabel.getText());
