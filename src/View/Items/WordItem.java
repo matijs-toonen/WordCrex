@@ -1,6 +1,5 @@
 package View.Items;
 
-import Model.Account;
 import Model.Word;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -21,19 +20,15 @@ public class WordItem extends AnchorPane {
 		super();
 		_word = word;
 		
-		init();
+		init();	
 	}
 	
 	private void init() {
 		
 		if(_word.getWordState().equals("denied") || _word.getWordState().equals("accepted"))
-		{
 			LoadJugdedItems();
-		}
 		else
-		{
 			LoadItems();
-		}
 	}
 
 	private void LoadItems()

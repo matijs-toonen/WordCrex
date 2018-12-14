@@ -5,14 +5,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
-import Model.Account;
 import Model.Word;
-import View.Items.AccountItem;
 import View.Items.WordItem;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 
 public class WordManagement implements Initializable {
@@ -76,4 +73,5 @@ public class WordManagement implements Initializable {
 		});
 		
 	}
+	
 }
