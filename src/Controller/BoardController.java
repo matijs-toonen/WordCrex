@@ -363,18 +363,17 @@ public class BoardController implements Initializable {
 	}
 	
 	private Letter createLetter() {
-		Letter letter = null;
-		var rndLetter = _letters.get(_random.nextInt(_letters.size()));
+		var number = _random.nextInt(_letters.size());
+		var rndLetter = _letters.get(number);
 		
 		var statement = "INSERT INTO handletter VALUES (" + _currentGame.getGameId() + ", " + _currentTurn.getTurnId() + ", " + rndLetter.getLetterId() + ")"; 
 		
 		try {
 			if(_db.Insert(statement)) {
+				_letters.remove(number);
 				return rndLetter;
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 			System.out.println(e.getMessage());
 		}
 		return null;
