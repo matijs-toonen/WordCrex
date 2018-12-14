@@ -6,6 +6,7 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
@@ -27,7 +28,10 @@
                   </Text>
                </children>
             </AnchorPane>
-          <AnchorPane fx:id="WordsNeedJugding" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="371.0" />
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="371.0">
+               <children>
+                  <VBox fx:id="WordsNeedJugding" layoutX="12.0" layoutY="12.0" prefHeight="308.0" prefWidth="374.0" />
+               </children></AnchorPane>
         </items>
       </SplitPane>
       <SplitPane dividerPositions="0.15" layoutX="534.0" layoutY="125.0" orientation="VERTICAL" prefHeight="400.0" prefWidth="400.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);" styleClass="split-pane-divider">
@@ -41,7 +45,10 @@
                   </Text>
                </children>
             </AnchorPane>
-            <AnchorPane fx:id="JudgedWords" minHeight="0.0" minWidth="0.0" prefHeight="245.0" prefWidth="398.0" />
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="245.0" prefWidth="398.0">
+               <children>
+                  <VBox fx:id="JudgedWords" layoutX="14.0" layoutY="14.0" prefHeight="308.0" prefWidth="374.0" />
+               </children></AnchorPane>
          </items>
       </SplitPane>
       <TextField fx:id="searchBox" focusTraversable="false" layoutX="534.0" layoutY="47.0" prefHeight="40.0" prefWidth="400.0" promptText="Zoek woord..." style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);" styleClass="search-bar">

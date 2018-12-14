@@ -12,6 +12,7 @@ import View.Items.WordItem;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 
 public class WordManagement implements Initializable {
@@ -49,14 +50,13 @@ public class WordManagement implements Initializable {
 			_wordsNeedJugding = (ArrayList<Word>) _db.SelectAll(queryNeedsJugding, Word.class);
 			_wordsJugded = (ArrayList<Word>) _db.SelectAll(queryJuged, Word.class);
 			
-			System.out.println(_wordsNeedJugding);
-			//renderAccounts();
+			renderWords();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void renderWords() {
 		WordsNeedJugding.getChildren().clear();
 		
@@ -65,5 +65,6 @@ public class WordManagement implements Initializable {
 			
 			WordsNeedJugding.getChildren().add(wordItem);
 		});
+		
 	}
 }
