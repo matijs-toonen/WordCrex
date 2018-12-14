@@ -45,7 +45,8 @@ public class ChallengeItem extends AnchorPane{
 	private void setLabel() {
 		lblUsername.setText(ownRequest() ? _currentGame.getUser2() : _currentGame.getUser1());
 		lblUsername.setLayoutX(50);
-		lblUsername.setStyle("-fx-padding: 10 0 48 0; -fx-font-size: 14px; -fx-font-weight: bold");
+		lblUsername.getStyleClass().add("boldLabel");
+		//lblUsername.setStyle("-fx-padding: 10 0 48 0; -fx-font-size: 14px; -fx-font-weight: bold");
 	}
 	
 	private void setButtons() {
@@ -53,12 +54,11 @@ public class ChallengeItem extends AnchorPane{
 		if (ownRequest()) {
 			
 			// pending button
-			btnPending.setText("Wachten op reactie...");
+			btnPending.setText("Wachten op reactie");
 			btnPending.setLayoutX(150);
 			btnPending.setLayoutY(5);
 			btnPending.setCursor(Cursor.HAND);
 			btnPending.getStyleClass().add("grayButton");
-			btnPending.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-pref-width: 150");
 			this.getChildren().add(btnPending);
 		}else {
 			// accept button
@@ -67,7 +67,6 @@ public class ChallengeItem extends AnchorPane{
 			btnAccept.setLayoutY(5);
 			btnAccept.setCursor(Cursor.HAND);
 			btnAccept.getStyleClass().add("blueButton");
-			btnAccept.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-pref-width: 100");
 			
 			// reject button
 			btnReject.setText(rejectText);
@@ -75,7 +74,6 @@ public class ChallengeItem extends AnchorPane{
 			btnReject.setLayoutY(5);
 			btnReject.setCursor(Cursor.HAND);
 			btnReject.getStyleClass().add("redButton");
-			btnReject.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-pref-width: 100");
 			
 			this.getChildren().add(btnAccept);
 			this.getChildren().add(btnReject);

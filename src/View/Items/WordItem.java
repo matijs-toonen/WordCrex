@@ -7,6 +7,7 @@ import Model.Word;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
@@ -44,13 +45,17 @@ public class WordItem extends AnchorPane {
 	{	
 		lblWoord.setText(_word.getWord());
 		lblWoord.setLayoutX(5);
-		lblWoord.getStyleClass().add("text");
+		lblWoord.getStyleClass().add("normalLabel");
 		
-		btnAccept.setLayoutX(200);
+		btnAccept.setLayoutX(150);
+		btnAccept.setLayoutY(5);
 		btnAccept.setText(acceptText);
+		btnAccept.getStyleClass().add("blueButton");
 		
-		btnDecline.setLayoutX(300);
+		btnDecline.setLayoutX(260);
+		btnDecline.setLayoutY(5);
 		btnDecline.setText(rejectText);
+		btnDecline.getStyleClass().add("redButton");
 		
 		this.getChildren().addAll(lblWoord, btnAccept, btnDecline);
 	}
@@ -59,10 +64,18 @@ public class WordItem extends AnchorPane {
 	{	
 		lblWoord.setText(_word.getWord());
 		lblWoord.setLayoutX(5);
-		lblWoord.getStyleClass().add("text");
+		lblWoord.getStyleClass().add("normalLabel");
 		
 		lblState.setText(_word.getWordState());
 		lblState.setLayoutX(200);
+		lblState.setPrefWidth(150);
+		lblState.setAlignment(Pos.CENTER);
+		
+		if(lblState.getText().equals("denied")) {
+			lblState.getStyleClass().add("rejectedItem");
+		} else {
+			lblState.getStyleClass().add("approvedItem");
+		}
 		
 		this.getChildren().addAll(lblWoord, lblState);
 	}
