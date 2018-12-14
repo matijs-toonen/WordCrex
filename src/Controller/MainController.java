@@ -166,13 +166,6 @@ public class MainController implements Initializable {
 	{
 		try {
 			Stage primaryStage = new Stage();
-			BorderPane root = new BorderPane();
-			Scene scene = new Scene(root,700,700);
-//			scene.getStylesheets().add(getClass().getResource("/View/application.css").toExternalForm());
-			Font.loadFont(getClass().getResourceAsStream("../Fonts/SourceSansPro-Regular.ttf"), 10);	
-			Font.loadFont(getClass().getResourceAsStream("../Fonts/SourceSansPro-Bold.ttf"), 10);
-			primaryStage.setScene(scene);
-			
 			Parent mainFrame = FXMLLoader.load(getClass().getResource("/View/Login.fxml"));	
 			primaryStage.getIcons().add(new Image("/Resources/logo.png"));
 			primaryStage.setScene(new Scene(mainFrame));
