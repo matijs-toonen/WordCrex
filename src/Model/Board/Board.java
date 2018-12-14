@@ -1,8 +1,8 @@
 package Model.Board;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.awt.Point;
 import java.util.Iterator;
 
 public class Board {
@@ -17,9 +17,36 @@ public class Board {
 		
 		_positions.put(cords, status);
 	}
-	
+
 	public boolean canPlace(Point cords) {
-		return _positions.get(cords) == PositionStatus.Open;
+		if(_positions.containsKey(cords))
+			return _positions.get(cords) == PositionStatus.Open;
+		else
+			return false;
+	}
+	
+	public boolean placedConnected(Point cord)
+	{
+		var connectedCords = new ArrayList<Point>();
+		
+		connectedCords.add(new Point((int)cord.getX() -1, (int)cord.getY()));
+		connectedCords.add(new Point((int)cord.getX() +1, (int)cord.getY()));
+		
+		connectedCords.add(new Point((int)cord.getX(), (int)cord.getY() -1));
+		connectedCords.add(new Point((int)cord.getX(), (int)cord.getY() +1));
+		
+		if(connectedCords.size() != 0)
+		{
+			for(Iterator<Point> iter = connectedCords.iterator(); iter.hasNext();)
+			{
+				var coordinate = iter.next();
+				
+				if(canPlace(coordinate) || !_positions.containsKey(coordinate))
+					iter.remove();
+			}
+		}
+		
+		return connectedCords.size() != 0;
 	}
 	
 	public ArrayList<Point> getOccupiedPositions(){

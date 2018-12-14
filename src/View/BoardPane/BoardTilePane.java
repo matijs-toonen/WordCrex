@@ -10,7 +10,6 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
@@ -79,21 +78,15 @@ public class BoardTilePane extends Pane {
 		showBoardTile();
 	}
 	
-	public void setTaken() {
-		_isTaken = true;
-	}
-	
-	public boolean getTaken() {
-		return _isTaken;
-	}
-	
 	public void removeBoardTile() {
 		_boardTile = null;
 		showBoardTile();
 	}
 	
-	public Point getCords(){
-		return _currentPoint;
+	public Character getBoardTileSymbolAsChar() {
+		if(_boardTile != null)
+			return _boardTile.getSymbolAsChar();
+		return ' ';
 	}
 	
 	public int getBonusValue()
@@ -104,6 +97,18 @@ public class BoardTilePane extends Pane {
 	public char getBonusLetter()
 	{
 		return _type.getLetter();
+	}
+	
+	public void setTaken() {
+		_isTaken = true;
+	}
+	
+	public boolean getTaken() {
+		return _isTaken;
+	}
+	
+	public Point getCords(){
+		return _currentPoint;
 	}
 	
 	public void setSymbol(Symbol symbol) {

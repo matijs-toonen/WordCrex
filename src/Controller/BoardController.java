@@ -17,12 +17,13 @@ import java.util.stream.Collectors;
 import Model.Game;
 import Model.HandLetter;
 import Model.Letter;
-import Model.Tile;
 import Model.Symbol;
+import Model.Tile;
 import Model.Turn;
 import Model.Word;
 import Model.Board.Board;
 import Model.Board.PositionStatus;
+import Tests.BoardTileTest;
 import View.BoardPane.BoardTile;
 import View.BoardPane.BoardTilePane;
 import javafx.event.EventHandler;
@@ -35,8 +36,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
@@ -54,6 +53,7 @@ public class BoardController implements Initializable {
 	private Turn _currentTurn;
 	private Game _currentGame;
 	private HashMap<Point, BoardTilePane> _boardTiles;
+	private HashMap<Point, BoardTileTest> _boardTilesTest;
 	private Board _board;
     private ArrayList<BoardTile> _currentHand;
     private HashMap<Point, BoardTile> _fieldHand;
@@ -108,9 +108,29 @@ public class BoardController implements Initializable {
 		lblScore2.setText("9");
 		lblScore2.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 0 25 25 0");
 
-		createField();
+		createField(false);
 		createHand();
 		dragOnHand();
+	}
+
+	public void initializeTest()
+	{
+		_boardTilesTest = new HashMap<Point, BoardTileTest>();
+		createField(true);
+	}
+	
+	public boolean placeTest(Point cord, Symbol symbol)
+	{
+		if(_boardTilesTest.containsKey(cord))
+		{
+			var tile = _boardTilesTest.get(cord);
+			tile.setSymbol(symbol);
+			
+			return true;
+		}
+		
+		return false;
+		
 	}
 
 	public void shuffle(){
@@ -161,7 +181,7 @@ public class BoardController implements Initializable {
 			_chatVisible = false;
 		}
 	}
-	private void createField() 
+	private void createField(boolean test) 
 	{
 		_db = new DatabaseController<Tile>();
 		try 
@@ -185,16 +205,26 @@ public class BoardController implements Initializable {
 					if(tile == null)
 						throw new Exception("Tile == null");
 						
-					var tilePane = new BoardTilePane(tile);
-					tilePane.setDropEvents(createDropEvents());
-					tilePane.setLayoutX(x);
-					tilePane.setLayoutY(y);
-					tilePane.setMinWidth(39);
-					tilePane.setMinHeight(39);
-					tilePane.setStyle("-fx-background-color: #E8E9EC; -fx-background-radius: 6");
 
-					_boardTiles.put(new Point(i, j), tilePane);
-					panePlayField.getChildren().add(tilePane);
+					if(!test)
+					{
+						var tilePane = new BoardTilePane(tile);
+						tilePane.setDropEvents(createDropEvents());
+						tilePane.setLayoutX(x);
+						tilePane.setLayoutY(y);
+						tilePane.setMinWidth(39);
+						tilePane.setMinHeight(39);
+						tilePane.setStyle("-fx-background-color: #E8E9EC; -fx-background-radius: 6");
+
+						_boardTiles.put(new Point(i, j), tilePane);
+						panePlayField.getChildren().add(tilePane);						
+					}
+					else
+					{
+						var boardTileTest = new BoardTileTest(tile);
+						_boardTilesTest.put(new Point(i, j), boardTileTest);
+					}
+					
 					y += 44.5;
 				}
 				x += 44.5;
@@ -228,7 +258,6 @@ public class BoardController implements Initializable {
 			for(var letter : handLetter.getLetters()) {
 				var boardTile = new BoardTile(letter.getSymbol());
 				boardTile.setDraggableEvents();
-				boardTile.setBackground(getBackground(Color.LIGHTPINK));
 				boardTile.setLayoutX(x);
 				boardTile.setLayoutY(y);
 				boardTile.setStyle("-fx-background-color: pink; -fx-background-radius: 6");
@@ -414,6 +443,7 @@ public class BoardController implements Initializable {
 					_board.updateStatus(oldCords, PositionStatus.Open);
 					oldBoardTile.removeBoardTile();
 					_fieldHand.remove(oldCords);
+					_boardTiles.put(boardTile.getCords(), oldBoardTile);
 				}
 				
 				sourceTile.setLayoutX(0);
@@ -421,15 +451,17 @@ public class BoardController implements Initializable {
 				boardTile.setBoardTile(sourceTile);
 				
 				reset.setVisible(true);
-				_fieldHand.put(boardTile.getCords(), sourceTile);
+				_fieldHand.put(cords, sourceTile);
+				_boardTiles.put(cords, boardTile);
 				
 				event.acceptTransferModes(TransferMode.ANY);
 				event.setDropCompleted(true);
 				_board.updateStatus(cords, PositionStatus.Taken);
+
 				// TODO Add word collection from database and do something with the placed words
-//					showPlacedWords(cords); // Only for testing purposes can remove after
-				event.consume();	
-				
+				showPlacedWords(cords); // Only for testing purposes can remove after
+
+				event.consume();
 			}
 		});
 	}
@@ -478,7 +510,7 @@ public class BoardController implements Initializable {
 		});
 	}
 	
-	private void showPlacedWords(Pair<Integer, Integer> cords)
+	private void showPlacedWords(Point cords)
 	{
 		try
 		{
@@ -496,14 +528,20 @@ public class BoardController implements Initializable {
 
 	}
 		
-	private ArrayList<Pair<String, Integer>> getPlacedWordsWithScore(Pair<Integer, Integer> playedCord)
+	private ArrayList<Pair<String, Integer>> getPlacedWordsWithScore(Point playedCord)
 	{
 		_db = new DatabaseController<Word>();
+		
+		// TODO add that this only gets checked after placing first letter on board
+		if(!_board.placedConnected(playedCord))
+			System.out.println("No tile connected");
+		else
+			System.out.println("Tile connected");
 				
 		ArrayList<Pair<String, Integer>> placedWords = new ArrayList<Pair<String, Integer>>();
 		
-		var column = playedCord.getKey();
-		var row = playedCord.getValue();
+		var column = (int)playedCord.getX();
+		var row = (int)playedCord.getY();
 		
 		var horWordScore = getPlacedWordFromChars(createCharArrFromCords(row, true), playedCord, true);
 		var verWordScore = getPlacedWordFromChars(createCharArrFromCords(column, false), playedCord, false);
@@ -556,7 +594,7 @@ public class BoardController implements Initializable {
 				if(_boardTiles.containsKey(new Point(i, colro)))
 				{
 					var tile = _boardTiles.get(new Point(i, colro));
-					letters.add(tile.getBoardTile().getSymbolAsChar());
+					letters.add(tile.getBoardTileSymbolAsChar());
 				}
 			}
 		}
@@ -568,7 +606,7 @@ public class BoardController implements Initializable {
 				if(_boardTiles.containsKey(new Point(colro, i)))
 				{
 					var tile = _boardTiles.get(new Point(colro, i));
-					letters.add(tile.getBoardTile().getSymbolAsChar());
+					letters.add(tile.getBoardTileSymbolAsChar());
 				}
 			}	
 		}
@@ -581,7 +619,29 @@ public class BoardController implements Initializable {
 		return arr.stream().map(String::valueOf).collect(Collectors.joining()).toCharArray();
 	}
 	
-	private Pair<String, Integer> getPlacedWordFromChars(char[] letters, Pair<Integer, Integer> placedCord, boolean horizontal)
+	private Pair<String, Integer> getPlacedWordFromChars(char[] letters, Point placedCord, boolean horizontal)
+	{	
+		Pair<String, Integer> wordWithScore;
+		
+		if(horizontal)			
+		{
+			var wordWithStartEnd = collectLettersUntilSeperator(letters, (int)placedCord.getX(), ' ');
+			var word = wordWithStartEnd.getKey();
+			var score = getWordScore(wordWithStartEnd.getValue(), (int)placedCord.getY(), horizontal);
+			wordWithScore = new Pair<String, Integer>(word, score);
+		}
+		else
+		{
+			var wordWithStartEnd = collectLettersUntilSeperator(letters, (int)placedCord.getY(), ' ');
+			var word = wordWithStartEnd.getKey();
+			var score = getWordScore(wordWithStartEnd.getValue(), (int)placedCord.getX(), horizontal);
+			wordWithScore = new Pair<String, Integer>(word, score);
+		}
+			
+		return wordWithScore;
+	}
+	
+	public Pair<String, Integer> getPlacedWordFromChars(char[] letters, Pair<Integer, Integer> placedCord, boolean horizontal, boolean test)
 	{	
 		Pair<String, Integer> wordWithScore;
 		
@@ -589,21 +649,21 @@ public class BoardController implements Initializable {
 		{
 			var wordWithStartEnd = collectLettersUntilSeperator(letters, placedCord.getKey(), ' ');
 			var word = wordWithStartEnd.getKey();
-			var score = getWordScore(wordWithStartEnd.getValue(), placedCord.getValue(), horizontal);
+			var score = getWordScore(wordWithStartEnd.getValue(), placedCord.getValue(), horizontal, test);
 			wordWithScore = new Pair<String, Integer>(word, score);
 		}
 		else
 		{
 			var wordWithStartEnd = collectLettersUntilSeperator(letters, placedCord.getValue(), ' ');
 			var word = wordWithStartEnd.getKey();
-			var score = getWordScore(wordWithStartEnd.getValue(), placedCord.getKey(), horizontal);
+			var score = getWordScore(wordWithStartEnd.getValue(), placedCord.getKey(), horizontal, test);
 			wordWithScore = new Pair<String, Integer>(word, score);
 		}
 			
 		return wordWithScore;
 	}
 	
-	public int getWordScore(Pair<Integer,Integer> endStart, int colro, boolean horizontal)
+	private int getWordScore(Pair<Integer,Integer> endStart, int colro, boolean horizontal, boolean Testing)
 	{
 		var start = endStart.getKey();
 		var end = endStart.getValue();
@@ -612,7 +672,59 @@ public class BoardController implements Initializable {
 		
 		var hasWordMulti = false;
 		
-		var wordMultiTiles = new ArrayList<BoardTile>();
+		var wordMultiTiles = new ArrayList<BoardTileTest>();
+		
+		for(int i = start; i <= end; i++)
+		{
+			Point cord = null;
+			
+			if(horizontal)
+				cord = new Point(i, colro);
+			else
+				cord = new Point(colro, i);
+			
+			if(_boardTilesTest.containsKey(cord))
+			{
+				var tile = _boardTilesTest.get(cord);
+				
+				var letterScore = tile.getSymbol().getValue();
+				var bonusLetter = tile.getBonusLetter();
+				var bonusMulti = tile.getBonusValue();
+				
+				if(bonusMulti != 0 && bonusLetter != 'W')
+					score += letterScore * bonusMulti;
+				else
+					score += letterScore;
+					
+				if (bonusLetter == 'W')
+				{
+					hasWordMulti = true;
+					wordMultiTiles.add(tile);
+				}
+			}
+		}
+		
+		if(hasWordMulti)
+		{
+			for(var tile : wordMultiTiles)
+			{
+				score += score * tile.getBonusValue();
+			}
+		}
+		
+		return score;
+	}
+	
+	private int getWordScore(Pair<Integer,Integer> endStart, int colro, boolean horizontal)
+	{
+		var start = endStart.getKey();
+		var end = endStart.getValue();
+		
+		var score = 0;
+		
+		var hasWordMulti = false;
+		
+		var wordMultiTiles = new ArrayList<BoardTilePane>();
 		
 		for(int i = start; i <= end; i++)
 		{
@@ -628,8 +740,8 @@ public class BoardController implements Initializable {
 				var tile = _boardTiles.get(cord);
 				
 				var letterScore = tile.getBoardTile().getSymbol().getValue();
-				var bonusLetter = tile.getBoardTile().getBonusLetter();
-				var bonusMulti = tile.getBoardTile().getBonusValue();
+				var bonusLetter = tile.getBonusLetter();
+				var bonusMulti = tile.getBonusValue();
 				
 				if(bonusMulti != 0 && bonusLetter != 'W')
 					score += letterScore * bonusMulti;
@@ -639,7 +751,7 @@ public class BoardController implements Initializable {
 				if (bonusLetter == 'W')
 				{
 					hasWordMulti = true;
-					wordMultiTiles.add(tile.getBoardTile());
+					wordMultiTiles.add(tile);
 				}
 			}
 		}

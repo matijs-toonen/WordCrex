@@ -3,8 +3,6 @@ package View.BoardPane;
 import java.util.function.Consumer;
 
 import Model.Symbol;
-import Model.Tile;
-import Model.TileType;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
@@ -17,11 +15,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import java.awt.Point;
 
 public class BoardTile extends Pane {
 	private Symbol _symbol;
-	private TileType _type;
 	private Label lblValue = new Label();
 	private Label lblSymbol = new Label();
 
@@ -51,19 +47,6 @@ public class BoardTile extends Pane {
 		getChildren().addAll(lblValue, lblSymbol);
 	}
 	
-	public BoardTile(int column, int row, TileType type)
-	{
-		this((Symbol)null);
-		_type = type;
-		setTypeAsVisual(_type);
-	}
-	
-	public BoardTile(Tile tile)
-	{
-		// Index 0
-		this(tile.getX()-1, tile.getY()-1, tile.getType());
-	}
-	
 	public Symbol getSymbol() {
 		return _symbol;
 	}
@@ -74,21 +57,10 @@ public class BoardTile extends Pane {
 	};
 	
 	public Character getSymbolAsChar() {
-		
 		if(_symbol != null)
 			return String.valueOf(_symbol.getChar()).toCharArray()[0];
 		else
 			return ' ';
-	}
-	
-	public int getBonusValue()
-	{
-		return _type.getValue();
-	}
-	
-	public char getBonusLetter()
-	{
-		return _type.getLetter();
 	}
 
 	public void setDraggableEvents() {
@@ -136,19 +108,6 @@ public class BoardTile extends Pane {
 	
 	public void setPaneVisible(boolean visible) {
 		setVisible(visible);
-	}
-	
-	private void setTypeAsVisual(TileType type)
-	{
-		if(type != null)
-		{
-			if(type.getValue() != 0)
-				lblValue.setText(String.valueOf(type.getValue()));
-			else
-				lblValue.setText("");
-			
-			lblSymbol.setText(String.valueOf(type.getLetter()));
-		}
 	}
 	
 	public void createOnClickEvent(Consumer<MouseEvent> action) {
