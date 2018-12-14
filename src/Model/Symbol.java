@@ -14,6 +14,12 @@ public class Symbol {
 		_symbol = symbol;
 	}
 	
+	public Symbol(char symbol, int value)
+	{
+		_symbol = symbol;
+		_value = value;
+	}
+	
 	public Symbol(char symbol, LetterSet letterSet, int value, int counted) {
 		this(symbol);
 		_letterSet = letterSet;
@@ -39,5 +45,9 @@ public class Symbol {
 	
 	public int getValue() {
 		return _value;
+	}
+	
+	public int getAmount() {
+		return _counted;
 	}
 }

@@ -1,6 +1,7 @@
 package Controller;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -139,11 +140,62 @@ public class DatabaseController <T> {
 	{
 		Connection conn = OpenConnection();
 		Statement state = conn.createStatement();
+		
 		int results = state.executeUpdate(statement);
 		
 		CloseConnection(conn, state);
 		
 		return results > 0;
+	}
+	
+	public boolean UpdateBatch (String... statements) throws SQLException
+	{
+		Connection conn = OpenConnection();
+		Statement state = conn.createStatement();
+		
+		for(var statement : statements) {
+			state.addBatch(statement);
+		}
+		
+		int[] results = state.executeBatch();
+		
+		CloseConnection(conn, state);
+		
+		return results.length > 0;
+	}
+	
+	public T UpdateWithReturnKeys(String statement, Function<ResultSet, T> action) throws SQLException {
+		Connection conn = OpenConnection();
+		PreparedStatement preparedState = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS);
+		
+		int results = preparedState.executeUpdate();
+		if(results == 0) 
+			return null;
+		
+		var generatedKeys = preparedState.getGeneratedKeys();
+		var returnValue = action.apply(generatedKeys);
+		
+		generatedKeys.close();
+		CloseConnection(conn, preparedState);
+		return returnValue;
+	}
+	
+	public T DeleteWithReturnKeys(String statement, Function<ResultSet, T> action) throws SQLException {
+		return UpdateWithReturnKeys(statement, action);
+	}
+	
+	public T InsertWithReturnKeys(String statement, Function<ResultSet, T> action) throws SQLException {
+		return UpdateWithReturnKeys(statement, action);
+	}
+	
+	public boolean DeleteBatch (String... statements) throws SQLException
+	{
+		return UpdateBatch(statements);
+	}
+	
+	public boolean InsertBatch (String... statements) throws SQLException
+	{
+		return UpdateBatch(statements);
 	}
 	
 	public boolean Delete (String statement) throws SQLException

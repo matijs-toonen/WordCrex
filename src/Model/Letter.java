@@ -40,4 +40,8 @@ public class Letter {
 	public Symbol getSymbol() {
 		return _symbol;
 	}
+	
+	public int getLetterId() {
+		return _letterId;
+	}
 }

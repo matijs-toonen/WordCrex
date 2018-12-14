@@ -106,6 +106,10 @@ public class GameItem extends AnchorPane {
 		lblUser.getStyleClass().add("text");
 		lblTime.setStyle("-fx-padding: 20 0 40 50; -fx-font-size: 13px; -fx-text-fill: #ABABB1");
 	}
+	
+	public Game getGame() {
+		return _currentGame;
+	}
 
 	public void setUserOnClickEvent(Consumer<MouseEvent> action) {
 		
