@@ -28,6 +28,8 @@ public class ChatController implements Initializable {
 	 */
 	private DatabaseController<ChatLine> _db;
 	private ArrayList<ChatLine> _chatLines;
+	
+	// TODO: remove dummy data
 	private final String username = "test-player";
 	private final int gameId = 500;
 	
