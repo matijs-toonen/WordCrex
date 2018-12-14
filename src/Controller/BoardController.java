@@ -297,7 +297,6 @@ public class BoardController implements Initializable {
 					event.acceptTransferModes(TransferMode.ANY);
 					event.setDropCompleted(true);
 					_board.updateStatus(cords, PositionStatus.Taken);
-					// TODO Add word collection from database and do something with the placed words
 					showPlacedWords(cords); // Only for testing purposes can remove after
 					event.consume();	
 				}
@@ -326,6 +325,12 @@ public class BoardController implements Initializable {
 	private ArrayList<Pair<String, Integer>> getPlacedWordsWithScore(Pair<Integer, Integer> playedCord)
 	{
 		_db = new DatabaseController<Word>();
+		
+		// TODO add that this only gets checked after placing first letter on board
+		if(!_board.placedConnected(playedCord))
+			System.out.println("No tile connected");
+		else
+			System.out.println("Tile connected");
 				
 		ArrayList<Pair<String, Integer>> placedWords = new ArrayList<Pair<String, Integer>>();
 		

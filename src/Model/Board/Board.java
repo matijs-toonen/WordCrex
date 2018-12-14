@@ -1,5 +1,6 @@
 package Model.Board;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -20,7 +21,37 @@ public class Board {
 	}
 	
 	public boolean canPlace(Pair<Integer, Integer> cords) {
-		return _positions.get(cords) == PositionStatus.Open;
+		
+		if(_positions.containsKey(cords))
+			return _positions.get(cords) == PositionStatus.Open;
+		else
+			return false;
+	}
+	
+	public boolean placedConnected(Pair<Integer, Integer> cord)
+	{
+		var connectedCords = new ArrayList<Pair<Integer,Integer>>();
+		
+		connectedCords.add(new Pair<Integer,Integer>(cord.getKey() -1, cord.getValue()));
+		connectedCords.add(new Pair<Integer,Integer>(cord.getKey() +1, cord.getValue()));
+		
+		connectedCords.add(new Pair<Integer,Integer>(cord.getKey(), cord.getValue() -1));
+		connectedCords.add(new Pair<Integer,Integer>(cord.getKey(), cord.getValue() +1));
+		
+		if(connectedCords.size() != 0)
+		{
+			for(Iterator<Pair<Integer, Integer>> iter = connectedCords.iterator(); iter.hasNext();)
+			{
+				var coordinate = iter.next();
+				
+				System.out.println(coordinate + " " + canPlace(coordinate));
+				
+				if(canPlace(coordinate) || !_positions.containsKey(coordinate))
+					iter.remove();
+			}
+		}
+		
+		return connectedCords.size() != 0;
 	}
 	
 	private void fillBoard() {
