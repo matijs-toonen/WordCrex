@@ -76,12 +76,17 @@ public class BoardController implements Initializable {
 	private ImageView reset;
 	
 	public BoardController(Game game) {
+		_currentGame = game;
+		_currentTurn = new Turn(1);
+	}
+	
+	public BoardController(Game game, Turn turn) {
+		this(game);
+		_currentTurn = turn;
 		_board = new Board();
 		_boardTiles = new HashMap<Point, BoardTilePane>();
         _currentHand = new ArrayList<BoardTile>();
         _fieldHand = new HashMap<Point, BoardTile>();
-		_currentGame = game;
-		_currentTurn = new Turn(1);
 		getLetters();
 	}
 	
@@ -181,6 +186,7 @@ public class BoardController implements Initializable {
 			_chatVisible = false;
 		}
 	}
+	
 	private void createField(boolean test) 
 	{
 		_db = new DatabaseController<Tile>();
