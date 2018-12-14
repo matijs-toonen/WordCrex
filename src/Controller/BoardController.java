@@ -109,7 +109,7 @@ public class BoardController implements Initializable {
 		lblScore2.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 0 25 25 0");
 
 		createField();
-//		createHand();
+		createHand();
 //		createOnButtonTestClick();
 	}
 
