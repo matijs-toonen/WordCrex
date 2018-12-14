@@ -13,6 +13,7 @@ public class WordItem extends AnchorPane {
 	
 	@FXML
 	private Label lblWoord = new Label();
+	private Label lblState = new Label();
 	private Button btnAccept = new Button("Accepteren");
 	private Button btnDecline = new Button("Weigeren");
 	
@@ -24,9 +25,15 @@ public class WordItem extends AnchorPane {
 	}
 	
 	private void init() {
-		LoadItems();
 		
-		this.getChildren().addAll(lblWoord, btnAccept, btnDecline);
+		if(_word.getWordState().equals("denied") || _word.getWordState().equals("accepted"))
+		{
+			LoadJugdedItems();
+		}
+		else
+		{
+			LoadItems();
+		}
 	}
 
 	private void LoadItems()
@@ -38,5 +45,19 @@ public class WordItem extends AnchorPane {
 		btnAccept.setLayoutX(200);
 		
 		btnDecline.setLayoutX(300);
+		
+		this.getChildren().addAll(lblWoord, btnAccept, btnDecline);
+	}
+	
+	private void LoadJugdedItems()
+	{	
+		lblWoord.setText(_word.getWord());
+		lblWoord.setLayoutX(5);
+		lblWoord.getStyleClass().add("text");
+		
+		lblState.setText(_word.getWordState());
+		lblState.setLayoutX(200);
+		
+		this.getChildren().addAll(lblWoord, lblState);
 	}
 }

@@ -23,6 +23,8 @@ public class WordManagement implements Initializable {
 	
 	@FXML
 	private VBox WordsNeedJugding;
+	
+	@FXML
 	private VBox JudgedWords;
 	
 	@FXML 
@@ -59,11 +61,18 @@ public class WordManagement implements Initializable {
 
 	private void renderWords() {
 		WordsNeedJugding.getChildren().clear();
+		JudgedWords.getChildren().clear();
 		
 		_wordsNeedJugding.forEach(Word -> {
 			var wordItem = new WordItem(Word);
 			
 			WordsNeedJugding.getChildren().add(wordItem);
+		});
+		
+		_wordsJugded.forEach(Word -> {
+			var wordItem = new WordItem(Word);
+			
+			JudgedWords.getChildren().add(wordItem);
 		});
 		
 	}

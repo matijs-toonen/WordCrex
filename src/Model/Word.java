@@ -79,7 +79,7 @@ public class Word {
 	}
 	
 	public static String selectAllQuery() {
-		return ("SELECT * FROM dictionary WHERE state != 'accepted'");
+		return ("SELECT * FROM dictionary WHERE state = 'pending'");
 	}
 	
 	public static String selectAllJugded() {
