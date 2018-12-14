@@ -58,7 +58,7 @@ public class GameController implements Initializable{
 		try {
 			_activeGames = (ArrayList<Game>) _db.SelectAll(gameCommandActive, Game.class);
 			_finishedGames = (ArrayList<Game>) _db.SelectAll(gameCommandFinished, Game.class);
-	
+			
 			renderGames();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

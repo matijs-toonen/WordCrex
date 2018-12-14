@@ -1,7 +1,5 @@
 package Application;
 	
-import java.io.IOException;
-
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
@@ -13,14 +11,8 @@ import javafx.scene.text.Font;
 
 
 public class Startup extends Application {
-	
-	private static Stage _primaryStage;
-	
 	@Override
 	public void start(Stage primaryStage) {
-		
-		_primaryStage = primaryStage;
-		
 		try {
 			BorderPane root = new BorderPane();
 			Scene scene = new Scene(root,700,700);
@@ -31,12 +23,10 @@ public class Startup extends Application {
 			
 			Parent mainFrame = FXMLLoader.load(getClass().getResource("/View/Login.fxml"));
 			
-//			primaryStage.setMaximized(true);	@ToDo aan einde weer toevoegen !!!
+//			primaryStage.setMaximized(true);	//@ToDo aan einde weer toevoegen !!!
 			primaryStage.getIcons().add(new Image("/Resources/logo.png"));
 			primaryStage.setScene(new Scene(mainFrame));
 			primaryStage.show();
-			
-			loadView("M");
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -44,14 +34,5 @@ public class Startup extends Application {
 	
 	public static void main(String[] args) {
 		launch(args);
-	}
-	
-	public void loadView(String viewName) {
-		try {
-			Parent mainFrame = FXMLLoader.load(getClass().getResource("/View/Login.fxml"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 }

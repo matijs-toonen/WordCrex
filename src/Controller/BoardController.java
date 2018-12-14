@@ -99,8 +99,6 @@ public class BoardController implements Initializable {
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		_boardTiles = new HashMap<Point, BoardTilePane>();
-
 		lblPlayer1.setText("BaderAli99");
 		lblPlayer1.setStyle("-fx-font-size: 28");
 		lblPlayer2.setText("SchurkTurk");
@@ -109,15 +107,12 @@ public class BoardController implements Initializable {
 		lblScore1.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 25 0 0 25");
 		lblScore2.setText("9");
 		lblScore2.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 0 25 25 0");
-    
-		_currentHand = new ArrayList<BoardTile>();
-		createField();
-		createHand();
-		createOnButtonTestClick();
-	}
-	
 
-			
+		createField();
+//		createHand();
+//		createOnButtonTestClick();
+	}
+
 	public void shuffle(){
 		placeHand();
 	}
@@ -175,7 +170,6 @@ public class BoardController implements Initializable {
 			for(int i = 0; i < 15; i++) {
 				int y = 13;
 				for(int j = 0; j < 15; j++) {
-				var tilelelle = new BoardTilePane(new Point(i, j));
 					Tile tile = null;
 
                     try
@@ -190,20 +184,29 @@ public class BoardController implements Initializable {
 					if(tile == null)
 						throw new Exception("Tile == null");
 						
+					var tilePane = new BoardTilePane(tile);
+					tilePane.setDropEvents(createDropEvents());
+					tilePane.setLayoutX(x);
+					tilePane.setLayoutY(y);
+					tilePane.setMinWidth(39);
+					tilePane.setMinHeight(39);
+					tilePane.setStyle("-fx-background-color: #E8E9EC; -fx-background-radius: 6");
 					
 					var boardTile = new BoardTile(tile);
-//					boardTile.setDropEvents(createDropEvents());
-					boardTile.setBackground(getBackground(Color.CHOCOLATE));
 					boardTile.setLayoutX(x);
 					boardTile.setLayoutY(y);
-					boardTile.setMinWidth(39);
-					boardTile.setMinHeight(39);
-					boardTile.setStyle("-fx-background-color: #E8E9EC; -fx-background-radius: 6");
-					_boardTiles.put(new Point(i, j), tilelelle);
-					panePlayField.getChildren().add(boardTile);
+					boardTile.setMinWidth(35);
+					boardTile.setMinHeight(35);
+					boardTile.setBackground(getBackground(Color.CHOCOLATE));
+					
+					tilePane.setBoardTile(boardTile);
+
+
+					_boardTiles.put(new Point(i, j), tilePane);
+					panePlayField.getChildren().add(tilePane);
 					y += 44.5;
 				}
-					x += 44.5;
+				x += 44.5;
 			}
 		} 
 		catch (SQLException e) 

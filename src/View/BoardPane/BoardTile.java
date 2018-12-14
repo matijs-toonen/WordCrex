@@ -55,7 +55,7 @@ public class BoardTile extends Pane {
 	{
 		this((Symbol)null);
 		_type = type;
-		setTypeAsVisual();
+		setTypeAsVisual(_type);
 	}
 	
 	public BoardTile(Tile tile)
@@ -138,16 +138,16 @@ public class BoardTile extends Pane {
 		setVisible(visible);
 	}
 	
-	private void setTypeAsVisual()
+	private void setTypeAsVisual(TileType type)
 	{
-		if(_type != null)
+		if(type != null)
 		{
-			if(_type.getValue() != 0)
-				lblValue.setText(String.valueOf(_type.getValue()));
+			if(type.getValue() != 0)
+				lblValue.setText(String.valueOf(type.getValue()));
 			else
 				lblValue.setText("");
 			
-			lblSymbol.setText(String.valueOf(_type.getLetter()));
+			lblSymbol.setText(String.valueOf(type.getLetter()));
 		}
 	}
 	
