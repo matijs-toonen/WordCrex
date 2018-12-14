@@ -406,6 +406,14 @@ public class BoardController implements Initializable {
 				if(!_board.canPlace(cords))
 					return;
 				
+				if(sourceTile.getParent() instanceof BoardTilePane) {
+					var oldBoardTile = (BoardTilePane) sourceTile.getParent();
+					var oldCords = oldBoardTile.getCords();
+					_board.updateStatus(oldCords, PositionStatus.Open);
+					oldBoardTile.removeBoardTile();
+					_fieldHand.remove(oldCords);
+				}
+				
 				sourceTile.setLayoutX(0);
 				sourceTile.setLayoutY(0);
 				boardTile.setBoardTile(sourceTile);
@@ -414,20 +422,15 @@ public class BoardController implements Initializable {
 //				boardTile.setDraggableEvents();
 				
 				reset.setVisible(true);
-//				var bg = sourceTile.getBackground();
-//				boardTile.setBackground(bg);
 				_fieldHand.put(boardTile.getCords(), sourceTile);
 				
-				Dragboard db = event.getDragboard();
-				
-				if(db.hasString()) {
-					event.acceptTransferModes(TransferMode.ANY);
-					event.setDropCompleted(true);
-					_board.updateStatus(cords, PositionStatus.Taken);
-					// TODO Add word collection from database and do something with the placed words
+				event.acceptTransferModes(TransferMode.ANY);
+				event.setDropCompleted(true);
+				_board.updateStatus(cords, PositionStatus.Taken);
+				// TODO Add word collection from database and do something with the placed words
 //					showPlacedWords(cords); // Only for testing purposes can remove after
-					event.consume();	
-				}
+				event.consume();	
+				
 			}
 		});
 	}
