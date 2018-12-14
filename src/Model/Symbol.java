@@ -14,6 +14,12 @@ public class Symbol {
 		_symbol = symbol;
 	}
 	
+	public Symbol(char symbol, int value)
+	{
+		_symbol = symbol;
+		_value = value;
+	}
+	
 	public Symbol(char symbol, LetterSet letterSet, int value, int counted) {
 		this(symbol);
 		_letterSet = letterSet;

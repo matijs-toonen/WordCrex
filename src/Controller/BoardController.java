@@ -18,12 +18,14 @@ import java.util.stream.Collectors;
 import Model.Account;
 import Model.HandLetter;
 import Model.Letter;
+import Model.Symbol;
 import Model.Tile;
 import Model.Turn;
 import Model.Word;
 import Model.Board.Board;
 import Model.Board.PositionStatus;
 import Model.WordState.WordState;
+import Tests.BoardTileTest;
 import View.BoardPane.BoardTile;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -49,6 +51,7 @@ public class BoardController implements Initializable {
 	
 	private DatabaseController _db;
 	private LinkedHashMap<Point, BoardTile> _boardTiles; // 15 by 15
+	private LinkedHashMap<Point, BoardTileTest> _boardTilesTest;
 	private Board _board;
 	private ArrayList<BoardTile> _currentHand;
 	private boolean _chatVisible;
@@ -72,7 +75,7 @@ public class BoardController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		_boardTiles = new LinkedHashMap<Point, BoardTile>();
-
+		
 		lblPlayer1.setText("BaderAli99");
 		lblPlayer1.setStyle("-fx-font-size: 28");
 		lblPlayer2.setText("SchurkTurk");
@@ -84,12 +87,31 @@ public class BoardController implements Initializable {
     
 		_currentHand = new ArrayList<BoardTile>();
 		_board = new Board();
-		createField();
+		createField(false);
 		createHand();
 	}
 	
-
+	public void initializeTest()
+	{
+		_boardTiles = new LinkedHashMap<Point, BoardTile>();
+		_boardTilesTest = new LinkedHashMap<Point, BoardTileTest>();
+		createField(true);
+	}
+	
+	public boolean placeTest(Point cord, Symbol symbol)
+	{
+		if(_boardTilesTest.containsKey(cord))
+		{
+			var tile = _boardTilesTest.get(cord);
+			tile.setSymbol(symbol);
 			
+			return true;
+		}
+		
+		return false;
+		
+	}
+				
 	public void shuffle(){
 		placeHand();
 	}
@@ -137,7 +159,7 @@ public class BoardController implements Initializable {
 			_chatVisible = false;
 		}
 	}
-	private void createField() 
+	private void createField(boolean test) 
 	{
 		_db = new DatabaseController<Tile>();
 		try 
@@ -162,17 +184,26 @@ public class BoardController implements Initializable {
 					if(tile == null)
 						throw new Exception("Tile == null");
 						
+					if(!test)
+					{
+						var boardTile = new BoardTile(tile);
+						boardTile.setDropEvents(createDropEvents());
+						boardTile.setBackground(getBackground(Color.CHOCOLATE));
+						boardTile.setLayoutX(x);
+						boardTile.setLayoutY(y);
+						boardTile.setMinWidth(39);
+						boardTile.setMinHeight(39);
+						boardTile.setStyle("-fx-background-color: #E8E9EC; -fx-background-radius: 6");
+						_boardTiles.put(new Point(i, j), boardTile);
+						panePlayField.getChildren().add(boardTile);
+						
+					}
+					else
+					{
+						var boardTileTest = new BoardTileTest(tile);
+						_boardTilesTest.put(new Point(i, j), boardTileTest);
+					}
 					
-					var boardTile = new BoardTile(tile);
-					boardTile.setDropEvents(createDropEvents());
-					boardTile.setBackground(getBackground(Color.CHOCOLATE));
-					boardTile.setLayoutX(x);
-					boardTile.setLayoutY(y);
-					boardTile.setMinWidth(39);
-					boardTile.setMinHeight(39);
-					boardTile.setStyle("-fx-background-color: #E8E9EC; -fx-background-radius: 6");
-					_boardTiles.put(new Point(i, j), boardTile);
-					panePlayField.getChildren().add(boardTile);
 					y += 44.5;
 				}
 					x += 44.5;
@@ -435,7 +466,81 @@ public class BoardController implements Initializable {
 		return wordWithScore;
 	}
 	
-	public int getWordScore(Pair<Integer,Integer> endStart, int colro, boolean horizontal)
+	public Pair<String, Integer> getPlacedWordFromChars(char[] letters, Pair<Integer, Integer> placedCord, boolean horizontal, boolean test)
+	{	
+		Pair<String, Integer> wordWithScore;
+		
+		if(horizontal)			
+		{
+			var wordWithStartEnd = collectLettersUntilSeperator(letters, placedCord.getKey(), ' ');
+			var word = wordWithStartEnd.getKey();
+			var score = getWordScore(wordWithStartEnd.getValue(), placedCord.getValue(), horizontal, test);
+			wordWithScore = new Pair<String, Integer>(word, score);
+		}
+		else
+		{
+			var wordWithStartEnd = collectLettersUntilSeperator(letters, placedCord.getValue(), ' ');
+			var word = wordWithStartEnd.getKey();
+			var score = getWordScore(wordWithStartEnd.getValue(), placedCord.getKey(), horizontal, test);
+			wordWithScore = new Pair<String, Integer>(word, score);
+		}
+			
+		return wordWithScore;
+	}
+	
+	private int getWordScore(Pair<Integer,Integer> endStart, int colro, boolean horizontal, boolean Testing)
+	{
+		var start = endStart.getKey();
+		var end = endStart.getValue();
+		
+		var score = 0;
+		
+		var hasWordMulti = false;
+		
+		var wordMultiTiles = new ArrayList<BoardTileTest>();
+		
+		for(int i = start; i <= end; i++)
+		{
+			Point cord = null;
+			
+			if(horizontal)
+				cord = new Point(i, colro);
+			else
+				cord = new Point(colro, i);
+			
+			if(_boardTilesTest.containsKey(cord))
+			{
+				var tile = _boardTilesTest.get(cord);
+				
+				var letterScore = tile.getSymbol().getValue();
+				var bonusLetter = tile.getBonusLetter();
+				var bonusMulti = tile.getBonusValue();
+				
+				if(bonusMulti != 0 && bonusLetter != 'W')
+					score += letterScore * bonusMulti;
+				else
+					score += letterScore;
+					
+				if (bonusLetter == 'W')
+				{
+					hasWordMulti = true;
+					wordMultiTiles.add(tile);
+				}
+			}
+		}
+		
+		if(hasWordMulti)
+		{
+			for(var tile : wordMultiTiles)
+			{
+				score += score * tile.getBonusValue();
+			}
+		}
+		
+		return score;
+	}
+	
+	private int getWordScore(Pair<Integer,Integer> endStart, int colro, boolean horizontal)
 	{
 		var start = endStart.getKey();
 		var end = endStart.getValue();
