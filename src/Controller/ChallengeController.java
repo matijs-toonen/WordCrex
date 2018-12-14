@@ -133,10 +133,17 @@ public class ChallengeController implements Initializable  {
 	    		awnser = "rejected";
 	    	}
 	    	
-	    	// update in database
-	    	var statement = Game.getChallengeAwnserQuery(gameId, awnser);
+	    	// create game in database
+	    	String newGameQuery = Game.getChallengeAwnserQuery(gameId, awnser);
+			String turnQuery = Game.getNewTurnQuery(gameId);
+			
     		try {
-				_dbGame.Update(statement);
+				_dbGame.Update(newGameQuery);
+				
+				if (awnser.equals("accepted")) {
+					_dbGame.Update(turnQuery);
+	    		}
+				
 			} catch (SQLException e) {
 				System.out.println(e.getMessage());
 			}
