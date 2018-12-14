@@ -7,13 +7,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import Model.Account;
 import Model.AccountRole.AccountRole;
-import Model.AccountRole.AdministratorRole;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 
 public class MainController implements Initializable {
@@ -27,7 +27,7 @@ public class MainController implements Initializable {
 	private VBox menuWrapper;
 	
 	@FXML
-	private AnchorPane rootPane;
+	private AnchorPane screenPane;
 	
 	@FXML
 	private Button gameButton;
@@ -53,6 +53,8 @@ public class MainController implements Initializable {
 	@FXML
 	private Button logoutButton;
 	
+	@FXML
+	private BorderPane rootPane;
 	
 	public MainController(Account account) {
 		_currentUser = account;
@@ -127,7 +129,23 @@ public class MainController implements Initializable {
 	{
 		loadPane("Settings");
 	}
+	@FXML
+	private void loadLogin(MouseEvent event)
+	{
+		_currentUser = null;
+		logout();
+	}
 	
+	private void logout()
+	{
+		try {
+			BorderPane pane = FXMLLoader.load(getClass().getResource("/View/Login.fxml"));			
+			rootPane.getChildren().setAll(pane);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	private void loadPane(String paneName) {
 		//Parent root = null;
 		AnchorPane pane = null;
@@ -138,7 +156,7 @@ public class MainController implements Initializable {
 			Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
 		}
 		//borderPane.setCenter(root);
-		rootPane.getChildren().setAll(pane);
+		screenPane.getChildren().setAll(pane);
 	}
 	
 	private boolean userHasRole(String role) {

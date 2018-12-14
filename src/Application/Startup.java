@@ -35,8 +35,6 @@ public class Startup extends Application {
 			primaryStage.getIcons().add(new Image("/Resources/logo.png"));
 			primaryStage.setScene(new Scene(mainFrame));
 			primaryStage.show();
-			
-			loadView("M");
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -44,14 +42,5 @@ public class Startup extends Application {
 	
 	public static void main(String[] args) {
 		launch(args);
-	}
-	
-	public void loadView(String viewName) {
-		try {
-			Parent mainFrame = FXMLLoader.load(getClass().getResource("/View/Login.fxml"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 }
