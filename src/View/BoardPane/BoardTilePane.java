@@ -21,12 +21,10 @@ public class BoardTilePane extends Pane {
 	private Label lblValue = new Label();
 	private Label lblSymbol = new Label();
 	
-	public BoardTilePane(Point point, TileType type, BoardTile boardTile) {
+	public BoardTilePane(Point point, TileType type) {
 		super();
 		_currentPoint = point;
-		_boardTile = boardTile;
 		_type = type;
-		showBoardTile();
 		setTypeAsVisual();
 		init();
 	}
@@ -34,7 +32,7 @@ public class BoardTilePane extends Pane {
 	public BoardTilePane(Tile tile)
 	{
 		// Index 0
-		this(new Point(tile.getX()-1, tile.getY()-1), tile.getType(), null);
+		this(new Point(tile.getX()-1, tile.getY()-1), tile.getType());
 	}
 	
 	private void init() {

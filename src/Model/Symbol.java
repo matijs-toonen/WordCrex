@@ -44,7 +44,7 @@ public class Symbol {
 	}
 	
 	public int getValue() {
-		return _value;
+		return _value != null ? _value : 0; 
 	}
 	
 	public int getAmount() {

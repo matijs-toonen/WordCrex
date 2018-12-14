@@ -20,6 +20,7 @@ import Model.Letter;
 import Model.Symbol;
 import Model.Tile;
 import Model.Turn;
+import Model.TurnBoardLetter;
 import Model.Word;
 import Model.Board.Board;
 import Model.Board.PositionStatus;
@@ -78,16 +79,16 @@ public class BoardController implements Initializable {
 	public BoardController(Game game) {
 		_currentGame = game;
 		_currentTurn = new Turn(1);
+		_board = new Board();
+		_boardTiles = new HashMap<Point, BoardTilePane>();
+        _currentHand = new ArrayList<BoardTile>();
+        _fieldHand = new HashMap<Point, BoardTile>();
+        getLetters();
 	}
 	
 	public BoardController(Game game, Turn turn) {
 		this(game);
 		_currentTurn = turn;
-		_board = new Board();
-		_boardTiles = new HashMap<Point, BoardTilePane>();
-        _currentHand = new ArrayList<BoardTile>();
-        _fieldHand = new HashMap<Point, BoardTile>();
-		getLetters();
 	}
 	
 	private void getLetters() {
@@ -189,6 +190,8 @@ public class BoardController implements Initializable {
 	
 	private void createField(boolean test) 
 	{
+		var existingTurns = getTurns();
+		
 		_db = new DatabaseController<Tile>();
 		try 
 		{
@@ -198,7 +201,7 @@ public class BoardController implements Initializable {
 				int y = 13;
 				for(int j = 0; j < 15; j++) {
 					Tile tile = null;
-
+					
                     try
                     {
                         tile = getTileFromCollection(allTiles, i+1, j+1);
@@ -214,6 +217,14 @@ public class BoardController implements Initializable {
 
 					if(!test)
 					{
+						BoardTile boardTile = null;
+						if(existingTurns.containsKey(new Point(i+1, j+1))) {
+							var turn = existingTurns.get(new Point(i+1, j+1));
+							boardTile = new BoardTile(turn.getSymbol());
+							boardTile.setMinWidth(39);
+							boardTile.setMinHeight(39);
+							boardTile.setStyle("-fx-background-color: pink; -fx-background-radius: 6");
+						}
 						var tilePane = new BoardTilePane(tile);
 						tilePane.setDropEvents(createDropEvents());
 						tilePane.setLayoutX(x);
@@ -221,7 +232,8 @@ public class BoardController implements Initializable {
 						tilePane.setMinWidth(39);
 						tilePane.setMinHeight(39);
 						tilePane.setStyle("-fx-background-color: #E8E9EC; -fx-background-radius: 6");
-
+						tilePane.setBoardTile(boardTile);
+						
 						_boardTiles.put(new Point(i, j), tilePane);
 						panePlayField.getChildren().add(tilePane);						
 					}
@@ -245,6 +257,22 @@ public class BoardController implements Initializable {
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	private HashMap<Point, TurnBoardLetter> getTurns() {
+		_db = new DatabaseController<TurnBoardLetter>();
+		var turns = new HashMap<Point, TurnBoardLetter>();
+		
+		String query = "SELECT * FROM turnboardletter NATURAL JOIN letter WHERE game_id = 502 AND turn_id < 4";
+		try {
+			((ArrayList<TurnBoardLetter>)_db.SelectAll(query, TurnBoardLetter.class)).forEach(turn -> {
+				turns.put(turn.getTileCords(), turn);	
+			});
+		}
+		catch(SQLException e) {
+			
+		}
+		return turns;
 	}
 	
 	private Tile getTileFromCollection(ArrayList<Tile> collection, int x, int y)
