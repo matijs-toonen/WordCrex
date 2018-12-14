@@ -4,17 +4,20 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 import Model.Word;
 import View.Items.WordItem;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 public class WordManagement implements Initializable {
 
-	private DatabaseController<Word> _db = new DatabaseController<Word>();;
+	private DatabaseController<Word> _db = new DatabaseController<Word>();
 	private ArrayList<Word> _wordsNeedJugding;
 	private ArrayList<Word> _wordsJugded;
 	

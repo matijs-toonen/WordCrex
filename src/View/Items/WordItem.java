@@ -1,9 +1,14 @@
 package View.Items;
 
+import java.util.function.Consumer;
+
 import Model.Word;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 
 public class WordItem extends AnchorPane {
