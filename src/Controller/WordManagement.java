@@ -6,10 +6,14 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
+import Model.Game;
 import Model.Word;
+import View.Items.ChallengeItem;
 import View.Items.WordItem;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
@@ -65,16 +69,40 @@ public class WordManagement implements Initializable {
 		
 		_wordsNeedJugding.forEach(Word -> {
 			var wordItem = new WordItem(Word);
-			
+			wordItem.setOnClickEvent(onHandleChallengeClick());
 			WordsNeedJugding.getChildren().add(wordItem);
 		});
 		
 		_wordsJugded.forEach(Word -> {
 			var wordItem = new WordItem(Word);
-			
 			JudgedWords.getChildren().add(wordItem);
 		});
 		
 	}
+	
+	
+	/**
+	 * Click handler that handels accept and reject
+	 * in the challengeItem
+	 * 
+	 * @return
+	 */
+	private Consumer<ActionEvent> onHandleChallengeClick() {
+		
+		return (event -> {
+			
+			// get item values
+	    	var btnReaction = (Button) event.getSource();
+	    	var type = btnReaction.getText();
+	    	
+	    	if (type.equals(WordItem.acceptText)) {
+	    		System.out.println("Accepted Click");
+	    	}else if(type.equals(WordItem.rejectText)) {
+	    		System.out.println("Reject ClickT");
+	    	}
+			
+			
+		});
+    }
 	
 }
