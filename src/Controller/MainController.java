@@ -6,19 +6,22 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import Model.Account;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.SplitPane;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.text.Font;
+import javafx.stage.Stage;
 
 public class MainController implements Initializable {
 	private static Account _currentUser;
@@ -152,7 +155,36 @@ public class MainController implements Initializable {
 	{
 		loadPane("Settings");
 	}
+	@FXML
+	private void loadLogin(MouseEvent event)
+	{
+		_currentUser = null;
+		logout();
+	}
 	
+	private void logout()
+	{
+		try {
+			Stage primaryStage = new Stage();
+			BorderPane root = new BorderPane();
+			Scene scene = new Scene(root,700,700);
+//			scene.getStylesheets().add(getClass().getResource("/View/application.css").toExternalForm());
+			Font.loadFont(getClass().getResourceAsStream("../Fonts/SourceSansPro-Regular.ttf"), 10);	
+			Font.loadFont(getClass().getResourceAsStream("../Fonts/SourceSansPro-Bold.ttf"), 10);
+			primaryStage.setScene(scene);
+			
+			Parent mainFrame = FXMLLoader.load(getClass().getResource("/View/Login.fxml"));	
+			primaryStage.getIcons().add(new Image("/Resources/logo.png"));
+			primaryStage.setScene(new Scene(mainFrame));
+			primaryStage.show();
+			
+			Stage stage = (Stage) rootPane.getScene().getWindow();
+		    stage.close();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	private void loadPane(String paneName) {
 		//Parent root = null;
 		AnchorPane pane = null;
