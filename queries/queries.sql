@@ -253,4 +253,35 @@ WHERE
         OR game_state = 'resigned')
         AND (game_id = 502);
 
+-- history davod
 
+SELECT 
+    tp1.game_id,
+    tp1.turn_id,
+    tp1.username_player1 AS player1,
+    tp1.score + tp1.bonus AS score1,
+    gp1.woorddeel AS woorddeel1,
+    tp2.username_player2 AS player2,
+    tp2.score + tp2.bonus AS score2,
+    gp2.woorddeel AS woorddeel2,
+    H.inhoud
+FROM
+    turnplayer1 AS tp1
+        INNER JOIN
+    gelegdplayer1 AS gp1 ON tp1.game_id = gp1.game_id
+        AND tp1.turn_id = gp1.turn_id
+        INNER JOIN
+    turnplayer2 AS tp2 ON tp1.game_id = tp2.game_id
+        AND tp1.turn_id = tp2.turn_id
+        INNER JOIN
+    gelegdplayer2 AS gp2 ON tp2.game_id = gp2.game_id
+        AND tp2.turn_id = gp2.turn_id
+        inner join hand as H
+        on H.game_id =  tp1.game_id
+        and H.turn_id = tp1.turn_id
+WHERE
+    tp1.game_id = 502;
+
+
+
+select * from hand;
