@@ -22,9 +22,9 @@
             </AnchorPane>
             <AnchorPane prefHeight="175.0" prefWidth="350.0" style="-fx-background-color: white;">
                <children>
-                  <ScrollPane hbarPolicy="NEVER" prefHeight="753.0" prefWidth="350.0">
+                  <ScrollPane fx:id="chatScroll" hbarPolicy="NEVER" prefHeight="753.0" prefWidth="350.0">
                      <content>
-                        <VBox fx:id="textScreen" prefHeight="735.0" prefWidth="335.0" />
+                        <VBox fx:id="textScreen" prefHeight="750.0" prefWidth="335.0" />
                      </content>
                   </ScrollPane>
                </children>

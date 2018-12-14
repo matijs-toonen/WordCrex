@@ -13,11 +13,9 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 
@@ -25,6 +23,8 @@ public class ChatController implements Initializable {
 	
 	private DatabaseController<ChatLine> _db;
 	private ArrayList<ChatLine> _chatLines;
+	private boolean updatedOnce = false;
+	private boolean jumpToBottom = true;
 	
 	// TODO: remove dummy data
 	final String username = "test-player";
@@ -32,6 +32,9 @@ public class ChatController implements Initializable {
 	
 	@FXML
 	private VBox textScreen;
+	
+	@FXML
+	private ScrollPane chatScroll;
 	
 	@FXML
 	private TextField chatInput;
@@ -105,6 +108,15 @@ public class ChatController implements Initializable {
 				showMessages();
 			}
 	    });
+		
+		if(updatedOnce) {
+			if(jumpToBottom) {
+				chatScroll.setVvalue(1.0);
+				jumpToBottom = false;
+			}
+		}
+		
+		updatedOnce = true;
 	}
 	
 	private void showMessages() {

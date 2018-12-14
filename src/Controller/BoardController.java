@@ -222,8 +222,6 @@ public class BoardController implements Initializable {
 						tilePane.setMinWidth(39);
 						tilePane.setMinHeight(39);
 						
-						System.out.println(String.valueOf(tile.getType().getValue()) + String.valueOf(tile.getType().getLetter()));
-						
 						switch(String.valueOf(tile.getType().getValue()) + String.valueOf(tile.getType().getLetter()).trim()) {
 						case "6L":
 							tilePane.getStyleClass().add("tile6L");
