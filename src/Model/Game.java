@@ -188,8 +188,8 @@ public class Game {
  		return String.format(
  				"SELECT *\n" + 
  				"FROM account\n" + 
- 				"WHERE username NOT IN (SELECT username_player1 FROM game WHERE username_player2 = '%s' AND game_state <> 'finished')\n" + 
- 				"  AND username NOT IN (SELECT username_player2 FROM game WHERE username_player1 = '%s' AND game_state <> 'finished')\n" + 
+ 				"WHERE username NOT IN (SELECT username_player1 FROM game WHERE username_player2 = '%s' AND (game_state = 'request' OR game_state = 'playing'))\n" + 
+ 				"  AND username NOT IN (SELECT username_player2 FROM game WHERE username_player1 = '%s' AND (game_state = 'request' OR game_state = 'playing'))\n" + 
  				"  AND username <> '%s'"
  				, username, username, username);
  	}
