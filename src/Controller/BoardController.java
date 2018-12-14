@@ -221,7 +221,32 @@ public class BoardController implements Initializable {
 						tilePane.setLayoutY(y);
 						tilePane.setMinWidth(39);
 						tilePane.setMinHeight(39);
-						tilePane.setStyle("-fx-background-color: #E8E9EC; -fx-background-radius: 6");
+						
+						System.out.println(String.valueOf(tile.getType().getValue()) + String.valueOf(tile.getType().getLetter()));
+						
+						switch(String.valueOf(tile.getType().getValue()) + String.valueOf(tile.getType().getLetter()).trim()) {
+						case "6L":
+							tilePane.getStyleClass().add("tile6L");
+							break;
+						case "4L":
+							tilePane.getStyleClass().add("tile4L");
+							break;
+						case "4W":
+							tilePane.getStyleClass().add("tile4W");
+							break;
+						case "3W":
+							tilePane.getStyleClass().add("tile3W");
+							break;
+						case "2L":
+							tilePane.getStyleClass().add("tile2L");
+							break;
+						case "0*":
+							tilePane.getStyleClass().add("tileCenter");
+							break;
+						case "0":
+							tilePane.getStyleClass().add("tile0");
+							break;
+						}
 
 						_boardTiles.put(new Point(i, j), tilePane);
 						panePlayField.getChildren().add(tilePane);						
