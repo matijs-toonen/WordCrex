@@ -4,44 +4,62 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.awt.Point;
 import java.sql.SQLException;
-
 import org.junit.jupiter.api.Test;
 import Controller.BoardController;
 import Controller.DatabaseController;
 import Model.Symbol;
 import javafx.util.Pair;
+import junit.framework.Assert;
 
 class ScoreTest {
 	
 	private BoardController _boardCont;
 	private DatabaseController _db;
-						
-	@Test
-	void test() {
-		
+	private char[] _letters;
+	
+	void init()
+	{
 		_db = new DatabaseController();
 		
 		_boardCont = new BoardController();
 		
 		_boardCont.initializeTest();
-				
+		
 		var letterStr = "               ";
 		
-		var letters = letterStr.toCharArray();
+		_letters = letterStr.toCharArray();
 		
-		if(letters.length != 15)
+		if(_letters.length != 15)
 			fail("Row is not 15 long");
+	}
+						
+	@Test
+	void TestWord1() {
 		
+		init();
+						
 		var row = 1;
 		var start = 1;
 		var end = 2;
 		
-		addWordStartEnd(letters, start, end, "eb".toCharArray());
+		var expectedScore = 7;
 		
-		placeWord(letters, row, start, end);
+		var word = "eb";
 		
-		var ebTest = _boardCont.getPlacedWordFromChars(letters, new Pair<Integer, Integer>(1,row), true, true);
-		System.out.println(ebTest.getKey() + " " + ebTest.getValue());		
+		addWordStartEnd(_letters, start, end, word.toCharArray());
+		
+		placeWord(_letters, row, start, end);
+		
+		var ebTest = runTest(start, row);
+		
+		Assert.assertEquals(word, ebTest.getKey());
+		Assert.assertEquals(expectedScore, (int)ebTest.getValue());	
+	}
+	
+	// Always horizontal
+	Pair<String, Integer> runTest(int start, int row)
+	{
+		return _boardCont.getPlacedWordFromChars(_letters, new Pair<Integer, Integer>(start,row), true, true);
 	}
 	
 	void addWordStartEnd(char[] arr, int start, int end, char[] word)
