@@ -10,7 +10,6 @@ import Controller.MainController;
 import Model.Answer.*;
 
 public class Game {
-	
  	/*
  	 * Props
  	 */
@@ -107,7 +106,8 @@ public class Game {
 	 * Filters
 	 */
 	public static List<Game> hasWinnerWithUsername(List<Game> games, String username){
-		return games.stream().filter(game -> game._opponent.toLowerCase().contains(username.toLowerCase()) || 
+		return games.stream()
+				.filter(game -> game._opponent.toLowerCase().contains(username.toLowerCase()) || 
 				game._winner.toLowerCase().contains(username.toLowerCase()))
 				.collect(Collectors.toList());
 	}
@@ -131,6 +131,20 @@ public class Game {
 				"AND (username_winner is not null)");
 	}
 	
+<<<<<<< HEAD
+ 	public static final String getActiveQuery(String username) {
+		return ("SELECT " +
+				"(SELECT IF(g.username_player1 = '" + username + "', g.username_player2, g.username_player1)) AS 'opponent', " +
+				"g.game_id, g.game_state, " +
+				"MAX(tp1.turn_id) AS player1_zet, tp1.username_player1 AS username_player1, " +
+				"MAX(tp2.turn_id) AS player2_zet, tp2.username_player2 AS username_player2 " +
+				"FROM game g " +
+				"LEFT JOIN turnplayer1 tp1 ON g.game_id = tp1.game_id " +
+				"LEFT JOIN turnplayer2 tp2 ON g.game_id = tp2.game_id " +
+				"WHERE (g.username_player1 = '"+username+"' OR g.username_player2 = '"+username+"') " +
+				"AND (g.game_state = '" + GameStatus.getGameStatus(GameStatus.Playing) + "')" +
+				"GROUP BY g.game_id");
+=======
  	public static final String getAcitveQuery(String username) {
  		return String.format(
  				"SELECT (SELECT IF(g.username_player1 = '%s', g.username_player2, g.username_player1)) AS 'opponent',\n" + 
@@ -146,6 +160,20 @@ public class Game {
  				"WHERE (g.username_player1 = '%s' OR g.username_player2 = '%s')\n" + 
  				"  AND (g.game_state = '%s')\n" + 
  				"GROUP BY g.game_id;", username, username, username, GameStatus.getGameStatus(GameStatus.Playing));
+>>>>>>> develop
+	}
+ 	
+ 	public static final String getActiveQueryObserver() {
+		return ("select game_id, game_state, username_player1, username_player2 "
+				+ "from game "
+				+ "where game_state = 'playing'");
+	}
+ 	
+	public static final String getWinnerQueryObserver() {
+		return ("SELECT game_id, username_winner, username_player1, username_player2 " + 
+				"FROM game " + 
+				"WHERE (username_winner is not null);");
+		
 	}
  	
  	public static final String getChallengeQuery(String username) {
