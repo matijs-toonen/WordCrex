@@ -18,6 +18,7 @@ public class BoardTilePane extends Pane {
 	private BoardTile _boardTile;
 	private Point _currentPoint;
 	private TileType _type;
+	private boolean _isTaken;
 	private Label lblValue = new Label();
 	private Label lblSymbol = new Label();
 	
@@ -76,6 +77,14 @@ public class BoardTilePane extends Pane {
 	public void setBoardTile(BoardTile newBoardTile) {
 		_boardTile = newBoardTile;
 		showBoardTile();
+	}
+	
+	public void setTaken() {
+		_isTaken = true;
+	}
+	
+	public boolean getTaken() {
+		return _isTaken;
 	}
 	
 	public void removeBoardTile() {

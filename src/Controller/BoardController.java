@@ -110,6 +110,7 @@ public class BoardController implements Initializable {
 
 		createField();
 		createHand();
+		dragOnHand();
 	}
 
 	public void shuffle(){
@@ -418,9 +419,6 @@ public class BoardController implements Initializable {
 				sourceTile.setLayoutX(0);
 				sourceTile.setLayoutY(0);
 				boardTile.setBoardTile(sourceTile);
-
-//				sourceTile.setCords(boardTile.getCords());
-//				boardTile.setDraggableEvents();
 				
 				reset.setVisible(true);
 				_fieldHand.put(boardTile.getCords(), sourceTile);
@@ -432,6 +430,50 @@ public class BoardController implements Initializable {
 //					showPlacedWords(cords); // Only for testing purposes can remove after
 				event.consume();	
 				
+			}
+		});
+	}
+	
+	private void dragOnHand() {
+		paneHand.setOnDragOver(new EventHandler<DragEvent>() {
+
+			@Override
+			public void handle(DragEvent event) {
+				if(event.getGestureSource() != event.getTarget()) {
+					event.acceptTransferModes(TransferMode.ANY);
+				}
+				event.consume();
+			}
+		});
+		
+		paneHand.setOnDragDropped(new EventHandler<DragEvent>() {
+
+			@Override
+			public void handle(DragEvent event) {
+				if(event.getGestureSource() instanceof BoardTile) {
+					var draggedTile = (BoardTile) event.getGestureSource();
+					
+					if(draggedTile.getParent() instanceof BoardTilePane) {
+						var oldBoardTile = (BoardTilePane) draggedTile.getParent();
+						var oldCords = oldBoardTile.getCords();
+						_board.updateStatus(oldCords, PositionStatus.Open);
+						oldBoardTile.removeBoardTile();
+						_fieldHand.remove(oldCords);
+					}
+					
+					int x = 10;
+					int y = 13;
+					
+					for(var tile : _currentHand) {
+						if(draggedTile.equals(tile)) {
+							tile.setLayoutX(x);
+							tile.setLayoutY(y);
+							paneHand.getChildren().remove(tile);
+							paneHand.getChildren().add(tile);		
+						}
+						y += 44.5;
+					}
+				}
 			}
 		});
 	}
