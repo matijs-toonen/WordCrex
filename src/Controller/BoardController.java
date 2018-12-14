@@ -396,31 +396,26 @@ public class BoardController implements Initializable {
 	}
 	
 	private Consumer<DragEvent> createDropEvents(){
-//		var boardTile = new BoardTile(tile);
-//		boardTile.setMinWidth(35);
-//		boardTile.setMinHeight(35);
-//		boardTile.setBackground(getBackground(Color.CHOCOLATE));
-		
-//		tilePane.setBoardTile(boardTile);
 		return (event -> {
 			if(event.getGestureTarget() instanceof BoardTilePane) {
 				var sourceTile = (BoardTile) event.getGestureSource();
 				var boardTile = (BoardTilePane) event.getGestureTarget();
-
+				
 				var cords = boardTile.getCords();
 				
 				if(!_board.canPlace(cords))
 					return;
+				
+				sourceTile.setLayoutX(0);
+				sourceTile.setLayoutY(0);
+				boardTile.setBoardTile(sourceTile);
 
 //				sourceTile.setCords(boardTile.getCords());
 //				boardTile.setDraggableEvents();
 				
-				var symbol = sourceTile.getSymbol();
-				boardTile.setSymbol(symbol);
-				boardTile.setStyle("-fx-background-color: pink; -fx-background-radius: 6");
 				reset.setVisible(true);
-				var bg = sourceTile.getBackground();
-				boardTile.setBackground(bg);
+//				var bg = sourceTile.getBackground();
+//				boardTile.setBackground(bg);
 				_fieldHand.put(boardTile.getCords(), sourceTile);
 				
 				Dragboard db = event.getDragboard();
