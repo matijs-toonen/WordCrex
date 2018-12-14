@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class TileType {
+	
 	private String _tileType;
 	
 	public TileType(String tileType) {
@@ -15,7 +16,6 @@ public class TileType {
 		try {
 			_tileType = columns.contains("type") ? rs.getString("type") : null;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
