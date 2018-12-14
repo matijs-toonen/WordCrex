@@ -5,12 +5,20 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class BoardPlayer {
+	
+	/*
+	 * Props
+	 */
 	private Game _game;
 	private Account _user;
 	private Turn _turn;
 	private Letter _letter;
 	private Tile _tile;
 	
+	
+	/*
+	 * Const
+	 */
 	public BoardPlayer(Game game, Account user, Turn turn, Letter letter, Tile tile) {
 		_game = game;
 		_user = user;

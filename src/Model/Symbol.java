@@ -5,11 +5,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class Symbol {
+	
+	/*
+	 * Props
+	 */
 	private char _symbol;
 	private LetterSet _letterSet;
 	private Integer _value;
 	private Integer _counted;
 	
+	/*
+	 * Const
+	 */
 	public Symbol(char symbol) {
 		_symbol = symbol;
 	}

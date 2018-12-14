@@ -2,20 +2,19 @@ package Controller;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import Model.Account;
+import Model.AccountRole.AccountRole;
+import Model.AccountRole.AdministratorRole;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 
 public class MainController implements Initializable {
 	private static Account _currentUser;
@@ -25,7 +24,35 @@ public class MainController implements Initializable {
 	}
 	
 	@FXML
+	private VBox menuWrapper;
+	
+	@FXML
 	private AnchorPane rootPane;
+	
+	@FXML
+	private Button gameButton;
+	
+	@FXML
+	private Button challengeButton;
+	
+	@FXML
+	private Button suggestButton;
+	
+	@FXML
+	private Button watchGameButton;
+	
+	@FXML
+	private Button judgeButton;
+	
+	@FXML
+	private Button usersButton;
+	
+	@FXML
+	private Button settingsButton;
+	
+	@FXML
+	private Button logoutButton;
+	
 	
 	public MainController(Account account) {
 		_currentUser = account;
@@ -34,6 +61,29 @@ public class MainController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		loadPane("Games");
+		
+		menuWrapper.getChildren().clear();
+		
+		if (userHasRole("Player")) {
+			menuWrapper.getChildren().add(gameButton);
+			menuWrapper.getChildren().add(challengeButton);
+			menuWrapper.getChildren().add(suggestButton);
+		}
+		
+		if (userHasRole("Observer")) {
+			menuWrapper.getChildren().add(watchGameButton);
+		}
+		
+		if (userHasRole("Moderator")) {
+			menuWrapper.getChildren().add(judgeButton);
+		}
+		
+		if (userHasRole("Administrator")) {
+			menuWrapper.getChildren().add(usersButton);
+		}
+		
+		menuWrapper.getChildren().add(settingsButton);
+		menuWrapper.getChildren().add(logoutButton);
 	}
 	
 	@FXML
@@ -89,5 +139,14 @@ public class MainController implements Initializable {
 		}
 		//borderPane.setCenter(root);
 		rootPane.getChildren().setAll(pane);
+	}
+	
+	private boolean userHasRole(String role) {
+		for (AccountRole userRole : _currentUser.getRoles()) {
+			if (role.equals(userRole.getRole())){
+				return true;
+			}
+		}
+		return false;
 	}
 }

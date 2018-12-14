@@ -23,19 +23,27 @@ import javafx.scene.text.TextAlignment;
 
 public class ChatController implements Initializable {
 	
+	/*
+	 * PROPS
+	 */
 	private DatabaseController<ChatLine> _db;
 	private ArrayList<ChatLine> _chatLines;
 	
 	// TODO: remove dummy data
-	final String username = "test-player";
-	final int gameId = 500;
+	private final String username = "test-player";
+	private final int gameId = 500;
 	
+	
+	/*
+	 * FIELDS
+	 */
 	@FXML
 	private VBox textScreen;
 	
 	@FXML
 	private TextField chatInput;
 
+	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		// TODO Auto-generated method stub
@@ -43,11 +51,19 @@ public class ChatController implements Initializable {
 		
 		startChatListener();
 	}
-	
+		
+	/**
+	 * Onaction from view
+	 * @param e
+	 */
 	public void submitChatInput(ActionEvent e) {
 		sendMessage();
 	}
-
+	
+	
+	/**
+	 * Send message
+	 */
 	private void sendMessage() {
 		
 		String message = chatInput.getText();
@@ -68,6 +84,10 @@ public class ChatController implements Initializable {
 		updateChat();
 	}
 	
+	
+	/**
+	 * Thread that refreshes the chat
+	 */
 	private void startChatListener() {
 		
 		Thread chatThread = new Thread(){
@@ -87,9 +107,12 @@ public class ChatController implements Initializable {
 		
 		chatThread.setDaemon(true);
 		chatThread.start();
-		
 	}
 	
+	
+	/**
+	 * Update the chat array from the database
+	 */
 	private void updateChat() {
 		try {
 			String selectStatement = ChatLine.getQuery(gameId);
@@ -107,6 +130,10 @@ public class ChatController implements Initializable {
 	    });
 	}
 	
+	
+	/**
+	 * Render message item
+	 */
 	private void showMessages() {
 		textScreen.getChildren().clear();
 		textScreen.setStyle("-fx-padding: 15 5 0 5");
