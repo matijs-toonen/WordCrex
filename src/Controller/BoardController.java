@@ -113,7 +113,7 @@ public class BoardController implements Initializable {
 	}
 
 	public void shuffle(){
-		placeHand();
+		placeHand(true);
 	}
 	
 	public void reset() {
@@ -238,7 +238,7 @@ public class BoardController implements Initializable {
 				_currentHand.add(boardTile);
 			}
 		};
-		placeHand();
+		placeHand(false);
 	}
 	
 	private ArrayList<HandLetter> getHandLetters() {
@@ -280,14 +280,14 @@ public class BoardController implements Initializable {
 	private void resetHand() {
 		_fieldHand.entrySet().forEach(handLetter -> {
 			var cords = handLetter.getKey();
-			var tile = handLetter.getValue();
 			
 			var tilePane = _boardTiles.get(cords);
-			tilePane.setBackground(getBackground(Color.CHOCOLATE));
 			tilePane.removeBoardTile();
 			_board.updateStatus(cords, PositionStatus.Open);
-			tile.setPaneVisible(true);
 		});	
+
+		placeHand(false);
+		_fieldHand.clear();
 	}
 	
 	private void addTurn() {
@@ -301,11 +301,12 @@ public class BoardController implements Initializable {
 		}
 	}
 	
-	private void placeHand() {
+	private void placeHand(boolean shuffle) {
 		int x = 10;
 		int y = 13;
 		
-		Collections.shuffle(_currentHand);
+		if(shuffle) 
+			Collections.shuffle(_currentHand);	
 		
 		for(var tile : _currentHand) {
 			tile.setLayoutX(x);
