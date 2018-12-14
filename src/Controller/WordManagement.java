@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import Model.Game;
 import Model.Word;
 import View.Items.ChallengeItem;
+import View.Items.ChallengePlayerItem;
 import View.Items.WordItem;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -94,14 +95,32 @@ public class WordManagement implements Initializable {
 			// get item values
 	    	var btnReaction = (Button) event.getSource();
 	    	var type = btnReaction.getText();
-	    	
+	    	var word = (WordItem) btnReaction.getParent();
+	    	String word_ = word.getWord().getWord();
+
 	    	if (type.equals(WordItem.acceptText)) {
-	    		System.out.println("Accepted Click");
+	    		String query = "UPDATE dictionary SET state = 'accepted' WHERE word = '"+word_+"'";
+	    		
+	    		try {
+					_db.Update(query);
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	    		
+	    		LoadWords();
 	    	}else if(type.equals(WordItem.rejectText)) {
-	    		System.out.println("Reject ClickT");
+	    		String query = "UPDATE dictionary SET state = 'denied' WHERE word = '"+word_+"'";
+	    		
+	    		try {
+					_db.Update(query);
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	    		
+	    		LoadWords();
 	    	}
-			
-			
 		});
     }
 	

@@ -2,6 +2,7 @@ package View.Items;
 
 import java.util.function.Consumer;
 
+import Model.Game;
 import Model.Word;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -64,6 +65,10 @@ public class WordItem extends AnchorPane {
 		lblState.setLayoutX(200);
 		
 		this.getChildren().addAll(lblWoord, lblState);
+	}
+	
+	public Word getWord() {
+		return _word;
 	}
 	
 	public void setOnClickEvent(Consumer<ActionEvent> action) {
