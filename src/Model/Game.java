@@ -18,6 +18,13 @@ public class Game {
 				"AND (username_winner is not null)");
 	}
 	
+	public static final String getWinnerQueryObserver() {
+		return ("SELECT game_id, username_winner, username_player1, username_player2 " + 
+				"FROM game " + 
+				"WHERE (username_winner is not null);");
+		
+	}
+	
  	public static final String getAcitveQuery(String username) {
 		return ("SELECT " +
 				"(SELECT IF(g.username_player1 = '" + username + "', g.username_player2, g.username_player1)) AS 'opponent', " +
@@ -30,6 +37,12 @@ public class Game {
 				"WHERE (g.username_player1 = '"+username+"' OR g.username_player2 = '"+username+"') " +
 				"AND (g.game_state = '" + GameStatus.getGameStatus(GameStatus.Playing) + "')" +
 				"GROUP BY g.game_id");
+	}
+ 	
+ 	public static final String getAcitveQueryObserver() {
+		return ("select game_id, game_state, username_player1, username_player2 "
+				+ "from game "
+				+ "where game_state = 'playing'");
 	}
  	
  	public static final String getChallengeQuery(String username) {
@@ -146,7 +159,8 @@ public class Game {
 	}
 	
 	public static List<Game> hasWinnerWithUsername(List<Game> games, String username){
-		return games.stream().filter(game -> game._opponent.toLowerCase().contains(username.toLowerCase()) || 
+		return games.stream()
+				.filter(game -> game._opponent.toLowerCase().contains(username.toLowerCase()) || 
 				game._winner.toLowerCase().contains(username.toLowerCase()))
 				.collect(Collectors.toList());
 	}
