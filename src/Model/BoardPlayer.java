@@ -39,4 +39,8 @@ public class BoardPlayer {
 			e.printStackTrace();
 		}
 	}
+	
+	public static final String hasPlacedTurn(String table, String username, int turnId, int gameId) {
+		return ("SELECT COUNT(*) FROM " + table + "  WHERE username = '" + username + "' AND turn_id = " + turnId + " AND game_id = " + gameId);
+	}
 }

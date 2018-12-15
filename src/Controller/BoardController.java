@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import Model.BoardPlayer;
 import Model.Game;
 import Model.HandLetter;
 import Model.Letter;
@@ -151,8 +152,25 @@ public class BoardController implements Initializable {
 		System.out.println("hier");
 		//TODO insert word in db
 		
-		addTurn();
-		createHand(true);
+		addTurn(true);
+		var checkGenerated = needsToWaitForHandLetters();
+		createHand(checkGenerated);
+	}
+	
+	private boolean needsToWaitForHandLetters() {
+		var table = checkPlayer() ? "boardplayer2" : "boardplayer1";
+		var query = BoardPlayer.hasPlacedTurn(table, _currentGame.getUser2(), _currentTurn.getTurnId(), _currentGame.getGameId());
+		try {
+			_db.SelectCount(query) ;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	private boolean checkPlayer() {
+		return MainController.getUser().getUsername().equals(_currentGame.getUser1());
 	}
 	
 	public void openHistory() throws IOException{
@@ -290,6 +308,7 @@ public class BoardController implements Initializable {
 		return  allTiles.size() == 1 ? allTiles.get(0) : null;
 	}
 	
+	
 	private void createHand(boolean checkGenerated) {
 		_currentHand.clear();
 		_db = new DatabaseController<HandLetter>();
@@ -361,7 +380,7 @@ public class BoardController implements Initializable {
 		var handLetters = new ArrayList<HandLetter>();
 		
 		if(!hasExisitingTurn()) {
-			addTurn();
+			addTurn(false);
 		}
 		
 		for(int i = 0; i < 7; i++) {
@@ -384,29 +403,18 @@ public class BoardController implements Initializable {
 		_fieldHand.clear();
 	}
 	
-	private void addTurn() {
-		_currentTurn.incrementId();
+	private void addTurn(boolean needsIncrement) {
+		if(needsIncrement) 
+			_currentTurn.incrementId();
+		
 		var turnStatement = Turn.getInsertNewTurn(_currentGame.getGameId(), _currentTurn.getTurnId());
 		
 		try {
-			var turn = _db.InsertWithReturnKeys(turnStatement, getNewTurn());
+			_db.Insert(turnStatement);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-	
-	private Function<ResultSet, Turn> getNewTurn() {
-		return (resultSet -> {
-			Turn turn = null;
-			try {
-				turn = new Turn(resultSet, DatabaseController.getColumns(resultSet.getMetaData()));
-			} catch (SQLException e) {
-
-			}
-//			_currentTurn = turn;
-			return turn;
-		});
 	}
 	
 	private void placeHand(boolean shuffle) {
