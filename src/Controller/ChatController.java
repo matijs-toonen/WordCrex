@@ -30,10 +30,7 @@ public class ChatController implements Initializable {
 	private boolean updatedOnce = false;
 	private boolean jumpToBottom = true;
 	private Game _currentGame;
-	
-	// TODO: remove dummy data
-	private final String username = "test-player";
-	private final int gameId = 500;
+	private String _username = MainController.getUser().getUsername();
 	
 	
 	/*
@@ -82,7 +79,7 @@ public class ChatController implements Initializable {
 		}
 		
 		try {
-			String insertStatement = ChatLine.insertQuery(username, gameId, message);
+			String insertStatement = ChatLine.insertQuery(_username, _currentGame.getGameId(), message);
 			_db.Insert(insertStatement);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -124,7 +121,7 @@ public class ChatController implements Initializable {
 	 */
 	private void updateChat() {
 		try {
-			String selectStatement = ChatLine.getQuery(gameId);
+			String selectStatement = ChatLine.getQuery(_currentGame.getGameId());
 			_chatLines = (ArrayList<ChatLine>) _db.SelectAll(selectStatement, ChatLine.class);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -166,7 +163,7 @@ public class ChatController implements Initializable {
 			vBox.setStyle("-fx-background-color: #FFFFFF");
 		    vBox.getChildren().add(messageLabel);
 			
-			if (chatLine.getUsername().equals(username)) {
+			if (chatLine.getUsername().equals(_username)) {
 				messageLabel.setStyle("-fx-background-radius: 20 20 0 20; -fx-padding: 5px 10px; -fx-background-color: #3B86FF; -fx-text-fill: white;");
 				vBox.setPadding(new Insets(0,5,10,30));
 				vBox.setAlignment(Pos.BASELINE_RIGHT);

@@ -91,7 +91,6 @@ public class BoardController implements Initializable {
 		_boardTiles = new HashMap<Point, BoardTilePane>();
         _currentHand = new ArrayList<BoardTile>();
         _fieldHand = new HashMap<Point, BoardTile>();
-        _currentGame = game;
         getLetters();
 	}
 	
@@ -152,7 +151,16 @@ public class BoardController implements Initializable {
 	
 	public void playTurn()
 	{
-		System.out.println(_currentGame.getGameId());
+		System.out.println(_currentGame.getGameId() + " " + _currentTurn.getTurnId() + " " + MainController.getUser().getUsername() + " " + _fieldHand);
+		
+		if(checkPlayer())
+		{
+			
+		}
+		else
+		{
+			
+		}
 		
 		
 	}
@@ -207,6 +215,13 @@ public class BoardController implements Initializable {
 			rightBarAnchor.getChildren().clear();
 			_chatVisible = false;
 		}
+	}
+	
+	 
+	
+	private boolean checkPlayer()
+	{		
+		return MainController.getUser().getUsername().equals(_currentGame.getUser1());
 	}
 	
 	private void closeCommunicationFrame() {
@@ -833,7 +848,6 @@ public class BoardController implements Initializable {
 	{
 		var start = endStart.getKey();
 		var end = endStart.getValue();
-		_currentTurn = new Turn(1);
 		var score = 0;
 		
 		var hasWordMulti = false;
