@@ -14,6 +14,8 @@ import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import Model.Game;
@@ -64,6 +66,7 @@ public class BoardController implements Initializable {
 	private Board _board;
     private ArrayList<BoardTile> _currentHand;
     private HashMap<Point, BoardTile> _fieldHand;
+    private AnchorPane _rootPane;
 
 	private boolean _chatVisible;
 	private boolean _historyVisible;
@@ -84,6 +87,9 @@ public class BoardController implements Initializable {
 	@FXML
 	private ImageView reset, accept;
 	
+	@FXML
+	private AnchorPane screenPane;	
+	
 	public BoardController(Game game, Turn turn) {
 		_currentGame = game;
 		_currentTurn = turn;
@@ -92,6 +98,10 @@ public class BoardController implements Initializable {
         _currentHand = new ArrayList<BoardTile>();
         _fieldHand = new HashMap<Point, BoardTile>();
         getLetters();
+	}
+	
+	public BoardController(AnchorPane rootPane) {
+		_rootPane = rootPane;
 	}
 	
 	public BoardController(Game game) {
@@ -112,9 +122,9 @@ public class BoardController implements Initializable {
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		lblPlayer1.setText("BaderAli99");
+		lblPlayer1.setText(_currentGame.getUser1());
 		lblPlayer1.setStyle("-fx-font-size: 28");
-		lblPlayer2.setText("SchurkTurk");
+		lblPlayer2.setText(_currentGame.getUser2());
 		lblPlayer2.setStyle("-fx-font-size: 28");
 		lblScore1.setText("1");
 		lblScore1.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 25 0 0 25");
@@ -163,6 +173,54 @@ public class BoardController implements Initializable {
 		}
 		
 		
+	}
+	
+	public void resignGame()
+	{		
+		try 
+		{
+			if(checkPlayer())
+			{
+				_db.Update("UPDATE turnplayer1 " + 
+						"SET " + 
+						"turnaction_type = 'resign' " + 
+						"WHERE " + 
+						"game_id = " + _currentGame.getGameId() + " " + 
+						"AND turn_id = " + _currentTurn.getTurnId() + " " + 
+						"AND username_player1 = " + MainController.getUser().getUsername() + "");
+			}
+			else 
+			{
+				_db.Update("UPDATE turnplayer2 " + 
+						"SET " + 
+						"turnaction_type = 'resign' " + 
+						"WHERE " + 
+						"game_id = " + _currentGame.getGameId() + " " + 
+						"AND turn_id = " + _currentTurn.getTurnId() + " " + 
+						"AND username_player2 = " + MainController.getUser().getUsername() + "");
+			}
+			
+			
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		AnchorPane pane = null;
+		try 
+		{		 
+			GameController con = new GameController(_rootPane);			
+			var panes = new FXMLLoader(getClass().getResource("/View/Games.fxml"));
+			
+			panes.setController(con);
+			pane = panes.load();
+			
+		}
+		catch(Exception ex) {
+			Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+		}		
+		_rootPane.getChildren().setAll(pane);
 	}
 	
 	public void reset() {
@@ -659,7 +717,7 @@ public class BoardController implements Initializable {
 			
 			for(var word : words)
 			{
-				System.out.println("Word: " + word.getKey() + " Score: " + word.getValue() + " isMiddle: " + _firstPlacedWord);
+				System.out.println("Word: " + word.getKey() + " Score: " + word.getValue() + " isMiddle: " + _firstPlacedWord + _currentTurn.getTurnId());
 			}
 		}
 		catch(Exception e)
