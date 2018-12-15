@@ -155,7 +155,15 @@ public class BoardController implements Initializable {
 	public void playTurn()
 	{
 		System.out.println(_currentGame.getGameId() + " " + _currentTurn.getTurnId() + " " + MainController.getUser().getUsername() + " " + _fieldHand);
-				
+		
+		// TODO cancel next turn
+		if(hasNotPlacedFirstMid())
+			System.out.println("Cancel next turn");
+		else
+		{
+			
+		}
+		
 		if(checkPlayerIfPlayer1())
 		{
 			
@@ -164,8 +172,16 @@ public class BoardController implements Initializable {
 		{
 			
 		}
+	}
+	
+	private boolean hasNotPlacedFirstMid()
+	{
+		var middleCord = new Point(7,7);
 		
-		
+		if(_currentTurn.getTurnId() == 1)
+			return _board.canPlace(middleCord);
+		else
+			return false;
 	}
 	
 	public void reset() {
@@ -565,47 +581,39 @@ public class BoardController implements Initializable {
 				if(!_board.canPlace(cords))
 					return;
 				
-				if(hasNotPlacedFirstMid(cords))
+				if(_board.placedConnected(cords) || _currentTurn.getTurnId() == 1)
 				{
-					event.setDropCompleted(false);
-					return;
+					if(sourceTile.getParent() instanceof BoardTilePane) {
+						var oldBoardTile = (BoardTilePane) sourceTile.getParent();
+						var oldCords = oldBoardTile.getCords();
+						_board.updateStatus(oldCords, PositionStatus.Open);
+						oldBoardTile.removeBoardTile();
+						_fieldHand.remove(oldCords);
+						_boardTiles.put(boardTile.getCords(), oldBoardTile);
+					}
+					
+					sourceTile.setLayoutX(0);
+					sourceTile.setLayoutY(0);
+					boardTile.setBoardTile(sourceTile);
+					
+					reset.setVisible(true);
+					_fieldHand.put(cords, sourceTile);
+					_boardTiles.put(cords, boardTile);
+					
+					event.acceptTransferModes(TransferMode.ANY);
+					event.setDropCompleted(true);
+					_board.updateStatus(cords, PositionStatus.Taken);
+					
+					playTileSound();
+
+					showPlacedWords(cords); // Only for testing purposes can remove after
+					
+					event.consume();
 				}
 				else
 				{
-					if(_board.placedConnected(cords) || (cords.equals(new Point(7,7))))
-					{
-						if(sourceTile.getParent() instanceof BoardTilePane) {
-							var oldBoardTile = (BoardTilePane) sourceTile.getParent();
-							var oldCords = oldBoardTile.getCords();
-							_board.updateStatus(oldCords, PositionStatus.Open);
-							oldBoardTile.removeBoardTile();
-							_fieldHand.remove(oldCords);
-							_boardTiles.put(boardTile.getCords(), oldBoardTile);
-						}
-						
-						sourceTile.setLayoutX(0);
-						sourceTile.setLayoutY(0);
-						boardTile.setBoardTile(sourceTile);
-						
-						reset.setVisible(true);
-						_fieldHand.put(cords, sourceTile);
-						_boardTiles.put(cords, boardTile);
-						
-						event.acceptTransferModes(TransferMode.ANY);
-						event.setDropCompleted(true);
-						_board.updateStatus(cords, PositionStatus.Taken);
-						
-						playTileSound();
-
-						showPlacedWords(cords); // Only for testing purposes can remove after
-						
-						event.consume();
-					}
-					else
-					{
-						event.setDropCompleted(false);
-						return;
-					}
+					event.setDropCompleted(false);
+					return;
 				}
 			}
 		});
@@ -654,17 +662,7 @@ public class BoardController implements Initializable {
 			}
 		});
 	}
-	
-	private boolean hasNotPlacedFirstMid(Point placingCord)
-	{
-		var middleCord = new Point(7,7);
 		
-		if(_currentTurn.getTurnId() == 1)
-			return _fieldHand.size() == 0 && !placingCord.equals(middleCord);
-		else
-			return _board.canPlace(middleCord);
-	}
-	
 	private void showPlacedWords(Point cords)
 	{
 		try
