@@ -598,7 +598,7 @@ public class BoardController implements Initializable {
 					
 					System.out.println(letterId + " " + letter + ": " + letterCord);
 				}
-				}
+			}
 		}
 		catch(Exception e)
 		{
