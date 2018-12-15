@@ -1,6 +1,7 @@
 package Controller;
 
 import java.awt.Point;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.ResultSet;
@@ -42,6 +43,8 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
 
@@ -449,6 +452,8 @@ public class BoardController implements Initializable {
 				
 				var cords = boardTile.getCords();
 				
+				playTileSound();
+				
 				if(!_board.canPlace(cords))
 					return;
 				
@@ -828,5 +833,12 @@ public class BoardController implements Initializable {
 		var word = str.toString().trim();
 		
 		return new Pair<>(word,wordStartEnd);
+	}
+	
+	private void playTileSound() {
+		String bip = "src/Resources/tileMove.mp3";
+		Media hit = new Media(new File(bip).toURI().toString());
+		MediaPlayer mediaPlayer = new MediaPlayer(hit);
+		mediaPlayer.play();
 	}
 }
