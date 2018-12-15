@@ -12,9 +12,11 @@ import Model.Game;
 import Model.GameStatus;
 import Model.Turn;
 import View.Items.GameItem;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
@@ -98,15 +100,14 @@ public class GameController implements Initializable{
 	 * Handles user click
 	 * @return
 	 */
-	private Consumer<MouseEvent> onLabelClick() {
+	private Consumer<ActionEvent> onLabelClick() {
 		return (event -> {
-	    	var userLabel = (Label) event.getSource();
+	    	var userLabel = (Button) event.getSource();
 	    	var parent = (GameItem) userLabel.getParent();
 	    	var currentGame= parent.getGame();
 	    	var turnQuery = Game.getTurnFromActiveGame(currentGame.getGameId());
 	    	var turn = new Turn(getTurn(turnQuery));
 	    	loadBoard(currentGame, turn);
-	        System.out.println("mouse click detected! " + userLabel.getText());
 		});
     }
 	
