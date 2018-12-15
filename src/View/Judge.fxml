@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
@@ -30,7 +31,11 @@
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="371.0">
                <children>
-                  <VBox fx:id="WordsNeedJugding" layoutX="12.0" layoutY="12.0" prefHeight="308.0" prefWidth="374.0" />
+                  <ScrollPane hbarPolicy="NEVER" layoutX="13.0" layoutY="6.0" prefHeight="317.0" prefWidth="368.0">
+                     <content>
+                        <VBox fx:id="WordsNeedJugding" prefHeight="314.0" prefWidth="365.0" />
+                     </content>
+                  </ScrollPane>
                </children></AnchorPane>
         </items>
       </SplitPane>
@@ -47,7 +52,11 @@
             </AnchorPane>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="245.0" prefWidth="398.0">
                <children>
-                  <VBox fx:id="JudgedWords" layoutX="14.0" layoutY="14.0" prefHeight="308.0" prefWidth="374.0" />
+                  <ScrollPane hbarPolicy="NEVER" layoutX="13.0" layoutY="6.0" prefHeight="317.0" prefWidth="368.0">
+                     <content>
+                        <VBox fx:id="JudgedWords" prefHeight="314.0" prefWidth="365.0" />
+                     </content>
+                  </ScrollPane>
                </children></AnchorPane>
          </items>
       </SplitPane>
