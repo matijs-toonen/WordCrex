@@ -392,7 +392,7 @@ public class BoardController implements Initializable {
 				boardTile.setDraggableEvents();
 				boardTile.setLayoutX(x);
 				boardTile.setLayoutY(y);
-				boardTile.setStyle("-fx-background-color: pink; -fx-background-radius: 6");
+				boardTile.setStyle("-fx-background-color: #3B86FF; -fx-background-radius: 6");
 				y += 44.5;
 				boardTile.setMinWidth(39);
 				boardTile.setMinHeight(39);
