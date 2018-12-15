@@ -90,6 +90,14 @@ public class Word {
 		return ("SELECT word, state FROM dictionary WHERE state != 'pending' AND username != 'bookowner'");
 	}
 	
+	public static String UpdateAcceptWord (String word) {
+		return ("UPDATE dictionary SET state = 'accepted' WHERE word = '"+word+"'");
+	}
+	
+	public static String UpdateDeniedWord (String word) {
+		return ("UPDATE dictionary SET state = 'denied' WHERE word = '"+word+"'");
+	}
+	
 	public static List<Word> getAllWordsThatContain (ArrayList<Word> words, String searchText){
 		return words.stream().filter(word -> word.getWord().contains(searchText)).collect(Collectors.toList());
 	}

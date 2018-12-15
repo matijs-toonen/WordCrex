@@ -88,7 +88,7 @@ public class WordManagement implements Initializable {
 	    	String word = wordItem.getWord().getWord(); 
 
 	    	if (type.equals(WordItem.acceptText)) {
-	    		String query = "UPDATE dictionary SET state = 'accepted' WHERE word = '"+word+"'";
+	    		String query = Word.UpdateAcceptWord(word);
 	    		
 	    		try {
 	    			if(_db.Update(query))
@@ -98,7 +98,7 @@ public class WordManagement implements Initializable {
 					e.printStackTrace();
 				}
 	    	}else if(type.equals(WordItem.rejectText)) {
-	    		String query = "UPDATE dictionary SET state = 'denied' WHERE word = '"+word+"'";
+	    		String query = Word.UpdateDeniedWord(word);
 	    		
 	    		try {
 					if(_db.Update(query))
