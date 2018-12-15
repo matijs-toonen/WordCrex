@@ -384,15 +384,26 @@ public class BoardController implements Initializable {
 		return handLetters.size() == 0 ? generateHandLetters() : handLetters; 
 	}
 	
+	private int getAmountLetters(ArrayList<HandLetter> handLetters) {
+		if(handLetters.isEmpty())
+			return 0;
+		return handLetters.get(0).getLetters().size();
+	}
+	
 	private void waitForVisualizeNewHandLetters(){	
 		var thread = new Thread() {
 			public void run() {
 				var handLetters = getExistingHandLetters();
-				while(handLetters.size() == 0) {
+				int tries = 0;
+				while(getAmountLetters(handLetters) == 0 || getAmountLetters(handLetters) != 7 || tries < 4) {
 	    			try {
 						Thread.sleep(1000);
-						handLetters =  getExistingHandLetters();
+						handLetters = getExistingHandLetters();
 						
+						tries++;
+						if (getAmountLetters(handLetters) == 0)
+							tries = 0;
+					
 					} catch (Exception e) {
 						System.out.println(e.getMessage());
 					}
@@ -412,7 +423,6 @@ public class BoardController implements Initializable {
 		_db = new DatabaseController<HandLetter>();
 		
 		var statement = Game.getExisitingHandLetters(_currentGame.getGameId(), _currentTurn.getTurnId());
-		
 		ArrayList<HandLetter> handLetters = new ArrayList<HandLetter>();
 		
 		try {
