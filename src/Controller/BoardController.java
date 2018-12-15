@@ -16,6 +16,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import Model.ChatLine;
 import Model.Game;
 import Model.HandLetter;
 import Model.Letter;
@@ -129,6 +130,8 @@ public class BoardController implements Initializable {
 		createField(false);
 		createHand(false);
 		dragOnHand();
+		
+		
 	}
 	
 	private void scoreRefreshThread() {
@@ -195,6 +198,22 @@ public class BoardController implements Initializable {
 	public void playTurn()
 	{
 		System.out.println("test");
+	}
+	
+	public void clickSkipTurn() {
+		System.out.println("User clicked skip turn");
+		boolean isFirstPlayer = _currentGame.getUser1().equals(MainController.getUser().getUsername());
+		String insertQuery = Game.getPassQuery(_currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername(), isFirstPlayer);
+		
+		var _db = new DatabaseController<Game>();
+		
+		try {
+			_db.Insert(insertQuery);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		// TODO: mathijs renew hand code
 	}
 	
 	public void reset() {
