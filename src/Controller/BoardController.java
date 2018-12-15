@@ -1,6 +1,7 @@
 package Controller;
 
 import java.awt.Point;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.ResultSet;
@@ -45,8 +46,12 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
 
@@ -62,8 +67,10 @@ public class BoardController implements Initializable {
 	private Board _board;
     private ArrayList<BoardTile> _currentHand;
     private HashMap<Point, BoardTile> _fieldHand;
+
 	private boolean _chatVisible;
 	private boolean _historyVisible;
+	private boolean _firstPlacedWord = false;
 	
 	@FXML
 	private Label lblScore1, lblScore2, lblPlayer1, lblPlayer2;
@@ -145,6 +152,22 @@ public class BoardController implements Initializable {
 		placeHand(true);
 	}
 	
+	public void playTurn()
+	{
+		System.out.println(_currentGame.getGameId() + " " + _currentTurn.getTurnId() + " " + MainController.getUser().getUsername() + " " + _fieldHand);
+		fieldhandReader();
+		if(checkPlayer())
+		{
+			
+		}
+		else
+		{
+			
+		}
+		
+		
+	}
+	
 	public void reset() {
 		resetHand();
 		reset.setVisible(false);
@@ -160,11 +183,18 @@ public class BoardController implements Initializable {
 	
 	public void openHistory() throws IOException{
 		if(!_historyVisible) {
-			closeCommunicationFrame();
-			Parent historyFrame = FXMLLoader.load(getClass().getResource("/View/SetHistory.fxml"));
 			
-			rightBarAnchor.getChildren().setAll(historyFrame);
+			closeCommunicationFrame();
+			//Parent historyFrame = FXMLLoader.load(getClass().getResource("/View/SetHistory.fxml"));
+			
+			SetHistoryController setHistoryController = new SetHistoryController(_currentGame);        
+    		FXMLLoader historyFrame = new FXMLLoader(getClass().getResource("/View/SetHistory.fxml"));
+    		historyFrame.setController(setHistoryController);
+    		AnchorPane pane = historyFrame.load();
+    		
+			rightBarAnchor.getChildren().setAll(pane);
 			_historyVisible = true;
+			
 		}
 		else {
 			rightBarAnchor.getChildren().clear();
@@ -175,15 +205,38 @@ public class BoardController implements Initializable {
 	public void openChat() throws IOException {
 		if(!_chatVisible) {
 			closeCommunicationFrame();
-			Parent chatFrame = FXMLLoader.load(getClass().getResource("/View/Chat.fxml"));
 			
-			rightBarAnchor.getChildren().setAll(chatFrame);
+			ChatController chatController = new ChatController(_currentGame);        
+    		FXMLLoader chatFrame = new FXMLLoader(getClass().getResource("/View/Chat.fxml"));
+    		chatFrame.setController(chatController);
+    		HBox pane = chatFrame.load();
+			
+			rightBarAnchor.getChildren().setAll(pane);
 			_chatVisible = true;
 		}
 		else {
 			rightBarAnchor.getChildren().clear();
 			_chatVisible = false;
 		}
+	}
+	
+	private ArrayList<String> fieldhandReader()
+	{
+		ArrayList<String> cords;
+		
+		for(Point point : _fieldHand.keySet())
+		{
+			String key = point.toString();
+			
+			System.out.println(key);
+		}
+		
+		return null;		
+	}
+	
+	private boolean checkPlayer()
+	{		
+		return MainController.getUser().getUsername().equals(_currentGame.getUser1());
 	}
 	
 	private void closeCommunicationFrame() {
@@ -243,8 +296,31 @@ public class BoardController implements Initializable {
 						tilePane.setLayoutY(y);
 						tilePane.setMinWidth(39);
 						tilePane.setMinHeight(39);
-						tilePane.setStyle("-fx-background-color: #E8E9EC; -fx-background-radius: 6");
+						
 						tilePane.setBoardTile(boardTile);
+						switch(String.valueOf(tile.getType().getValue()) + String.valueOf(tile.getType().getLetter()).trim()) {
+						case "6L":
+							tilePane.getStyleClass().add("tile6L");
+							break;
+						case "4L":
+							tilePane.getStyleClass().add("tile4L");
+							break;
+						case "4W":
+							tilePane.getStyleClass().add("tile4W");
+							break;
+						case "3W":
+							tilePane.getStyleClass().add("tile3W");
+							break;
+						case "2L":
+							tilePane.getStyleClass().add("tile2L");
+							break;
+						case "0*":
+							tilePane.getStyleClass().add("tileCenter");
+							break;
+						case "0":
+							tilePane.getStyleClass().add("tile0");
+							break;
+						}
 						
 						_boardTiles.put(new Point(i, j), tilePane);
 						panePlayField.getChildren().add(tilePane);						
@@ -499,6 +575,8 @@ public class BoardController implements Initializable {
 				var boardTile = (BoardTilePane) event.getGestureTarget();
 				
 				var cords = boardTile.getCords();
+				
+				playTileSound();
 				
 				if(!_board.canPlace(cords))
 					return;
@@ -821,7 +899,6 @@ public class BoardController implements Initializable {
 			else
 				cord = new Point(colro, i);
 			
-			if(tileCollection.containsKey(cord))
 			{
 				var tile = tileCollection.get(cord);
 				
@@ -899,5 +976,12 @@ public class BoardController implements Initializable {
 		var word = str.toString().trim();
 		
 		return new Pair<>(word,wordStartEnd);
+	}
+	
+	private void playTileSound() {
+		String bip = "src/Resources/tileMove.mp3";
+		Media hit = new Media(new File(bip).toURI().toString());
+		MediaPlayer mediaPlayer = new MediaPlayer(hit);
+		mediaPlayer.play();
 	}
 }

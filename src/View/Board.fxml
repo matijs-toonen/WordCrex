@@ -12,9 +12,9 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1000.0" prefWidth="1635.0" style="-fx-background-color: #F0F0F7;" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Pane prefHeight="900.0" prefWidth="1298.0">
+      <Pane prefHeight="900.0" prefWidth="920.0" style="-fx-background-color: transparent;">
          <children>
             <Pane fx:id="panePlayField" layoutX="70.0" layoutY="84.0" prefHeight="680.0" prefWidth="680.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1);" />
             <Pane fx:id="paneHand" layoutX="782.0" layoutY="84.0" prefHeight="330.0" prefWidth="59.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1);" />
@@ -52,7 +52,7 @@
                      </padding></Label>
                </children>
            </GridPane>
-                  <Pane fx:id="backPanel" layoutX="782.0" layoutY="525.0" prefHeight="239.0" prefWidth="59.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1);" styleClass="backPanel">
+                  <Pane fx:id="backPanel" layoutX="782.0" layoutY="437.0" prefHeight="239.0" prefWidth="59.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1);" styleClass="backPanel">
                      <children>
                         <ImageView fitHeight="39.0" fitWidth="39.0" layoutX="11.0" layoutY="56.0" onMouseClicked="#shuffle" pickOnBounds="true" preserveRatio="true" styleClass="optionButton">
                            <image>
@@ -62,7 +62,7 @@
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </ImageView>
-                        <ImageView fx:id="accept" fitHeight="39.0" fitWidth="39.0" layoutX="11.0" layoutY="12.0" onMouseClicked="#acceptWord" pickOnBounds="true" preserveRatio="true" styleClass="optionButton">
+                        <ImageView fitHeight="39.0" fitWidth="39.0" layoutX="11.0" layoutY="12.0" onMouseClicked="#playTurn" pickOnBounds="true" preserveRatio="true" styleClass="optionButton">
                            <image>
                               <Image url="@../Resources/play.png" />
                            </image>
@@ -106,6 +106,6 @@
                   </Pane>
            </children>
             </Pane>
-            <AnchorPane fx:id="rightBarAnchor" layoutX="1299.0" prefHeight="900.0" prefWidth="300.0" />
+            <AnchorPane fx:id="rightBarAnchor" layoutX="965.0" prefHeight="900.0" prefWidth="390.0" />
          </children>
 </AnchorPane>
