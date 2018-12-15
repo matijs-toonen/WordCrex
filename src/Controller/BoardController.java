@@ -479,6 +479,7 @@ public class BoardController implements Initializable {
 		}
 		else
 		{
+			System.out.println(placedCord);
 			var wordWithStartEnd = collectLettersUntilSeperator(letters, placedCord.getValue(), ' ');
 			var word = wordWithStartEnd.getKey();
 			var score = getWordScore(wordWithStartEnd.getValue(), placedCord.getKey(), horizontal, test);
@@ -511,13 +512,15 @@ public class BoardController implements Initializable {
 			if(_boardTilesTest.containsKey(cord))
 			{
 				var tile = _boardTilesTest.get(cord);
-				
+								
 				var letterScore = tile.getSymbol().getValue();
 				var bonusLetter = tile.getBonusLetter();
 				var bonusMulti = tile.getBonusValue();
 				
-				if(bonusMulti != 0 && bonusLetter != 'W')
+				if(bonusLetter == 'L')
+				{
 					score += letterScore * bonusMulti;
+				}
 				else
 					score += letterScore;
 					
@@ -533,7 +536,7 @@ public class BoardController implements Initializable {
 		{
 			for(var tile : wordMultiTiles)
 			{
-				score += score * tile.getBonusValue();
+				score = score * tile.getBonusValue();
 			}
 		}
 		
@@ -568,7 +571,7 @@ public class BoardController implements Initializable {
 				var bonusLetter = tile.getBonusLetter();
 				var bonusMulti = tile.getBonusValue();
 				
-				if(bonusMulti != 0 && bonusLetter != 'W')
+				if(bonusLetter == 'L')
 					score += letterScore * bonusMulti;
 				else
 					score += letterScore;
@@ -585,7 +588,7 @@ public class BoardController implements Initializable {
 		{
 			for(var tile : wordMultiTiles)
 			{
-				score += score * tile.getBonusValue();
+				score = score * tile.getBonusValue();
 			}
 		}
 		
@@ -596,7 +599,7 @@ public class BoardController implements Initializable {
 	{
 		var str = new StringBuilder();
 		
-		var endStr = 0;
+		var endStr = 14;
 		
 		var startStr = 0;
 		
@@ -625,6 +628,8 @@ public class BoardController implements Initializable {
 		
 		var wordStartEnd = new Pair<>(startStr, endStr);
 		var word = str.toString().trim();
+		
+		System.out.println(word + " " + wordStartEnd);
 		
 		return new Pair<>(word,wordStartEnd);
 	}

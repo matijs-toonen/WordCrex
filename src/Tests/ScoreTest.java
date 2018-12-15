@@ -50,30 +50,107 @@ class ScoreTest {
 		
 		placeWord(_letters, row, start, end);
 		
-		var ebTest = runTest(start, row);
+		var ebTest = runTest(start, row, true);
 		
 		Assert.assertEquals(word, ebTest.getKey());
 		Assert.assertEquals(expectedScore, (int)ebTest.getValue());	
 	}
 	
-	// Always horizontal
-	Pair<String, Integer> runTest(int start, int row)
+	@Test
+	void TestWord2() {
+		
+		init();
+						
+		var row = 7;
+		var start = 11;
+		var end = 14;
+		
+		var expectedScore = 204;
+		
+		var word = "quiz";
+		
+		addWordStartEnd(_letters, start, end, word.toCharArray());
+		
+		placeWord(_letters, row, start, end);
+		
+		var ebTest = runTest(start, row, true);
+		
+		Assert.assertEquals(word, ebTest.getKey());
+		Assert.assertEquals(expectedScore, (int)ebTest.getValue());	
+	}
+	
+	@Test
+	int TestWord3() {
+		
+		init();
+						
+		var row = 10;
+		var start = 1;
+		var end = 4;
+		
+		var expectedScore = 51;
+		
+		var word = "brie";
+		
+		addWordStartEnd(_letters, start, end, word.toCharArray());
+		
+		placeWord(_letters, row, start, end);
+		
+		var ebTest = runTest(start, row, true);
+		
+		Assert.assertEquals(word, ebTest.getKey());
+		Assert.assertEquals(expectedScore, (int)ebTest.getValue());	
+		
+		return (int)ebTest.getValue();
+	}
+	
+	@Test
+	void testWord4() {
+		
+		init();
+						
+		var row = 4;
+		var start = 8;
+		var end = 10;
+		
+		var expectedScore = 19;
+		
+		var word = "wie";
+		
+		addWordStartEnd(_letters, start, end, word.toCharArray());
+		
+		placeWord(_letters, row, start, end);
+		
+		var ebTest = runTest(start, row, false);
+		
+		Assert.assertEquals(word, ebTest.getKey());
+		Assert.assertEquals(expectedScore, (int)ebTest.getValue());	
+		
+//		return (int)ebTest.getValue();
+	}
+	
+
+	
+	@Test
+	void Test2Words() {
+		
+		var expectedScore = 80;
+		
+		Assert.assertEquals(expectedScore, TestWord3() + TestWord4());	
+	}
+	
+	Pair<String, Integer> runTest(int start, int row, boolean Horizontal)
 	{
-		return _boardCont.getPlacedWordFromChars(_letters, new Pair<Integer, Integer>(start,row), true, true);
+		return _boardCont.getPlacedWordFromChars(_letters, new Pair<Integer, Integer>(start,row), Horizontal, true);
 	}
 	
 	void addWordStartEnd(char[] arr, int start, int end, char[] word)
-	{		
+	{
 		int wordIndex = 0;
 		for(int i = start; i <= end; i++)
 		{
-			if(i == start)
-			{
-				arr[i] = word[wordIndex];
-				wordIndex += 1;
-			}
-			else
-				arr[i] = word[wordIndex];
+			arr[i] = word[wordIndex];
+			wordIndex++;
 		}
 	}
 	
