@@ -29,9 +29,11 @@ import Model.Symbol;
 import Model.Tile;
 import Model.Turn;
 import Model.TurnBoardLetter;
+import Model.TurnPlayer;
 import Model.Word;
 import Model.Board.Board;
 import Model.Board.PositionStatus;
+import Model.TurnAction.TurnAction;
 import Tests.BoardTileTest;
 import View.BoardPane.BoardTile;
 import View.BoardPane.BoardTilePane;
@@ -158,16 +160,27 @@ public class BoardController implements Initializable {
 		System.out.println("hier");
 		//TODO insert word in db
 		
-		_currentTurn.incrementId();
+		var table = checkPlayer() ? "turnplayer1" : "turnplayer2";
+		
+//		var insertQuery = TurnPlayer.insertPlayer(table, _currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername(), 0, 0, "play");
+//		try {
+//			_db.Insert(insertQuery);
+//		} catch (SQLException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+
 		createHand(true);
-		addTurn();
 	}
 	
 	private boolean needsToWaitForHandLetters() {
-		var table = checkPlayer() ? "boardplayer2" : "boardplayer1";
-		var query = BoardPlayer.hasPlacedTurn(table, _currentGame.getUser2(), _currentTurn.getTurnId(), _currentGame.getGameId());
+		var table = checkPlayer() ? "turnplayer2" : "turnplayer1";
+		var query = TurnPlayer.hasPlacedTurn(table, _currentGame.getUser2(), _currentTurn.getTurnId(), _currentGame.getGameId());
+		System.out.println(query);
 		try {
-			return _db.SelectCount(query) == 0;
+			var shoud = _db.SelectCount(query) == 0;
+			System.out.println(shoud + " table " + table + " turn " + _currentTurn.getTurnId());
+			return shoud;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -319,12 +332,20 @@ public class BoardController implements Initializable {
 		_currentHand.clear();
 		_db = new DatabaseController<HandLetter>();
 		var handLetters = new ArrayList<HandLetter>();
+		
 		if(checkGenerated) {
 			var check = needsToWaitForHandLetters();
-			handLetters = getGeneratedLetters(check);
+			_currentTurn.incrementId();
+			getGeneratedLetters(check);
+			return;
 		}
 		
+//		_currentTurn.incrementId();
 		handLetters = getHandLetters();
+		visualizeHand(handLetters);
+	}
+	
+	private void visualizeHand(ArrayList<HandLetter> handLetters) {
 		int x = 0;
 		int y = 13;
 
@@ -345,22 +366,13 @@ public class BoardController implements Initializable {
 		placeHand(false);
 	}
 	
-	private ArrayList<HandLetter> getGeneratedLetters(boolean checkGenerated){
+	private void getGeneratedLetters(boolean checkGenerated){
 		if(checkGenerated) {
-			return checkNewHandLetter();
-//			var futureHandLetters = checkNewHandLetter();
-//			if(futureHandLetters.isDone()) {
-//				try {
-//					return futureHandLetters.get();
-//				} catch (InterruptedException e) {
-//					return null;
-//				} catch (ExecutionException e) {
-//					return null;
-//				}
-//			}
+			waitForVisualizeNewHandLetters();
 		}
 		else {
-			return generateHandLetters();
+			var handLetters = generateHandLetters();
+			visualizeHand(handLetters);
 		}
 	}
 	
@@ -369,13 +381,33 @@ public class BoardController implements Initializable {
 		return handLetters.size() == 0 ? generateHandLetters() : handLetters; 
 	}
 	
-	private synchronized ArrayList<HandLetter> checkNewHandLetter(){
-		ArrayList<HandLetter> handLetters = new ArrayList<HandLetter>();
-		while(handLetters.size() == 0) {
-			handLetters = getExistingHandLetters();
-			new Timer(1000, null).start();
-		}
-		return handLetters;
+	private void waitForVisualizeNewHandLetters(){
+		
+//		while(handLetters.size() == 0) {
+//			handLetters = getExistingHandLetters();
+//			new Timer(1000, null).start();
+//		}
+//		return handLetters;
+//		
+		var thread = new Thread() {
+			public void run() {
+				var handLetters = getExistingHandLetters();
+				while(handLetters.size() == 0) {
+	    			try {
+	    				handLetters =  getExistingHandLetters();
+						Thread.sleep(1000);
+						
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+				visualizeHand(handLetters);
+				addTurn();
+			}
+		};
+		
+		thread.setDaemon(true);
+		thread.start();
 		
 //		var handLetters = new Callable<ArrayList<HandLetter>>() {
 //			@Override
@@ -383,8 +415,9 @@ public class BoardController implements Initializable {
 //				var handLetters = getExistingHandLetters();
 //				while(handLetters.size() == 0) {
 //	    			try {
-//	    				new Timer(1000, (ArrayList<HandLetter>) getExistingHandLetters()).start();
-////						Thread.sleep(1000);
+////	    				new Timer(1000, (ArrayList<HandLetter>).start();
+//	    				handLetters =  getExistingHandLetters();
+//						Thread.sleep(1000);
 //						
 //					} catch (Exception e) {
 //						e.printStackTrace();
@@ -393,7 +426,8 @@ public class BoardController implements Initializable {
 //				return handLetters;
 //			}
 //		};
-//		var executor = Executors.defaultThreadFactory().newThread(handLetters);
+//		
+//		var executor = Executors.newSingleThreadExecutor();
 //		var items = executor.submit((Callable<ArrayList<HandLetter>>) handLetters.call());
 //		return items;
 	}
