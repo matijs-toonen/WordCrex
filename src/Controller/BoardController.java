@@ -152,7 +152,7 @@ public class BoardController implements Initializable {
 	public void playTurn()
 	{
 		System.out.println(_currentGame.getGameId() + " " + _currentTurn.getTurnId() + " " + MainController.getUser().getUsername() + " " + _fieldHand);
-		
+		fieldhandReader();
 		if(checkPlayer())
 		{
 			
@@ -217,7 +217,19 @@ public class BoardController implements Initializable {
 		}
 	}
 	
-	 
+	private ArrayList<String> fieldhandReader()
+	{
+		ArrayList<String> cords;
+		
+		for(Point point : _fieldHand.keySet())
+		{
+			String key = point.toString();
+			
+			System.out.println(key);
+		}
+		
+		return null;		
+	}
 	
 	private boolean checkPlayer()
 	{		
