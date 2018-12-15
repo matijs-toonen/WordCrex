@@ -148,6 +148,18 @@ public class Game {
  				"GROUP BY g.game_id;", username, username, username, GameStatus.getGameStatus(GameStatus.Playing));
  	}
  	
+ 	public static final String getTurnFromActiveGame(int gameId) {
+ 		return ("SELECT MAX(turn_id) FROM handletter WHERE game_id = " + gameId);
+ 	}
+ 	
+ 	public static final String getExistingTiles(int gameId, int turnId) {
+ 		return ("SELECT * FROM turnboardletter NATURAL JOIN letter WHERE game_id = " + gameId + " AND turn_id < " + turnId);
+ 	}
+ 	
+ 	public static final String getExisitingHandLetters(int gameId, int turnId) {
+ 		return("SELECT * FROM handletter NATURAL JOIN letter NATURAL JOIN symbol where game_id = " + gameId + " AND turn_id = " + turnId);
+ 	}
+ 	
  	public static final String getActiveQueryObserver() {
 		return ("select game_id, game_state, username_player1, username_player2 "
 				+ "from game "

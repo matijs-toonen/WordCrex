@@ -76,9 +76,9 @@ public class BoardController implements Initializable {
 	@FXML
 	private ImageView reset;
 	
-	public BoardController(Game game) {
+	public BoardController(Game game, Turn turn) {
 		_currentGame = game;
-		_currentTurn = new Turn(1);
+		_currentTurn = turn;
 		_board = new Board();
 		_boardTiles = new HashMap<Point, BoardTilePane>();
         _currentHand = new ArrayList<BoardTile>();
@@ -86,11 +86,10 @@ public class BoardController implements Initializable {
         getLetters();
 	}
 	
-	public BoardController(Game game, Turn turn) {
-		this(game);
-		_currentTurn = turn;
+	public BoardController(Game game) {
+		this(game, new Turn(1));
 	}
-	
+
 	private void getLetters() {
 		_db = new DatabaseController<Symbol>();
 		var statement = "SELECT * FROM letter WHERE game_id = " + _currentGame.getGameId();
@@ -265,9 +264,9 @@ public class BoardController implements Initializable {
 		_db = new DatabaseController<TurnBoardLetter>();
 		var turns = new HashMap<Point, TurnBoardLetter>();
 		
-		String query = "SELECT * FROM turnboardletter NATURAL JOIN letter WHERE game_id = 502 AND turn_id < 4";
+		String tileQuery = Game.getExistingTiles(_currentGame.getGameId(), _currentTurn.getTurnId());
 		try {
-			((ArrayList<TurnBoardLetter>)_db.SelectAll(query, TurnBoardLetter.class)).forEach(turn -> {
+			((ArrayList<TurnBoardLetter>)_db.SelectAll(tileQuery, TurnBoardLetter.class)).forEach(turn -> {
 				turns.put(turn.getTileCords(), turn);	
 			});
 		}
@@ -315,7 +314,7 @@ public class BoardController implements Initializable {
 	private ArrayList<HandLetter> getExistingHandLetters() {
 		_db = new DatabaseController<HandLetter>();
 		
-		var statement = "SELECT * FROM handletter NATURAL JOIN letter NATURAL JOIN symbol where game_id = " + _currentGame.getGameId() + " AND turn_id = " + _currentTurn.getTurnId();
+		var statement = Game.getExisitingHandLetters(_currentGame.getGameId(), _currentTurn.getTurnId());
 		
 		ArrayList<HandLetter> handLetters = new ArrayList<HandLetter>();
 		

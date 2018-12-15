@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import Model.Game;
 import Model.GameStatus;
+import Model.Turn;
 import View.Items.GameItem;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -101,16 +102,28 @@ public class GameController implements Initializable{
 		return (event -> {
 	    	var userLabel = (Label) event.getSource();
 	    	var parent = (GameItem) userLabel.getParent();
-	    	loadBoard(parent.getGame().getGameId());
+	    	var currentGame= parent.getGame();
+	    	var turnQuery = Game.getTurnFromActiveGame(currentGame.getGameId());
+	    	var turn = new Turn(getTurn(turnQuery));
+	    	loadBoard(currentGame, turn);
 	        System.out.println("mouse click detected! " + userLabel.getText());
 		});
     }
 	
+	private int getTurn(String query) {
+		try {
+			return _db.SelectCount(query);
+		} catch (SQLException e) {
+			
+		}
+		return 1;
+	}
 	
-	private void loadBoard(int gameId) {
+	
+	private void loadBoard(Game game, Turn turn) {
 		AnchorPane pane = null;
 		try {
-			var con = new BoardController(new Game(gameId));
+			var con = new BoardController(game, turn);
 			var panes = new FXMLLoader(getClass().getResource("/View/Board.fxml"));
 			panes.setController(con);
 			pane = panes.load();
