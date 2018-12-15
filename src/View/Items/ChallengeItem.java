@@ -46,7 +46,6 @@ public class ChallengeItem extends AnchorPane{
 		lblUsername.setText(ownRequest() ? _currentGame.getUser2() : _currentGame.getUser1());
 		lblUsername.setLayoutX(50);
 		lblUsername.getStyleClass().add("boldLabel");
-		//lblUsername.setStyle("-fx-padding: 10 0 48 0; -fx-font-size: 14px; -fx-font-weight: bold");
 	}
 	
 	private void setButtons() {
