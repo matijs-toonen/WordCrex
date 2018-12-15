@@ -47,7 +47,8 @@ public class UserManagementController implements Initializable {
 		
 		var db = new DatabaseController<Account>();
 		try {
-			_accounts = (ArrayList<Account>) db.SelectWithCustomLogic(getAccountRole(), "SELECT * FROM accountrole");
+			String rolesQuery = Account.getRolesQuery();
+			_accounts = (ArrayList<Account>) db.SelectWithCustomLogic(getAccountRole(), rolesQuery);
 			
 			renderAccounts();
 		} catch (SQLException e) {

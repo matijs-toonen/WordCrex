@@ -99,61 +99,38 @@ public class AccountItem extends AnchorPane {
 	}
 
 	public void setUpdateEvent(Consumer<String> action) {
-		chbAdministrator.selectedProperty().addListener(new ChangeListener<Boolean>() {
-		    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-		    	
-		    	String Query = null;
-		    	String username = _currentAccount.getUsername();
-		    	if(newValue == false)
-		    		Query = "DELETE FROM accountrole WHERE username = '"+username+"' AND role = 'administrator'";
-		    	else if(newValue == true)
-		    		Query = "INSERT INTO accountrole (username, role) VALUES ('"+username+"','administrator')";
+		
+		chbAdministrator.selectedProperty().addListener((ChangeListener<? super Boolean>)((observer, oldVal, newVal) -> {
+			var query = changed(observer, newVal, "administrator");
+			action.accept(query);
+			chbAdministrator.setDisable(true);
+			chbAdministrator.getStyleClass().add("disabled");
+		}));
+		
+		chbModerator.selectedProperty().addListener((ChangeListener<? super Boolean>)((observer, oldVal, newVal) -> {
+			var query = changed(observer, newVal, "moderator");
+			action.accept(query);
+		}));
+		
+		chbObserver.selectedProperty().addListener((ChangeListener<? super Boolean>)((observer, oldVal, newVal) -> {
+			var query = changed(observer, newVal, "observer");
+			action.accept(query);
+		}));
+		
+		chbPlayer.selectedProperty().addListener((ChangeListener<? super Boolean>)((observer, oldVal, newVal) -> {
+			var query = changed(observer, newVal, "player");
+			action.accept(query);
+		}));
 
-		    	action.accept(Query);
-		    	
-		    	chbAdministrator.setDisable(true);
-				chbAdministrator.getStyleClass().add("disabled");
-		    }
-		});
-		chbModerator.selectedProperty().addListener(new ChangeListener<Boolean>() {
-		    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-		    	
-		    	String Query = null;
-		    	String username = _currentAccount.getUsername();
-		    	if(newValue == false)
-		    		Query = "DELETE FROM accountrole WHERE username = '"+username+"' AND role = 'moderator'";
-		    	else if(newValue == true)
-		    		Query = "INSERT INTO accountrole (username, role) VALUES ('"+username+"','moderator')";
-
-		    	action.accept(Query);
-		    }
-		});
-		chbObserver.selectedProperty().addListener(new ChangeListener<Boolean>() {
-		    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-		    	
-		    	String Query = null;
-		    	String username = _currentAccount.getUsername();
-		    	if(newValue == false)
-		    		Query = "DELETE FROM accountrole WHERE username = '"+username+"' AND role = 'observer'";
-		    	else if(newValue == true)
-		    		Query = "INSERT INTO accountrole (username, role) VALUES ('"+username+"','observer')";
-
-		    	action.accept(Query);
-		    }
-		});
-		chbPlayer.selectedProperty().addListener(new ChangeListener<Boolean>() {
-		    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-		    	
-		    	String Query = null;
-		    	String username = _currentAccount.getUsername();
-		    	if(newValue == false)
-		    		Query = "DELETE FROM accountrole WHERE username = '"+username+"' AND role = 'player'";
-		    	else if(newValue == true)
-		    		Query = "INSERT INTO accountrole (username, role) VALUES ('"+username+"','player')";
-
-		    	action.accept(Query);
-		    }
-		});
 	}
+	
+	private String changed(ObservableValue<? extends Boolean> observable, Boolean newValue, String role) {
+		String username = _currentAccount.getUsername();
+		if (newValue) {
+			return Account.getAddRoleQuery(username, role);
+		}else {
+			return Account.getRemoveRoleQuery(username, role);
+		}
+    }
 	
 }

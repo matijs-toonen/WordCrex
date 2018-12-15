@@ -8,19 +8,18 @@ import java.util.Date;
 
 public class ChatLine {
 	
-	public static final String getQuery(int gameId) {
-		return String.format("SELECT * FROM chatline WHERE game_id = '%d' ORDER BY moment", gameId);
-	}
 	
-	public static final String insertQuery(String username, int gameId, String message) {
-		return String.format("INSERT INTO chatline (username, game_id, moment, message) VALUES ('%s', '%d', NOW(), '%s');", username, gameId, message);
-	}
-	
+	/*
+	 * Props
+	 */
 	private String _username;
 	private Game _game;
 	private Date _moment;
 	private String _message;
 	
+	/*
+	 * Const
+	 */
 	public ChatLine(String username, int game_id, Date moment, String message) {
 		_username = username;
 		_game = new Game(game_id);
@@ -35,11 +34,14 @@ public class ChatLine {
 			_moment = columns.contains("moment") ? rs.getTimestamp("moment") : null;
 			_message = columns.contains("message") ? rs.getString("message") : null;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
+	
+	/*
+	 * Getters
+	 */
 	public String getMessage() {
 		return _message;
 	}
@@ -51,5 +53,16 @@ public class ChatLine {
 	public String getTime() {
 		SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");
         return DATE_FORMAT.format(_moment);
+	}
+	
+	/*
+	 * Queries
+	 */
+	public static final String getQuery(int gameId) {
+		return String.format("SELECT * FROM chatline WHERE game_id = '%d' ORDER BY moment", gameId);
+	}
+	
+	public static final String insertQuery(String username, int gameId, String message) {
+		return String.format("INSERT INTO chatline (username, game_id, moment, message) VALUES ('%s', '%d', NOW(), '%s');", username, gameId, message);
 	}
 }

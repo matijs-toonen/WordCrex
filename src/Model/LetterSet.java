@@ -5,9 +5,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class LetterSet {
+	
+	/*
+	 * Props
+	 */
 	private String _letterCode;
 	private String _description;
 	
+	/*
+	 * Const
+	 */
 	public LetterSet(String letterCode) {
 		_letterCode = letterCode;
 	}
@@ -22,11 +29,13 @@ public class LetterSet {
 			_letterCode = columns.contains("code") ? rs.getString("code") : null;
 			_description = columns.contains("description") ? rs.getString("description") : null;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
+	/*
+	 * Getters
+	 */
 	public String getLetterCode() {
 		return _letterCode;
 	}

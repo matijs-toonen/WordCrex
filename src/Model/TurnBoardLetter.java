@@ -6,11 +6,19 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class TurnBoardLetter {
+	
+	/*
+	 * Props
+	 */
 	private Letter _letter;
 	private Game _game;
 	private Turn _turn;
 	private Tile _tile;
 	
+	
+	/*
+	 * Const
+	 */
 	public TurnBoardLetter(Letter letter, Game game, Turn turn, Tile tile) {
 		_letter = letter;
 		_game = game;
@@ -25,7 +33,6 @@ public class TurnBoardLetter {
 			_turn = columns.contains("turn_id") ? new Turn(rs, columns) : null;
 			_tile = columns.contains("tile_x") && columns.contains("tile_y") ? new Tile(rs.getInt("tile_x"), rs.getInt("tile_y")) : null;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

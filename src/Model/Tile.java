@@ -6,10 +6,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class Tile {
+	
+	/*
+	 * Props
+	 */
 	private Integer _x;
 	private Integer _y;
 	private TileType _tileType;
 	
+	
+	/*
+	 * Const
+	 */
 	public Tile(int x, int y) {
 		_x = x;
 		_y = y;

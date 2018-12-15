@@ -10,18 +10,18 @@ import java.util.stream.Collectors;
 import Model.AccountRole.*;
 
 public class Account {
-	public static final String getAllAccounts() {
-		return ("select username, role from accountrole order by username");
-	}
 	
+	
+	/*
+	 * PROPS
+	 */
 	private String _username;
 	private String _password;
 	private ArrayList<AccountRole> _roles = new ArrayList<AccountRole>();
 	
-	public static final String updatePassword(String password, String username) {
-		return ("UPDATE account SET password = '" + password + "' WHERE username = '" + username + "'");
-	}
-	
+	/*
+	 * COMNST
+	 */
 	public Account(String username) {
 		_username = username;
 	}
@@ -49,6 +49,9 @@ public class Account {
 		}
 	}
 	
+	/*
+	 * Getters
+	 */
 	private AccountRole getRole(String role) {
 		switch(role.toLowerCase()) {
 		case "administrator":
@@ -67,7 +70,6 @@ public class Account {
 	public String getUsername() {
 		return _username;
 	}
-
   
 	public ArrayList<AccountRole> getRoles()
 	{
@@ -85,6 +87,52 @@ public class Account {
 	
 	public static List<Account> getAllAccountsByUsername(ArrayList<Account> accounts, String username){
 		return accounts.stream().filter(account -> account.getUsername().contains(username)).collect(Collectors.toList());
+	}
+	
+	
+	/*
+	 * Queries
+	 */
+	public static final String getAllAccounts() {
+		return ("select username, role from accountrole order by username");
+	}
+	
+	public static final String getLoginQuery(String username, String password) {
+		return String.format("SELECT username FROM account WHERE username = '%s' AND password = '%s'", username, password);
+	}
+	
+	public static final String getNewUserQuery(String username, String password) {
+		return String.format(
+				"INSERT INTO account (username, password)\n" + 
+				"SELECT *\n" + 
+				"FROM (SELECT '%s' as username1, '%s' as password1) AS tmp\n" + 
+				"WHERE NOT EXISTS(SELECT username FROM account WHERE username = '%s')\n" + 
+				"LIMIT 1;"
+				, username, password, username);
+	}
+	
+	public static final String getInsertDefaultRoleQuery(String username) {
+		return String.format("INSERT INTO accountrole (username, role) VALUES ('%s','player')", username);
+	}
+	
+	public static final String getRolesFromUserQuery(String username) {
+		return String.format("SELECT * FROM accountrole WHERE username = '%s'", username);
+	}
+	
+	public static final String getRolesQuery() {
+		return "SELECT * FROM accountrole";
+	}
+	
+	public static final String updatePassword(String password, String username) {
+		return ("UPDATE account SET password = '" + password + "' WHERE username = '" + username + "'");
+	}
+	
+	public static final String getAddRoleQuery(String username, String role) {
+		return String.format("INSERT INTO accountrole (username, role) VALUES ('%s','%s')", username, role);
+	}
+	
+	public static final String getRemoveRoleQuery(String username, String role) {
+		return String.format("DELETE FROM accountrole WHERE username = '%s' AND role = '%s'", username, role);
 	}
 	
 }

@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import Model.TurnAction.*;
 
 public class TurnPlayer {
+	
+	/*
+	 * Props
+	 */
 	private Game _game;
 	private Turn _turn;
 	private Account _user;
@@ -13,6 +17,10 @@ public class TurnPlayer {
 	private Integer _score;
 	private TurnAction _turnAction;
 	
+	
+	/*
+	 * Const
+	 */
 	public TurnPlayer(Game game, Turn turn, Account user, int bonus, int score, TurnAction turnAction) {
 		_game = game;
 		_turn = turn;
@@ -32,11 +40,13 @@ public class TurnPlayer {
 			_score = columns.contains("score") ? rs.getInt("score") : null;
 			_turnAction = columns.contains("turnaction_type") ? getTurnAction(rs.getString("turnaction_type")) : null;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
+	/*
+	 * Getters
+	 */
 	private Integer checkPlayerNumber(ArrayList<String> columns) {
 		if(columns.contains("username_player1"))
 			return 1;

@@ -25,7 +25,10 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 
 public class ChallengeController implements Initializable  {
-
+	
+	/*
+	 * PROPS
+	 */
 	private ArrayList<Game> _gameChallenges;
 	private ArrayList<Account> _uninvitedPlayers;
 	private DatabaseController _db;
@@ -33,6 +36,10 @@ public class ChallengeController implements Initializable  {
 	private DatabaseController<Account> _dbAccount = new DatabaseController<Account>();
 	private AnchorPane _rootPane;
 	
+	
+	/*
+	 * FIELDS
+	 */
 	@FXML
 	private VBox vboxChallenges, vboxChallengePlayers;
 	
@@ -55,6 +62,7 @@ public class ChallengeController implements Initializable  {
 		});
 	}
 	
+	
 	/**
 	 * Load all challenges where user is involved
 	 */
@@ -68,6 +76,7 @@ public class ChallengeController implements Initializable  {
 			System.out.println(e.getMessage());
 		}
 	}
+	
 	
 	/**
 	 * Load all players that have no open invitation
@@ -97,6 +106,7 @@ public class ChallengeController implements Initializable  {
 			challengeItem.setOnClickEvent(onHandleChallengeClick());
 		});
 	}
+	
 	
 	/**
 	 * Show players in the view
@@ -136,18 +146,19 @@ public class ChallengeController implements Initializable  {
 	    		awnser = "rejected";
 	    	}
 	    	
-	    	// update in database
-	    	var statement = Game.getChallengeAwnserQuery(gameId, awnser);
-	    		insertLetters(gameId);
-//	    		var statement = "UPDATE game SET answer_player2 = 'accepted' WHERE game_id = " + gameId; 
-//	    		try {
-//					_db.Update(statement);
-//				} catch (SQLException e) {
-//					System.out.println(e.getMessage());
-//				}
+	    	// create game in database
+	    	
+	    	String newGameQuery = Game.getChallengeAwnserQuery(gameId, awnser);
+			String turnQuery = Game.getNewTurnQuery(gameId);			
     		try {
-	    		loadBoard(gameId);
-				_dbGame.Update(statement);
+				_dbGame.Update(newGameQuery);
+				
+				if (awnser.equals("accepted")) {
+					_dbGame.Update(turnQuery);
+					insertLetters(gameId);
+					loadBoard(gameId);
+	    		}
+				
 			} catch (SQLException e) {
 				System.out.println(e.getMessage());
 			}
@@ -157,6 +168,11 @@ public class ChallengeController implements Initializable  {
 		});
     }
 	
+	
+	/**
+	 * Click when user send inventation to other player
+	 * @return
+	 */
 	private Consumer<ActionEvent> onSentChallenge() {
 		
 		return (event -> {
