@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import Model.Game;
 import Model.HandLetter;
 import Model.Letter;
+import Model.Score;
 import Model.Symbol;
 import Model.Tile;
 import Model.Turn;
@@ -29,6 +30,7 @@ import Model.Board.PositionStatus;
 import Tests.BoardTileTest;
 import View.BoardPane.BoardTile;
 import View.BoardPane.BoardTilePane;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -64,6 +66,7 @@ public class BoardController implements Initializable {
 	private Board _board;
     private ArrayList<BoardTile> _currentHand;
     private HashMap<Point, BoardTile> _fieldHand;
+    private Score _currentScore;
 
 	private boolean _chatVisible;
 	private boolean _historyVisible;
@@ -112,18 +115,59 @@ public class BoardController implements Initializable {
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		lblPlayer1.setText("BaderAli99");
+		lblPlayer1.setText(MainController.getUser().getUsername());
 		lblPlayer1.setStyle("-fx-font-size: 28");
-		lblPlayer2.setText("SchurkTurk");
+		lblPlayer2.setText(_currentGame.getOpponent());
 		lblPlayer2.setStyle("-fx-font-size: 28");
 		lblScore1.setText("1");
 		lblScore1.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 25 0 0 25");
 		lblScore2.setText("9");
 		lblScore2.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 0 25 25 0");
+		
+		scoreRefreshThread();
 
 		createField(false);
 		createHand(false);
 		dragOnHand();
+	}
+	
+	private void scoreRefreshThread() {
+		
+		Thread chatThread = new Thread(){
+		    public void run(){
+		    	
+		    	while(true) {
+		    		refreshScore();
+	    			
+	    			try {
+						Thread.sleep(2000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+	    		}
+		    }
+		};
+		
+		chatThread.setDaemon(true);
+		chatThread.start();
+	}
+	
+	private void refreshScore() {
+		var _dbScore = new DatabaseController<Score>();
+		String scoreQuery = Score.getScoreFromGameQuery(_currentGame.getGameId());
+		
+		try {
+			_currentScore = (Score) _db.SelectFirst(scoreQuery, Score.class);
+			System.out.println(_currentScore.getOwnScore());
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		
+		Platform.runLater(() -> {
+			lblScore1.setText(Integer.toString(_currentScore.getOwnScore()));
+			lblScore2.setText(Integer.toString(_currentScore.getOpponentScore()));
+	    });
+		
 	}
 
 	public void initializeTest()
