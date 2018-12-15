@@ -11,10 +11,15 @@ import java.util.Collection;
 import java.util.function.Function;
 
 public class DatabaseController <T> {
+	
+	/*
+	 * PROPS
+	 */
 	private static String _url = "jdbc:mysql://digitalbyali.nl/";
 	private static String _schema = "u17091p12601_wordcrex";
 	private static String _user = "u17091p12601_groepd";
 	private static String _password = "P@s5w0rd!";
+	
 	
 	public DatabaseController(String url, String schema, String user, String password) {
 		_url = url != null ? url : _url;

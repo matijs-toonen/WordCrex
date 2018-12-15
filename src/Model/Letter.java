@@ -28,7 +28,6 @@ public class Letter {
 			_letterSet = columns.contains("symbol_letterset_code") ? new LetterSet(rs.getString("symbol_letterset_code")) : null;
 			_symbol = columns.contains("symbol") ? new Symbol(rs, columns) : null;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

@@ -109,7 +109,7 @@ public class SuggestController implements Initializable{
 		
 			Label wordState = new Label();
 			
-			wordState.setPrefWidth(150);
+			wordState.setPrefWidth(120);
 			wordState.setAlignment(Pos.CENTER);
 			
 			switch (word.getWordState()) {

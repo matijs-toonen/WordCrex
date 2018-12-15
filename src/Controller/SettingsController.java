@@ -102,7 +102,6 @@ public class SettingsController implements Initializable {
         	   //TODO: Martijn Logout
            }
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 		
