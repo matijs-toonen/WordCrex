@@ -38,6 +38,7 @@ import Tests.BoardTileTest;
 import View.BoardPane.BoardTile;
 import View.BoardPane.BoardTilePane;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -341,12 +342,11 @@ public class BoardController implements Initializable {
 			return;
 		}
 		
-//		_currentTurn.incrementId();
 		handLetters = getHandLetters();
-		visualizeHand(handLetters, false);
+		visualizeHand(handLetters);
 	}
 	
-	private void visualizeHand(ArrayList<HandLetter> handLetters, boolean runLater) {
+	private void visualizeHand(ArrayList<HandLetter> handLetters) {
 		int x = 0;
 		int y = 13;
 
@@ -360,20 +360,13 @@ public class BoardController implements Initializable {
 				y += 44.5;
 				boardTile.setMinWidth(39);
 				boardTile.setMinHeight(39);
-				if(runLater) {
-					Platform.runLater(new Runnable() {
-			            @Override
-			            public void run() {
-			            	paneHand.getChildren().add(boardTile);
-			            }
-			        });	
-				}else 
-					paneHand.getChildren().add(boardTile);
 				
+				paneHand.getChildren().add(boardTile);
 				_currentHand.add(boardTile);
 			}
 		};
-		placeHand(false);
+		
+		placeHand(false);		
 	}
 	
 	private void getGeneratedLetters(boolean checkGenerated){
@@ -382,7 +375,7 @@ public class BoardController implements Initializable {
 		}
 		else {
 			var handLetters = generateHandLetters();
-			visualizeHand(handLetters, false);
+			visualizeHand(handLetters);
 		}
 	}
 	
@@ -391,14 +384,7 @@ public class BoardController implements Initializable {
 		return handLetters.size() == 0 ? generateHandLetters() : handLetters; 
 	}
 	
-	private void waitForVisualizeNewHandLetters(){
-		
-//		while(handLetters.size() == 0) {
-//			handLetters = getExistingHandLetters();
-//			new Timer(1000, null).start();
-//		}
-//		return handLetters;
-//		
+	private void waitForVisualizeNewHandLetters(){	
 		var thread = new Thread() {
 			public void run() {
 				var handLetters = getExistingHandLetters();
@@ -409,38 +395,18 @@ public class BoardController implements Initializable {
 						
 					} catch (Exception e) {
 						System.out.println(e.getMessage());
-//						e.printStackTrace();
 					}
 				}
-				visualizeHand(handLetters, true);
-//				addTurn();
+				final var finalHandLetters = handLetters;
+				Platform.runLater(() -> {
+	            	visualizeHand(finalHandLetters);
+	            	addTurn();
+		        });
 			}
 		};
 		
 		thread.setDaemon(true);
 		thread.start();
-		
-//		var handLetters = new Callable<ArrayList<HandLetter>>() {
-//			@Override
-//			public ArrayList<HandLetter> call() {
-//				var handLetters = getExistingHandLetters();
-//				while(handLetters.size() == 0) {
-//	    			try {
-////	    				new Timer(1000, (ArrayList<HandLetter>).start();
-//	    				handLetters =  getExistingHandLetters();
-//						Thread.sleep(1000);
-//						
-//					} catch (Exception e) {
-//						e.printStackTrace();
-//					}
-//				}
-//				return handLetters;
-//			}
-//		};
-//		
-//		var executor = Executors.newSingleThreadExecutor();
-//		var items = executor.submit((Callable<ArrayList<HandLetter>>) handLetters.call());
-//		return items;
 	}
 	
 	private ArrayList<HandLetter> getExistingHandLetters() {
