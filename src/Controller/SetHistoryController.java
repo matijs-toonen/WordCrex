@@ -25,7 +25,6 @@ public class SetHistoryController implements Initializable {
 	
 	private DatabaseController<SetHistory> _db;
 	private ArrayList<SetHistory> _setHistoryItems;
-	private final int gameId = 502;
 	private Game _currentGame;
 	
 	@FXML
@@ -68,10 +67,9 @@ public class SetHistoryController implements Initializable {
 	
 	private void updateHistory() {
 		try {
-			String selectStatement = SetHistory.getQuery(gameId);
+			String selectStatement = SetHistory.getQuery(_currentGame.getGameId());
 			_setHistoryItems = (ArrayList<SetHistory>) _db.SelectAll(selectStatement, SetHistory.class);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

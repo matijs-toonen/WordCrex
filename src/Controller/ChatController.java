@@ -45,7 +45,6 @@ public class ChatController implements Initializable {
 	private TextField chatInput;
 	
 	
-	
 	public ChatController(Game currentGame) {
 		_currentGame = currentGame;
 	}
