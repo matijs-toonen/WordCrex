@@ -38,15 +38,11 @@ public class WordManagement implements Initializable {
 	@Override
 	public void initialize(URL url, ResourceBundle resources) {
 		// TODO Auto-generated method stub
-		init();
+		LoadWords();
 
 		searchBox.textProperty().addListener((observable) -> {
 			renderWords();
 		});
-	}
-	
-	private void init() {
-		LoadWords();
 	}
 	
 	private void LoadWords() {
@@ -70,7 +66,7 @@ public class WordManagement implements Initializable {
 		
 		Word.getWordsThatContain(_wordsNeedJugding, searchBox.getText()).forEach(Word -> {
 			var wordItem = new WordItem(Word);
-			wordItem.setOnClickEvent(onHandleChallengeClick());
+			wordItem.setOnClickEvent(onHandleJudgeClick());
 			WordsNeedJugding.getChildren().add(wordItem);
 		});
 		
@@ -81,45 +77,36 @@ public class WordManagement implements Initializable {
 		
 	}
 	
-	
-	/**
-	 * Click handler that handels accept and reject
-	 * in the challengeItem
-	 * 
-	 * @return
-	 */
-	private Consumer<ActionEvent> onHandleChallengeClick() {
+	private Consumer<ActionEvent> onHandleJudgeClick() {
 		
 		return (event -> {
 			
 			// get item values
 	    	var btnReaction = (Button) event.getSource();
 	    	var type = btnReaction.getText();
-	    	var word = (WordItem) btnReaction.getParent();
-	    	String word_ = word.getWord().getWord();
+	    	var wordItem = (WordItem) btnReaction.getParent();
+	    	String word = wordItem.getWord().getWord(); 
 
 	    	if (type.equals(WordItem.acceptText)) {
-	    		String query = "UPDATE dictionary SET state = 'accepted' WHERE word = '"+word_+"'";
+	    		String query = "UPDATE dictionary SET state = 'accepted' WHERE word = '"+word+"'";
 	    		
 	    		try {
-					_db.Update(query);
+	    			if(_db.Update(query))
+						LoadWords();
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-	    		
-	    		LoadWords();
 	    	}else if(type.equals(WordItem.rejectText)) {
-	    		String query = "UPDATE dictionary SET state = 'denied' WHERE word = '"+word_+"'";
+	    		String query = "UPDATE dictionary SET state = 'denied' WHERE word = '"+word+"'";
 	    		
 	    		try {
-					_db.Update(query);
+					if(_db.Update(query))
+						LoadWords();
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-	    		
-	    		LoadWords();
 	    	}
 		});
     }

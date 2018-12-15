@@ -21,7 +21,7 @@ public class WordItem extends AnchorPane {
 	public final static String rejectText = "Weigeren";
 	
 	@FXML
-	private Label lblWoord = new Label();
+	private Label lblWord = new Label();
 	private Label lblState = new Label();
 	private Button btnAccept = new Button();
 	private Button btnDecline = new Button();
@@ -34,18 +34,17 @@ public class WordItem extends AnchorPane {
 	}
 	
 	private void init() {
-		
-		if(_word.getWordState().equals("denied") || _word.getWordState().equals("accepted"))
-			LoadJugdedItems();
-		else
+		if(_word.getWordState().equals("pending"))
 			LoadItems();
+		else
+			LoadJugdedItems();
 	}
 
 	private void LoadItems()
 	{	
-		lblWoord.setText(_word.getWord());
-		lblWoord.setLayoutX(5);
-		lblWoord.getStyleClass().add("normalLabel");
+		lblWord.setText(_word.getWord());
+		lblWord.setLayoutX(5);
+		lblWord.getStyleClass().add("normalLabel");
 		
 		btnAccept.setLayoutX(150);
 		btnAccept.setLayoutY(5);
@@ -57,14 +56,14 @@ public class WordItem extends AnchorPane {
 		btnDecline.setText(rejectText);
 		btnDecline.getStyleClass().add("redButton");
 		
-		this.getChildren().addAll(lblWoord, btnAccept, btnDecline);
+		this.getChildren().addAll(lblWord, btnAccept, btnDecline);
 	}
 	
 	private void LoadJugdedItems()
 	{	
-		lblWoord.setText(_word.getWord());
-		lblWoord.setLayoutX(5);
-		lblWoord.getStyleClass().add("normalLabel");
+		lblWord.setText(_word.getWord());
+		lblWord.setLayoutX(5);
+		lblWord.getStyleClass().add("normalLabel");
 		
 		lblState.setText(_word.getWordState());
 		lblState.setLayoutX(200);
@@ -77,7 +76,7 @@ public class WordItem extends AnchorPane {
 			lblState.getStyleClass().add("approvedItem");
 		}
 		
-		this.getChildren().addAll(lblWoord, lblState);
+		this.getChildren().addAll(lblWord, lblState);
 	}
 	
 	public Word getWord() {
