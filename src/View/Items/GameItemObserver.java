@@ -13,14 +13,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 
-public class GameItem extends AnchorPane {
+public class GameItemObserver extends AnchorPane {
 	
 	private Game _currentGame;
 	private Label lblUser = new Label();
 	private Label lblTime = new Label();
 	private ImageView imgStatus = new ImageView();
 	
-	public GameItem(Game game) {
+	public GameItemObserver(Game game) {
 		super();
 		_currentGame = game;
 		setUserLabel();
@@ -46,30 +46,9 @@ public class GameItem extends AnchorPane {
 	}
 	
 	private Image getActiveImage() {
-		InputStream is = null;
+		InputStream is = this.getClass().getResourceAsStream("/Resources/playing.png");
+		lblTime.setText("Game wordt gespeeld");
 		
-		var currentPlayer = MainController.getUser();
-		String username = currentPlayer.getUsername();
-		int zetUser1, zetUser2; //User1 will always be the user who's logged in, User2 is always his opponent.
-		String opponent = _currentGame.getOpponent();
-	
-		if(_currentGame.getUser1().equals(username)) {
-			zetUser1 = _currentGame.getZettenPlayer1();
-			zetUser2 = _currentGame.getZettenPlayer2();
-		}
-		else {
-			zetUser1 = _currentGame.getZettenPlayer2();
-			zetUser2 = _currentGame.getZettenPlayer1();
-		}
-		
-		if(zetUser1 <= zetUser2){
-			is = this.getClass().getResourceAsStream("/Resources/request.png");
-			lblTime.setText(opponent + " wacht op jou...");
-		}
-		else {
-			is = this.getClass().getResourceAsStream("/Resources/playing.png");
-			lblTime.setText("We wachten op " + opponent);
-		}
     
 		return new Image(is);
 	}
@@ -77,26 +56,26 @@ public class GameItem extends AnchorPane {
 	private Image getPlayedImage() {
 		InputStream is = null;
 		
-		var currentPlayer = MainController.getUser();
-		String username = currentPlayer.getUsername();
+		String player1 = _currentGame.getUser1();
 		String winner = _currentGame.getWinner();
 		
 		//Determine won/lost
-		if(username.equals(winner)) {
+		if(player1.equals(winner)) {
 			is = this.getClass().getResourceAsStream("/Resources/finished.png");
-			lblTime.setText("Je hebt gewonnen!");
+			lblTime.setText(player1 + " heeft gewonnen!");
 		}
 		else
 		{
 			is = this.getClass().getResourceAsStream("/Resources/resigned.png");
-			lblTime.setText("Je hebt verloren..");
+			lblTime.setText(player1 + " heeft verloren.");
 		}
 		
 		return new Image(is);
 	}
 	
 	private void setUserLabel() { 
-		var userText = _currentGame.getOpponent();
+		var userText = _currentGame.getUser1() + " - " + _currentGame.getUser2();
+		
 		lblUser.setText(userText);
 		lblUser.getStyleClass().add("text");
 		lblUser.setStyle("-fx-padding: 0 0 0 50; -fx-font-size: 14px; -fx-text-fill: #4D4F5C; -fx-font-weight: bold;");
@@ -105,10 +84,6 @@ public class GameItem extends AnchorPane {
 	private void setSubLabel() {
 		lblUser.getStyleClass().add("text");
 		lblTime.setStyle("-fx-padding: 20 0 40 50; -fx-font-size: 13px; -fx-text-fill: #ABABB1");
-	}
-	
-	public Game getGame() {
-		return _currentGame;
 	}
 
 	public void setUserOnClickEvent(Consumer<MouseEvent> action) {

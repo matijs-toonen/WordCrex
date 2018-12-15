@@ -10,16 +10,23 @@ import Model.Account;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 
 public class LoginController {
+	
+	/*
+	 * PROPERTIES
+	 */
 	private String _username, _password;
 	private Account _account;
-
+	
+	
+	/*
+	 * FIELDS
+	 */
 	@FXML
 	private TextField txtLogin, txtPassword; 
 	@FXML
@@ -62,34 +69,13 @@ public class LoginController {
 	
 	
 	/**
-	 * Check if user exists in the database
-	 * @return
-	 */
-	private boolean userInDatabase() {	
-		var db = new DatabaseController<Account>();
-		String sqlStatement = "SELECT username FROM account WHERE username = '" + _username + "' AND password = '" + _password + "'";
-
-		try {
-			_account = (Account) db.SelectFirst(sqlStatement, Account.class);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
-		if(_account.getUsername() == null)
-			return false;
-
-		return true;
-	}
-	
-	
-	/**
 	 * User clicks on register
 	 * 
 	 * @param e
 	 */
 	public void onClickRegister(ActionEvent e)
 	{
-		// get valies
+		// get values
 		_username = txtLogin.getText().toLowerCase();
 		_password = txtPassword.getText().toLowerCase();
 		
@@ -122,6 +108,7 @@ public class LoginController {
 		lblError.setVisible(false);
 		if(registerUser())
 		{
+			userInDatabase();
 			loadSidebar();
 		}
 		else 
@@ -129,6 +116,27 @@ public class LoginController {
 			lblError.setText("Deze gebruikersnaam bestaat al, kies een andere gebruikersnaam.");
 			lblError.setVisible(true);
 		}
+	}
+	
+	
+	/**
+	 * Check if user exists in the database
+	 * @return
+	 */
+	private boolean userInDatabase() {	
+		var db = new DatabaseController<Account>();
+		String sqlStatement = Account.getLoginQuery(_username, _password);
+
+		try {
+			_account = (Account) db.SelectFirst(sqlStatement, Account.class);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		if(_account.getUsername() == null)
+			return false;
+
+		return true;
 	}
 
 	
@@ -142,23 +150,25 @@ public class LoginController {
 		var db = new DatabaseController<Account>();
 		
 		// insert the user
-		String acountInsertQuery = "INSERT INTO account (username, password) SELECT * FROM (SELECT '" + _username + "', '" + _password + "') AS tmp WHERE NOT EXISTS ( SELECT username FROM account WHERE username = '" + _username + "' ) LIMIT 1";
-		String roleInsertQuery = "INSERT INTO accountrole (username, role) VALUES ('" + _username + "','player')";
+		String acountInsertQuery = Account.getNewUserQuery(_username, _password);
+		String roleInsertQuery = Account.getInsertDefaultRoleQuery(_username);
+		
+		System.out.println(acountInsertQuery);
 		
 		try {
 			db.Insert(acountInsertQuery);
 			db.Insert(roleInsertQuery);
 			return true;
-			
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return false;
 		}
-		
-		return false;
 	}
 	
 	
-	
+	/**
+	 * Load the side bar and pass the active account to it
+	 */
     private void loadSidebar() 
     {
     	try {
@@ -174,10 +184,15 @@ public class LoginController {
 		}
     }
     
+    
+    /**
+     * Load all the user roles assosiated with the account
+     */
     private void loadUserRols() {
 		var db = new DatabaseController<String>();
 		try {
-			var roles = (ArrayList<String>) db.SelectWithCustomLogic(getAccountRole(), "SELECT * FROM accountrole WHERE username = '" + _account.getUsername() + "'");
+			String selectRoleQuery  = Account.getRolesFromUserQuery(_account.getUsername());
+			var roles = (ArrayList<String>) db.SelectWithCustomLogic(getAccountRole(), selectRoleQuery);
 			roles.forEach(role -> {
 				_account.addAllRoles(role);
 			});
@@ -187,7 +202,11 @@ public class LoginController {
 		}
     }
     
-	//Custom functionality for merging account and role together
+    
+	/**
+	 * Custom filter function
+	 * @return
+	 */
 	private Function<ResultSet, ArrayList<String>> getAccountRole(){
 		return (resultSet -> {
 			var roles = new ArrayList<String>();

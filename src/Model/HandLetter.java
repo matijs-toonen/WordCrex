@@ -5,10 +5,17 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public class HandLetter {
+	
+	/*
+	 * Props
+	 */
 	private Game _game;
 	private Turn _turn;
 	private ArrayList<Letter> _letters = new ArrayList<Letter>();
-	
+
+	/*
+	 * Const
+	 */
 	public HandLetter(Game game, Turn turn, Letter... letters) {
 		_game = game;
 		_turn = turn;

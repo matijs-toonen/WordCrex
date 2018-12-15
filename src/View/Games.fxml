@@ -11,7 +11,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1000.0" prefWidth="1635.0" style="-fx-background-color: #F0F0F7;" stylesheets="@../Application/application.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.GameController">
+<AnchorPane focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1000.0" prefWidth="1635.0" style="-fx-background-color: #F0F0F7;" stylesheets="@../Application/application.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Text fill="#43425d" layoutX="98.0" layoutY="82.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Games">
          <font>
@@ -50,14 +50,13 @@
                   </Text>
                </children>
             </AnchorPane>
-            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="245.0" prefWidth="398.0">
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="245.0" prefWidth="371.0">
                <children>
-                  <ScrollPane layoutX="15.0" layoutY="10.0" prefHeight="317.0" prefWidth="368.0" style="-fx-background-color: transparent;">
+                  <ScrollPane hbarPolicy="NEVER" layoutX="15.0" layoutY="6.0" prefHeight="317.0" prefWidth="368.0" style="-fx-background-color: transparent;">
                      <content>
-                        <VBox fx:id="vboxGames1" prefHeight="314.0" prefWidth="365.0" style="-fx-background-color: #FFFFFF; -fx-border-width: 0;" />
+                        <VBox fx:id="vboxFinishedGames" prefHeight="314.0" prefWidth="365.0" style="-fx-background-color: #FFFFFF; -fx-border-width: 0;" />
                      </content>
                   </ScrollPane>
-                  <VBox fx:id="vboxFinishedGames" layoutX="15.0" layoutY="10.0" prefHeight="314.0" prefWidth="365.0" style="-fx-background-color: #FFFFFF; -fx-border-width: 0;" />
                </children></AnchorPane>
          </items>
       </SplitPane>

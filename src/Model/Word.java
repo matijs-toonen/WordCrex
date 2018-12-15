@@ -10,11 +10,18 @@ import Model.WordState.*;
 import Model.WordState.WordState;
 
 public class Word {
+	
+	/*
+	 * Props
+	 */
 	private String _word;
 	private LetterSet _letterSet;
 	private WordState _state;
 	private Account _user;
 	
+	/*
+	 * COnst
+	 */
 	public Word(String word, LetterSet letterSet, WordState wordState, Account user) {
 		_word = word;
 		_letterSet = letterSet;
@@ -33,7 +40,10 @@ public class Word {
 			e.printStackTrace();
 		}
 	}
-
+	
+	/*
+	 * Getters
+	 */
 	private WordState getWordState(String state) {
 		switch(state.toLowerCase()) {
 		case "accepted":
@@ -55,6 +65,10 @@ public class Word {
 		return _word;
 	}
 	
+	
+	/*
+	 * Queries
+	 */
 	public static String insertQuery(String word, String username) {
 		return String.format("INSERT INTO dictionary (word, letterset_code, state, username) VALUES ('%s', 'NL', 'pending', '%s');", word, username);
 	}

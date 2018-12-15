@@ -7,26 +7,28 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.ResourceBundle;
+import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import Model.Account;
+import Model.Game;
 import Model.HandLetter;
 import Model.Letter;
 import Model.Symbol;
 import Model.Tile;
 import Model.Turn;
+import Model.TurnBoardLetter;
 import Model.Word;
 import Model.Board.Board;
 import Model.Board.PositionStatus;
-import Model.WordState.WordState;
 import Tests.BoardTileTest;
 import View.BoardPane.BoardTile;
+import View.BoardPane.BoardTilePane;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -36,13 +38,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
-import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
@@ -50,10 +50,15 @@ import javafx.util.Pair;
 public class BoardController implements Initializable {
 	
 	private DatabaseController _db;
-	private LinkedHashMap<Point, BoardTile> _boardTiles; // 15 by 15
-	private LinkedHashMap<Point, BoardTileTest> _boardTilesTest;
+	private Random _random = new Random();
+	private ArrayList<Letter> _letters = new ArrayList<Letter>();
+	private Turn _currentTurn;
+	private Game _currentGame;
+	private HashMap<Point, BoardTilePane> _boardTiles;
+	private HashMap<Point, BoardTileTest> _boardTilesTest;
 	private Board _board;
-	private ArrayList<BoardTile> _currentHand;
+    private ArrayList<BoardTile> _currentHand;
+    private HashMap<Point, BoardTile> _fieldHand;
 	private boolean _chatVisible;
 	private boolean _historyVisible;
 	
@@ -70,12 +75,36 @@ public class BoardController implements Initializable {
 	private AnchorPane rightBarAnchor;
 	
 	@FXML
-	private ImageView reset;
+	private ImageView reset, accept;
+	
+	public BoardController(Game game, Turn turn) {
+		_currentGame = game;
+		_currentTurn = turn;
+		_board = new Board();
+		_boardTiles = new HashMap<Point, BoardTilePane>();
+        _currentHand = new ArrayList<BoardTile>();
+        _fieldHand = new HashMap<Point, BoardTile>();
+        getLetters();
+	}
+	
+	public BoardController(Game game) {
+		this(game, new Turn(1));
+	}
+
+	private void getLetters() {
+		_db = new DatabaseController<Symbol>();
+		var statement = "SELECT * FROM letter NATURAL JOIN symbol WHERE game_id = " + _currentGame.getGameId();
+		
+		try {
+			_letters = (ArrayList<Letter>)_db.SelectAll(statement, Letter.class);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		_boardTiles = new LinkedHashMap<Point, BoardTile>();
-		
 		lblPlayer1.setText("BaderAli99");
 		lblPlayer1.setStyle("-fx-font-size: 28");
 		lblPlayer2.setText("SchurkTurk");
@@ -84,17 +113,15 @@ public class BoardController implements Initializable {
 		lblScore1.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 25 0 0 25");
 		lblScore2.setText("9");
 		lblScore2.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 0 25 25 0");
-    
-		_currentHand = new ArrayList<BoardTile>();
-		_board = new Board();
+
 		createField(false);
-		createHand();
+		createHand(false);
+		dragOnHand();
 	}
-	
+
 	public void initializeTest()
 	{
-		_boardTiles = new LinkedHashMap<Point, BoardTile>();
-		_boardTilesTest = new LinkedHashMap<Point, BoardTileTest>();
+		_boardTilesTest = new HashMap<Point, BoardTileTest>();
 		createField(true);
 	}
 	
@@ -109,15 +136,23 @@ public class BoardController implements Initializable {
 		}
 		
 		return false;
-		
 	}
-				
+
 	public void shuffle(){
-		placeHand();
+		placeHand(true);
 	}
 	
 	public void reset() {
+		resetHand();
 		reset.setVisible(false);
+	}
+	
+	public void acceptWord() {
+		System.out.println("hier");
+		//TODO insert word in db
+		
+		addTurn();
+		createHand(true);
 	}
 	
 	public void openHistory() throws IOException{
@@ -159,8 +194,11 @@ public class BoardController implements Initializable {
 			_chatVisible = false;
 		}
 	}
+	
 	private void createField(boolean test) 
 	{
+		var existingTurns = getTurns();
+		
 		_db = new DatabaseController<Tile>();
 		try 
 		{
@@ -169,9 +207,8 @@ public class BoardController implements Initializable {
 			for(int i = 0; i < 15; i++) {
 				int y = 13;
 				for(int j = 0; j < 15; j++) {
-					
 					Tile tile = null;
-
+					
                     try
                     {
                         tile = getTileFromCollection(allTiles, i+1, j+1);
@@ -184,19 +221,30 @@ public class BoardController implements Initializable {
 					if(tile == null)
 						throw new Exception("Tile == null");
 						
+
 					if(!test)
 					{
-						var boardTile = new BoardTile(tile);
-						boardTile.setDropEvents(createDropEvents());
-						boardTile.setBackground(getBackground(Color.CHOCOLATE));
-						boardTile.setLayoutX(x);
-						boardTile.setLayoutY(y);
-						boardTile.setMinWidth(39);
-						boardTile.setMinHeight(39);
-						boardTile.setStyle("-fx-background-color: #E8E9EC; -fx-background-radius: 6");
-						_boardTiles.put(new Point(i, j), boardTile);
-						panePlayField.getChildren().add(boardTile);
+						BoardTile boardTile = null;
+						var cords = new Point(i, j);
+						if(existingTurns.containsKey(cords)) {
+							var turn = existingTurns.get(cords);
+							boardTile = new BoardTile(turn.getSymbol());
+							boardTile.setMinWidth(39);
+							boardTile.setMinHeight(39);
+							boardTile.setStyle("-fx-background-color: pink; -fx-background-radius: 6");
+							_board.updateStatus(cords, PositionStatus.Taken);
+						}
+						var tilePane = new BoardTilePane(tile);
+						tilePane.setDropEvents(createDropEvents());
+						tilePane.setLayoutX(x);
+						tilePane.setLayoutY(y);
+						tilePane.setMinWidth(39);
+						tilePane.setMinHeight(39);
+						tilePane.setStyle("-fx-background-color: #E8E9EC; -fx-background-radius: 6");
+						tilePane.setBoardTile(boardTile);
 						
+						_boardTiles.put(new Point(i, j), tilePane);
+						panePlayField.getChildren().add(tilePane);						
 					}
 					else
 					{
@@ -206,7 +254,7 @@ public class BoardController implements Initializable {
 					
 					y += 44.5;
 				}
-					x += 44.5;
+				x += 44.5;
 			}
 		} 
 		catch (SQLException e) 
@@ -220,49 +268,153 @@ public class BoardController implements Initializable {
 		}
 	}
 	
+	private HashMap<Point, TurnBoardLetter> getTurns() {
+		_db = new DatabaseController<TurnBoardLetter>();
+		var turns = new HashMap<Point, TurnBoardLetter>();
+		
+		String tileQuery = Game.getExistingTiles(_currentGame.getGameId(), _currentTurn.getTurnId());
+		try {
+			((ArrayList<TurnBoardLetter>)_db.SelectAll(tileQuery, TurnBoardLetter.class)).forEach(turn -> {
+				turns.put(turn.getTileCords(), turn);	
+			});
+		}
+		catch(SQLException e) {
+			
+		}
+		return turns;
+	}
+	
 	private Tile getTileFromCollection(ArrayList<Tile> collection, int x, int y)
 	{
 		var allTiles = collection.stream().filter(t -> t.isAtPoint(new Point(x,y))).collect(Collectors.toList());
 		return  allTiles.size() == 1 ? allTiles.get(0) : null;
 	}
 	
-	private void createHand() {
+	private void createHand(boolean checkGenerated) {
 		_currentHand.clear();
 		_db = new DatabaseController<HandLetter>();
-		try {
-			var count = _db.SelectCount("SELECT COUNT(*) FROM handletter");
-			var handLetters = (ArrayList<HandLetter>) _db.SelectWithCustomLogic(getHandLetter(), "SELECT * FROM handletter NATURAL JOIN letter NATURAL JOIN symbol where turn_id = 1 AND game_id = " + 500);
-			int x = 0;
-			int y = 13;
+		var handLetters = getHandLetters(checkGenerated);
+		int x = 0;
+		int y = 13;
 
-			for(var handLetter : handLetters) {
-				for(var letter : handLetter.getLetters()) {
-					var boardTile = new BoardTile(letter.getSymbol());
-					boardTile.setDraggableEvents();
-					boardTile.setLayoutX(x);
-					boardTile.setLayoutY(y);
-					boardTile.setStyle("-fx-background-color: pink; -fx-background-radius: 6");
-					y += 44.5;
-					boardTile.setMinWidth(39);
-					boardTile.setMinHeight(39);
-					paneHand.getChildren().add(boardTile);	
-          
-					_currentHand.add(boardTile);
+		for(var handLetter : handLetters) {
+			for(var letter : handLetter.getLetters()) {
+				var boardTile = new BoardTile(letter.getSymbol());
+				boardTile.setDraggableEvents();
+				boardTile.setLayoutX(x);
+				boardTile.setLayoutY(y);
+				boardTile.setStyle("-fx-background-color: pink; -fx-background-radius: 6");
+				y += 44.5;
+				boardTile.setMinWidth(39);
+				boardTile.setMinHeight(39);
+				paneHand.getChildren().add(boardTile);
+				_currentHand.add(boardTile);
+			}
+		};
+		placeHand(false);
+	}
+	
+	private ArrayList<HandLetter> getHandLetters(boolean checkGenerated) {
+		if(checkGenerated) {
+			return checkNewHandLetter();
+		}
+		var handLetters = getExistingHandLetters();
+		return handLetters.size() == 0 ? generateHandLetters() : handLetters; 
+	}
+	
+	private ArrayList<HandLetter> checkNewHandLetter(){
+		return new Callable<ArrayList<HandLetter>>() {
+			@Override
+			public ArrayList<HandLetter> call() {
+				var handLetters = getExistingHandLetters();
+				while(handLetters.size() == 0) {
+	    			try {
+						Thread.sleep(1000);
+						handLetters = getExistingHandLetters();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
-			};
-			placeHand();
-		} 
-		catch (SQLException e) {
+				return handLetters;
+			}
+		}.call();
+	}
+	
+	private ArrayList<HandLetter> getExistingHandLetters() {
+		_db = new DatabaseController<HandLetter>();
+		
+		var statement = Game.getExisitingHandLetters(_currentGame.getGameId(), _currentTurn.getTurnId());
+		
+		ArrayList<HandLetter> handLetters = new ArrayList<HandLetter>();
+		
+		try {
+			handLetters = (ArrayList<HandLetter>) _db.SelectWithCustomLogic(getHandLetter(), statement);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return handLetters;
+	}
+	
+	private ArrayList<HandLetter> generateHandLetters() {
+		var handLetters = new ArrayList<HandLetter>();
+		
+		if(!hasExisitingTurn()) {
+			addTurn();
+		}
+		
+		for(int i = 0; i < 7; i++) {
+			handLetters.add(createHandLetter());
+		}
+		
+		return handLetters;
+	}
+	
+	private void resetHand() {
+		_fieldHand.entrySet().forEach(handLetter -> {
+			var cords = handLetter.getKey();
+			
+			var tilePane = _boardTiles.get(cords);
+			tilePane.removeBoardTile();
+			_board.updateStatus(cords, PositionStatus.Open);
+		});	
+
+		placeHand(false);
+		_fieldHand.clear();
+	}
+	
+	private void addTurn() {
+		_currentTurn.incrementId();
+		var turnStatement = Turn.getInsertNewTurn(_currentGame.getGameId(), _currentTurn.getTurnId());
+		
+		try {
+			var turn = _db.InsertWithReturnKeys(turnStatement, getNewTurn());
+		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	private void placeHand() {
+	private Function<ResultSet, Turn> getNewTurn() {
+		return (resultSet -> {
+			Turn turn = null;
+			try {
+				turn = new Turn(resultSet, DatabaseController.getColumns(resultSet.getMetaData()));
+			} catch (SQLException e) {
+
+			}
+//			_currentTurn = turn;
+			return turn;
+		});
+	}
+	
+	private void placeHand(boolean shuffle) {
 		int x = 10;
 		int y = 13;
 		
-		Collections.shuffle(_currentHand);
+		if(shuffle) 
+			Collections.shuffle(_currentHand);	
 		
 		for(var tile : _currentHand) {
 			tile.setLayoutX(x);
@@ -270,7 +422,39 @@ public class BoardController implements Initializable {
 			y += 44.5;
 			paneHand.getChildren().remove(tile);
 			paneHand.getChildren().add(tile);
-		}	
+		}
+	}	
+	
+	private boolean hasExisitingTurn() {
+		_db = new DatabaseController<Turn>();
+		try {
+			return _db.SelectCount("SELECT COUNT(*) FROM turn WHERE game_id = " + _currentGame.getGameId() + " AND turn_id = " + _currentTurn.getTurnId()) == 1;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+	}
+		
+	private HandLetter createHandLetter() {
+		return new HandLetter(_currentGame, _currentTurn, createLetter());
+	}
+	
+	private Letter createLetter() {
+		var number = _random.nextInt(_letters.size());
+		var rndLetter = _letters.get(number);
+		
+		var statement = "INSERT INTO handletter VALUES (" + _currentGame.getGameId() + ", " + _currentTurn.getTurnId() + ", " + rndLetter.getLetterId() + ")"; 
+		
+		try {
+			if(_db.Insert(statement)) {
+				_letters.remove(number);
+				return rndLetter;
+			}
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		return null;
 	}
 	
 	private Function<ResultSet, ArrayList<HandLetter>> getHandLetter(){
@@ -307,35 +491,89 @@ public class BoardController implements Initializable {
 	
 	private Consumer<DragEvent> createDropEvents(){
 		return (event -> {
-			
-			if(event.getGestureTarget() instanceof BoardTile) {
-
-				var boardTile = (BoardTile) event.getGestureTarget();
+			if(event.getGestureTarget() instanceof BoardTilePane) {
+				var sourceTile = (BoardTile) event.getGestureSource();
+				var boardTile = (BoardTilePane) event.getGestureTarget();
+				
 				var cords = boardTile.getCords();
 				
 				if(!_board.canPlace(cords))
 					return;
 				
-				var sourceTile = (BoardTile) event.getGestureSource();
-				var symbol = sourceTile.getSymbol();
-				boardTile.setSymbol(symbol);
-				boardTile.setStyle("-fx-background-color: pink; -fx-background-radius: 6");
+				if(sourceTile.getParent() instanceof BoardTilePane) {
+					var oldBoardTile = (BoardTilePane) sourceTile.getParent();
+					var oldCords = oldBoardTile.getCords();
+					_board.updateStatus(oldCords, PositionStatus.Open);
+					oldBoardTile.removeBoardTile();
+					_fieldHand.remove(oldCords);
+					_boardTiles.put(boardTile.getCords(), oldBoardTile);
+				}
+				
+				sourceTile.setLayoutX(0);
+				sourceTile.setLayoutY(0);
+				boardTile.setBoardTile(sourceTile);
+				
 				reset.setVisible(true);
+				_fieldHand.put(cords, sourceTile);
+				_boardTiles.put(cords, boardTile);
 				
-				Dragboard db = event.getDragboard();
-				
-				if(db.hasString()) {
+				event.acceptTransferModes(TransferMode.ANY);
+				event.setDropCompleted(true);
+				_board.updateStatus(cords, PositionStatus.Taken);
+
+				// TODO Add word collection from database and do something with the placed words
+				showPlacedWords(cords); // Only for testing purposes can remove after
+
+				event.consume();
+			}
+		});
+	}
+	
+	private void dragOnHand() {
+		paneHand.setOnDragOver(new EventHandler<DragEvent>() {
+
+			@Override
+			public void handle(DragEvent event) {
+				if(event.getGestureSource() != event.getTarget()) {
 					event.acceptTransferModes(TransferMode.ANY);
-					event.setDropCompleted(true);
-					_board.updateStatus(cords, PositionStatus.Taken);
-					showPlacedWords(cords); // Only for testing purposes can remove after
-					event.consume();	
+				}
+				event.consume();
+			}
+		});
+		
+		paneHand.setOnDragDropped(new EventHandler<DragEvent>() {
+
+			@Override
+			public void handle(DragEvent event) {
+				if(event.getGestureSource() instanceof BoardTile) {
+					var draggedTile = (BoardTile) event.getGestureSource();
+					
+					if(draggedTile.getParent() instanceof BoardTilePane) {
+						var oldBoardTile = (BoardTilePane) draggedTile.getParent();
+						var oldCords = oldBoardTile.getCords();
+						_board.updateStatus(oldCords, PositionStatus.Open);
+						oldBoardTile.removeBoardTile();
+						_fieldHand.remove(oldCords);
+					}
+					
+					int x = 10;
+					int y = 13;
+					
+					for(var tile : _currentHand) {
+						if(draggedTile.equals(tile)) {
+							tile.setLayoutX(x);
+							tile.setLayoutY(y);
+							paneHand.getChildren().remove(tile);
+							paneHand.getChildren().add(tile);		
+						}
+						y += 44.5;
+					}
 				}
 			}
 		});
 	}
 	
-	private void showPlacedWords(Pair<Integer, Integer> cords)
+	private void showPlacedWords(Point cords)
 	{
 		try
 		{
@@ -353,7 +591,7 @@ public class BoardController implements Initializable {
 
 	}
 		
-	private ArrayList<Pair<String, Integer>> getPlacedWordsWithScore(Pair<Integer, Integer> playedCord)
+	private ArrayList<Pair<String, Integer>> getPlacedWordsWithScore(Point playedCord)
 	{
 		_db = new DatabaseController<Word>();
 		
@@ -365,8 +603,8 @@ public class BoardController implements Initializable {
 				
 		ArrayList<Pair<String, Integer>> placedWords = new ArrayList<Pair<String, Integer>>();
 		
-		var column = playedCord.getKey();
-		var row = playedCord.getValue();
+		var column = (int)playedCord.getX();
+		var row = (int)playedCord.getY();
 		
 		var horWordScore = getPlacedWordFromChars(createCharArrFromCords(row, true), playedCord, true);
 		var verWordScore = getPlacedWordFromChars(createCharArrFromCords(column, false), playedCord, false);
@@ -419,7 +657,7 @@ public class BoardController implements Initializable {
 				if(_boardTiles.containsKey(new Point(i, colro)))
 				{
 					var tile = _boardTiles.get(new Point(i, colro));
-					letters.add(tile.getSymbolAsChar());
+					letters.add(tile.getBoardTileSymbolAsChar());
 				}
 			}
 		}
@@ -431,7 +669,7 @@ public class BoardController implements Initializable {
 				if(_boardTiles.containsKey(new Point(colro, i)))
 				{
 					var tile = _boardTiles.get(new Point(colro, i));
-					letters.add(tile.getSymbolAsChar());
+					letters.add(tile.getBoardTileSymbolAsChar());
 				}
 			}	
 		}
@@ -444,22 +682,22 @@ public class BoardController implements Initializable {
 		return arr.stream().map(String::valueOf).collect(Collectors.joining()).toCharArray();
 	}
 	
-	private Pair<String, Integer> getPlacedWordFromChars(char[] letters, Pair<Integer, Integer> placedCord, boolean horizontal)
+	private Pair<String, Integer> getPlacedWordFromChars(char[] letters, Point placedCord, boolean horizontal)
 	{	
 		Pair<String, Integer> wordWithScore;
 		
 		if(horizontal)			
 		{
-			var wordWithStartEnd = collectLettersUntilSeperator(letters, placedCord.getKey(), ' ');
+			var wordWithStartEnd = collectLettersUntilSeperator(letters, (int)placedCord.getX(), ' ');
 			var word = wordWithStartEnd.getKey();
-			var score = getWordScore(wordWithStartEnd.getValue(), placedCord.getValue(), horizontal);
+			var score = getWordScore(wordWithStartEnd.getValue(), (int)placedCord.getY(), horizontal);
 			wordWithScore = new Pair<String, Integer>(word, score);
 		}
 		else
 		{
-			var wordWithStartEnd = collectLettersUntilSeperator(letters, placedCord.getValue(), ' ');
+			var wordWithStartEnd = collectLettersUntilSeperator(letters, (int)placedCord.getY(), ' ');
 			var word = wordWithStartEnd.getKey();
-			var score = getWordScore(wordWithStartEnd.getValue(), placedCord.getKey(), horizontal);
+			var score = getWordScore(wordWithStartEnd.getValue(), (int)placedCord.getX(), horizontal);
 			wordWithScore = new Pair<String, Integer>(word, score);
 		}
 			
@@ -552,7 +790,7 @@ public class BoardController implements Initializable {
 		
 		var hasWordMulti = false;
 		
-		var wordMultiTiles = new ArrayList<BoardTile>();
+		var wordMultiTiles = new ArrayList<BoardTilePane>();
 		
 		for(int i = start; i <= end; i++)
 		{
@@ -567,7 +805,7 @@ public class BoardController implements Initializable {
 			{
 				var tile = _boardTiles.get(cord);
 				
-				var letterScore = tile.getSymbol().getValue();
+				var letterScore = tile.getBoardTile().getSymbol().getValue();
 				var bonusLetter = tile.getBonusLetter();
 				var bonusMulti = tile.getBonusValue();
 				

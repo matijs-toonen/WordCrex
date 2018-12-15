@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import org.junit.jupiter.api.Test;
 import Controller.BoardController;
 import Controller.DatabaseController;
+import Model.Game;
 import Model.Symbol;
 import javafx.util.Pair;
 import junit.framework.Assert;
@@ -21,7 +22,7 @@ class ScoreTest {
 	{
 		_db = new DatabaseController();
 		
-		_boardCont = new BoardController();
+		_boardCont = new BoardController(new Game(0));
 		
 		_boardCont.initializeTest();
 		
