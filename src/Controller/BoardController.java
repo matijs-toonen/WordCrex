@@ -1,6 +1,7 @@
 package Controller;
 
 import java.awt.Point;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.ResultSet;
@@ -11,9 +12,14 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import javax.swing.Timer;
 
 import Model.BoardPlayer;
 import Model.Game;
@@ -152,9 +158,9 @@ public class BoardController implements Initializable {
 		System.out.println("hier");
 		//TODO insert word in db
 		
-		addTurn(true);
-		var checkGenerated = needsToWaitForHandLetters();
-		createHand(checkGenerated);
+		_currentTurn.incrementId();
+		createHand(true);
+		addTurn();
 	}
 	
 	private boolean needsToWaitForHandLetters() {
@@ -312,7 +318,13 @@ public class BoardController implements Initializable {
 	private void createHand(boolean checkGenerated) {
 		_currentHand.clear();
 		_db = new DatabaseController<HandLetter>();
-		var handLetters = getHandLetters(checkGenerated);
+		var handLetters = new ArrayList<HandLetter>();
+		if(checkGenerated) {
+			var check = needsToWaitForHandLetters();
+			handLetters = getGeneratedLetters(check);
+		}
+		
+		handLetters = getHandLetters();
 		int x = 0;
 		int y = 13;
 
@@ -333,30 +345,57 @@ public class BoardController implements Initializable {
 		placeHand(false);
 	}
 	
-	private ArrayList<HandLetter> getHandLetters(boolean checkGenerated) {
+	private ArrayList<HandLetter> getGeneratedLetters(boolean checkGenerated){
 		if(checkGenerated) {
 			return checkNewHandLetter();
+//			var futureHandLetters = checkNewHandLetter();
+//			if(futureHandLetters.isDone()) {
+//				try {
+//					return futureHandLetters.get();
+//				} catch (InterruptedException e) {
+//					return null;
+//				} catch (ExecutionException e) {
+//					return null;
+//				}
+//			}
 		}
+		else {
+			return generateHandLetters();
+		}
+	}
+	
+	private ArrayList<HandLetter> getHandLetters() {
 		var handLetters = getExistingHandLetters();
 		return handLetters.size() == 0 ? generateHandLetters() : handLetters; 
 	}
 	
-	private ArrayList<HandLetter> checkNewHandLetter(){
-		return new Callable<ArrayList<HandLetter>>() {
-			@Override
-			public ArrayList<HandLetter> call() {
-				var handLetters = getExistingHandLetters();
-				while(handLetters.size() == 0) {
-	    			try {
-						Thread.sleep(1000);
-						handLetters = getExistingHandLetters();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-				return handLetters;
-			}
-		}.call();
+	private synchronized ArrayList<HandLetter> checkNewHandLetter(){
+		ArrayList<HandLetter> handLetters = new ArrayList<HandLetter>();
+		while(handLetters.size() == 0) {
+			handLetters = getExistingHandLetters();
+			new Timer(1000, null).start();
+		}
+		return handLetters;
+		
+//		var handLetters = new Callable<ArrayList<HandLetter>>() {
+//			@Override
+//			public ArrayList<HandLetter> call() {
+//				var handLetters = getExistingHandLetters();
+//				while(handLetters.size() == 0) {
+//	    			try {
+//	    				new Timer(1000, (ArrayList<HandLetter>) getExistingHandLetters()).start();
+////						Thread.sleep(1000);
+//						
+//					} catch (Exception e) {
+//						e.printStackTrace();
+//					}
+//				}
+//				return handLetters;
+//			}
+//		};
+//		var executor = Executors.defaultThreadFactory().newThread(handLetters);
+//		var items = executor.submit((Callable<ArrayList<HandLetter>>) handLetters.call());
+//		return items;
 	}
 	
 	private ArrayList<HandLetter> getExistingHandLetters() {
@@ -380,7 +419,7 @@ public class BoardController implements Initializable {
 		var handLetters = new ArrayList<HandLetter>();
 		
 		if(!hasExisitingTurn()) {
-			addTurn(false);
+			addTurn();
 		}
 		
 		for(int i = 0; i < 7; i++) {
@@ -403,10 +442,7 @@ public class BoardController implements Initializable {
 		_fieldHand.clear();
 	}
 	
-	private void addTurn(boolean needsIncrement) {
-		if(needsIncrement) 
-			_currentTurn.incrementId();
-		
+	private void addTurn() {		
 		var turnStatement = Turn.getInsertNewTurn(_currentGame.getGameId(), _currentTurn.getTurnId());
 		
 		try {
