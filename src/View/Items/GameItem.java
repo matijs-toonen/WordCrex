@@ -7,6 +7,7 @@ import Controller.MainController;
 import Model.Game;
 import Model.GameStatus;
 import javafx.event.EventHandler;
+import javafx.scene.Cursor;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -19,6 +20,7 @@ public class GameItem extends AnchorPane {
 	private Label lblUser = new Label();
 	private Label lblTime = new Label();
 	private ImageView imgStatus = new ImageView();
+	private ImageView rightArrow = new ImageView();
 	
 	public GameItem(Game game) {
 		super();
@@ -26,7 +28,8 @@ public class GameItem extends AnchorPane {
 		setUserLabel();
 		setSubLabel();
 		setImage();
-		this.getChildren().addAll(lblTime, imgStatus, lblUser);
+		setRightArrow();
+		this.getChildren().addAll(lblTime, imgStatus, lblUser, rightArrow);
 	}
 	
 	private void setImage() {
@@ -105,6 +108,19 @@ public class GameItem extends AnchorPane {
 	private void setSubLabel() {
 		lblUser.getStyleClass().add("text");
 		lblTime.setStyle("-fx-padding: 20 0 40 50; -fx-font-size: 13px; -fx-text-fill: #ABABB1");
+	}
+	
+	private void setRightArrow() {
+		InputStream is = this.getClass().getResourceAsStream("/Resources/rightArrow.png");
+		Image image = new Image(is);
+		
+		rightArrow.setLayoutX(300);
+		rightArrow.setLayoutY(5);
+		rightArrow.setFitHeight(30);
+		rightArrow.setFitWidth(30);
+		rightArrow.setImage(image);
+		rightArrow.setCursor(Cursor.HAND);
+		rightArrow.getStyleClass().add("rightArrow");
 	}
 	
 	public Game getGame() {
