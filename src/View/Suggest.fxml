@@ -30,11 +30,15 @@
                   </Text>
                </children>
             </AnchorPane>
-            <ScrollPane hbarPolicy="NEVER" style="-fx-background-color: white;" vbarPolicy="ALWAYS">
-               <content>
-                <VBox fx:id="wordList" prefHeight="339.0" prefWidth="360.0" style="-fx-background-color: white;" />
-               </content>
-            </ScrollPane>
+            <AnchorPane>
+               <children>
+                  <ScrollPane hbarPolicy="NEVER" layoutX="13.0" layoutY="6.0" prefHeight="317.0" prefWidth="368.0" style="-fx-background-color: white;" vbarPolicy="ALWAYS">
+                     <content>
+                      <VBox fx:id="wordList" prefHeight="339.0" prefWidth="330.0" style="-fx-background-color: white;" />
+                     </content>
+                  </ScrollPane>
+               </children>
+            </AnchorPane>
         </items>
       </SplitPane>
       <TextField fx:id="searchBox" focusTraversable="false" layoutX="534.0" layoutY="47.0" prefHeight="40.0" prefWidth="400.0" promptText="Zoek woord..." style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);" styleClass="search-bar">

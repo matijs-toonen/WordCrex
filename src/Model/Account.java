@@ -105,7 +105,7 @@ public class Account {
 		return String.format(
 				"INSERT INTO account (username, password)\n" + 
 				"SELECT *\n" + 
-				"FROM (SELECT '%s', '%s') AS tmp\n" + 
+				"FROM (SELECT '%s' as username1, '%s' as password1) AS tmp\n" + 
 				"WHERE NOT EXISTS(SELECT username FROM account WHERE username = '%s')\n" + 
 				"LIMIT 1;"
 				, username, password, username);
