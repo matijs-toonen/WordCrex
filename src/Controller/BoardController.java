@@ -524,7 +524,6 @@ public class BoardController implements Initializable {
 				event.setDropCompleted(true);
 				_board.updateStatus(cords, PositionStatus.Taken);
 
-				// TODO Add word collection from database and do something with the placed words
 				showPlacedWords(cords); // Only for testing purposes can remove after
 
 				event.consume();
