@@ -161,7 +161,7 @@ public class BoardController implements Initializable {
 		var table = checkPlayer() ? "boardplayer2" : "boardplayer1";
 		var query = BoardPlayer.hasPlacedTurn(table, _currentGame.getUser2(), _currentTurn.getTurnId(), _currentGame.getGameId());
 		try {
-			_db.SelectCount(query) ;
+			return _db.SelectCount(query) == 0;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
