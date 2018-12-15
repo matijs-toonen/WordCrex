@@ -146,7 +146,9 @@ public class BoardController implements Initializable {
 	
 	public void playTurn()
 	{
-		System.out.println("test");
+		System.out.println(_currentGame.getGameId());
+		
+		
 	}
 	
 	public void reset() {
@@ -552,7 +554,7 @@ public class BoardController implements Initializable {
 			
 			for(var word : words)
 			{
-				System.out.println("Word: " + word.getKey() + " Score: " + word.getValue());
+				System.out.println("Word: " + word.getKey() + " Score: " + word.getValue() + " isMiddle: " + _firstPlacedWord);
 			}
 		}
 		catch(Exception e)
