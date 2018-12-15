@@ -62,7 +62,7 @@
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </ImageView>
-                        <ImageView fitHeight="39.0" fitWidth="39.0" layoutX="11.0" layoutY="12.0" pickOnBounds="true" preserveRatio="true" styleClass="optionButton">
+                        <ImageView fx:id="accept" fitHeight="39.0" fitWidth="39.0" layoutX="11.0" layoutY="12.0" onMouseClicked="#acceptWord" pickOnBounds="true" preserveRatio="true" styleClass="optionButton">
                            <image>
                               <Image url="@../Resources/play.png" />
                            </image>
