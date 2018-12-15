@@ -39,7 +39,10 @@ public class BoardTile extends Pane {
 			lblSymbol.setText("#");
 			
 		}else {
-			lblValue.setText(String.valueOf(_symbol.getValue()));
+			var value = _symbol.getValue();
+			if(value != 0) 
+				lblValue.setText(String.valueOf(value));	
+			
 			lblSymbol.setText(String.valueOf(_symbol.getChar()));
 		}
 
