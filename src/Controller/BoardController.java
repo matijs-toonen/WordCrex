@@ -503,6 +503,12 @@ public class BoardController implements Initializable {
 				if(!_board.canPlace(cords))
 					return;
 				
+				// TODO cancel drop if not connected after first center placement
+				if(!_board.placedConnected(cords))
+					System.out.println("No tile connected");
+				else
+					System.out.println("Tile connected");
+				
 				if(sourceTile.getParent() instanceof BoardTilePane) {
 					var oldBoardTile = (BoardTilePane) sourceTile.getParent();
 					var oldCords = oldBoardTile.getCords();
@@ -652,13 +658,7 @@ public class BoardController implements Initializable {
 	private ArrayList<Pair<String, Integer>> getPlacedWordsWithScore(Point playedCord)
 	{
 		_db = new DatabaseController<Word>();
-		
-		// TODO add that this only gets checked after placing first letter on board
-		if(!_board.placedConnected(playedCord))
-			System.out.println("No tile connected");
-		else
-			System.out.println("Tile connected");
-				
+					
 		ArrayList<Pair<String, Integer>> placedWords = new ArrayList<Pair<String, Integer>>();
 		
 		var column = (int)playedCord.getX();
