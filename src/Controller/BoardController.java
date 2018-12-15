@@ -158,7 +158,6 @@ public class BoardController implements Initializable {
 		
 		try {
 			_currentScore = (Score) _db.SelectFirst(scoreQuery, Score.class);
-			System.out.println(_currentScore.getOwnScore());
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}
