@@ -400,7 +400,6 @@ public class BoardController implements Initializable {
 				final var finalHandLetters = handLetters;
 				Platform.runLater(() -> {
 	            	visualizeHand(finalHandLetters);
-	            	addTurn();
 		        });
 			}
 		};
