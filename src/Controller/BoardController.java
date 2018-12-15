@@ -218,12 +218,14 @@ public class BoardController implements Initializable {
 					if(!test)
 					{
 						BoardTile boardTile = null;
-						if(existingTurns.containsKey(new Point(i+1, j+1))) {
-							var turn = existingTurns.get(new Point(i+1, j+1));
+						var cords = new Point(i, j);
+						if(existingTurns.containsKey(cords)) {
+							var turn = existingTurns.get(cords);
 							boardTile = new BoardTile(turn.getSymbol());
 							boardTile.setMinWidth(39);
 							boardTile.setMinHeight(39);
 							boardTile.setStyle("-fx-background-color: pink; -fx-background-radius: 6");
+							_board.updateStatus(cords, PositionStatus.Taken);
 						}
 						var tilePane = new BoardTilePane(tile);
 						tilePane.setDropEvents(createDropEvents());
