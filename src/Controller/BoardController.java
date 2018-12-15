@@ -92,7 +92,7 @@ public class BoardController implements Initializable {
 
 	private void getLetters() {
 		_db = new DatabaseController<Symbol>();
-		var statement = "SELECT * FROM letter WHERE game_id = " + _currentGame.getGameId();
+		var statement = "SELECT * FROM letter NATURAL JOIN symbol WHERE game_id = " + _currentGame.getGameId();
 		
 		try {
 			_letters = (ArrayList<Letter>)_db.SelectAll(statement, Letter.class);

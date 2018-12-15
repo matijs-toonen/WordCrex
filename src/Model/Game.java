@@ -149,7 +149,9 @@ public class Game {
  	}
  	
  	public static final String getTurnFromActiveGame(int gameId) {
- 		return ("SELECT MAX(turn_id) FROM handletter WHERE game_id = " + gameId);
+ 		return ("SELECT IF(MAX(turn_id) IS NULL, 1, MAX(turn_id)) " + 
+ 				"FROM handletter " + 
+ 				"WHERE game_id = " + gameId);
  	}
  	
  	public static final String getExistingTiles(int gameId, int turnId) {
