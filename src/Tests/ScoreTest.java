@@ -82,9 +82,7 @@ class ScoreTest {
 	
 	@Test
 	int TestWord3() {
-		
-		init();
-						
+								
 		var row = 10;
 		var start = 1;
 		var end = 4;
@@ -107,9 +105,7 @@ class ScoreTest {
 	
 	@Test
 	int TestWord4() {
-		
-		init();
-						
+								
 		var row = 4;
 		var start = 8;
 		var end = 10;
@@ -136,6 +132,8 @@ class ScoreTest {
 	void Test2Words() {
 		
 		var expectedScore = 70;
+		
+		init();
 		
 		Assert.assertEquals(expectedScore, TestWord3() + TestWord4());	
 	}
