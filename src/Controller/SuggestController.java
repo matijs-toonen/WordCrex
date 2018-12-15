@@ -115,16 +115,15 @@ public class SuggestController implements Initializable{
 			switch (word.getWordState()) {
 			case "accepted":
 				wordState.setText("Goedgekeurd");
-				wordState.setStyle("-fx-padding: 5 0; -fx-background-color: #E0F9EC; -fx-background-radius: 25; -fx-font-size: 15px; -fx-font-family: 'Source Sans Pro'");
+				wordState.getStyleClass().add("approvedItem");
 				break;
 			case "pending":
 				wordState.setText("In beoordeling");
-				wordState.setStyle("-fx-padding: 5 0; -fx-background-color: #b3b3b3; -fx-background-radius: 25; -fx-font-size: 15px; -fx-font-family: 'Source Sans Pro'");
+				wordState.getStyleClass().add("pendingItem");
 				break;
 			case "denied":
 				wordState.setText("Afgekeurd");
-				wordState.setStyle("-fx-padding: 5 0; -fx-background-color: #FFE2E6; -fx-background-radius: 25; -fx-font-size: 15px; -fx-font-family: 'Source Sans Pro'");
-				break;
+				wordState.getStyleClass().add("rejectedItem");
 			default:
 				break;
 			}

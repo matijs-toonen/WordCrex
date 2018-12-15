@@ -34,13 +34,24 @@
 	-fx-background-color: #e6e6e6;
 }
 
-.grayButton, .grayButton:hover {
+.grayButton {
+	-fx-background-color: #B4B4C6;
+	-fx-cursor: pointer;
+	-fx-text-fill: white;
+	-fx-font-weight: bold;
+	-fx-pref-width: 150;
+}
+
+.grayButton:hover {
 	-fx-background-color: #B4B4C6;
 	-fx-cursor: pointer;
 }
 
 .blueButton {
 	-fx-background-color: #3B86FF;
+	-fx-text-fill: white;
+	-fx-font-weight: bold;
+	-fx-pref-width: 100;
 }
 
 .blueButton:hover {
@@ -49,10 +60,48 @@
 
 .redButton {
 	-fx-background-color: #FF6565;
+	-fx-text-fill: white;
+	-fx-font-weight: bold;
+	-fx-pref-width: 100;
+}
+
+.boldLabel {
+	-fx-padding: 10 0 48 0;
+	-fx-font-size: 14px;
+	-fx-font-weight: bold;
+}
+
+.normalLabel {
+	-fx-padding: 10 0 48 0;
+	-fx-font-size: 14px;
+	-fx-font-weight: normal;
 }
 
 .redButton:hover {
 	-fx-background-color: #ff3333;
+}
+
+.approvedItem {
+	-fx-padding: 5 0;
+	-fx-background-color: #E0F9EC;
+	-fx-background-radius: 25;
+	-fx-font-size: 15px;
+	-fx-font-family: 'Source Sans Pro';
+}
+
+.pendingItem {
+	-fx-padding: 5 0;
+	-fx-background-color: #b3b3b3;
+	-fx-background-radius: 25;
+	-fx-font-size: 15px;
+	-fx-font-family: 'Source Sans Pro';
+}
+
+.rejectedItem {
+	-fx-padding: 5 0;
+	-fx-background-color: #FFE2E6;
+	-fx-background-radius: 25; -fx-font-size: 15px;
+	-fx-font-family: 'Source Sans Pro';
 }
 
 .submitButton {
