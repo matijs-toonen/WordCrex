@@ -37,6 +37,7 @@ import Model.TurnAction.TurnAction;
 import Tests.BoardTileTest;
 import View.BoardPane.BoardTile;
 import View.BoardPane.BoardTilePane;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -162,20 +163,20 @@ public class BoardController implements Initializable {
 		
 		var table = checkPlayer() ? "turnplayer1" : "turnplayer2";
 		
-//		var insertQuery = TurnPlayer.insertPlayer(table, _currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername(), 0, 0, "play");
-//		try {
-//			_db.Insert(insertQuery);
-//		} catch (SQLException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		var insertQuery = TurnPlayer.insertPlayer(table, _currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername(), 0, 0, "play");
+		try {
+			_db.Insert(insertQuery);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		createHand(true);
 	}
 	
 	private boolean needsToWaitForHandLetters() {
 		var table = checkPlayer() ? "turnplayer2" : "turnplayer1";
-		var query = TurnPlayer.hasPlacedTurn(table, _currentGame.getUser2(), _currentTurn.getTurnId(), _currentGame.getGameId());
+		var query = TurnPlayer.hasPlacedTurn(table, _currentTurn.getTurnId(), _currentGame.getGameId());
 		System.out.println(query);
 		try {
 			var shoud = _db.SelectCount(query) == 0;
@@ -342,10 +343,10 @@ public class BoardController implements Initializable {
 		
 //		_currentTurn.incrementId();
 		handLetters = getHandLetters();
-		visualizeHand(handLetters);
+		visualizeHand(handLetters, false);
 	}
 	
-	private void visualizeHand(ArrayList<HandLetter> handLetters) {
+	private void visualizeHand(ArrayList<HandLetter> handLetters, boolean runLater) {
 		int x = 0;
 		int y = 13;
 
@@ -359,7 +360,16 @@ public class BoardController implements Initializable {
 				y += 44.5;
 				boardTile.setMinWidth(39);
 				boardTile.setMinHeight(39);
-				paneHand.getChildren().add(boardTile);
+				if(runLater) {
+					Platform.runLater(new Runnable() {
+			            @Override
+			            public void run() {
+			            	paneHand.getChildren().add(boardTile);
+			            }
+			        });	
+				}else 
+					paneHand.getChildren().add(boardTile);
+				
 				_currentHand.add(boardTile);
 			}
 		};
@@ -372,7 +382,7 @@ public class BoardController implements Initializable {
 		}
 		else {
 			var handLetters = generateHandLetters();
-			visualizeHand(handLetters);
+			visualizeHand(handLetters, false);
 		}
 	}
 	
@@ -394,15 +404,16 @@ public class BoardController implements Initializable {
 				var handLetters = getExistingHandLetters();
 				while(handLetters.size() == 0) {
 	    			try {
-	    				handLetters =  getExistingHandLetters();
 						Thread.sleep(1000);
+						handLetters =  getExistingHandLetters();
 						
 					} catch (Exception e) {
-						e.printStackTrace();
+						System.out.println(e.getMessage());
+//						e.printStackTrace();
 					}
 				}
-				visualizeHand(handLetters);
-				addTurn();
+				visualizeHand(handLetters, true);
+//				addTurn();
 			}
 		};
 		

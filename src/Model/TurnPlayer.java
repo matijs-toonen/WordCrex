@@ -69,14 +69,8 @@ public class TurnPlayer {
 		}
 	}
 	
-	public static final String hasPlacedTurn(String table, String username, int turnId, int gameId) {
-		String whereUser = "username";
-		if(table.equals("turnplayer2"))
-			whereUser += "_player2";
-		else
-			whereUser += "_player1";
-		
-		return ("SELECT COUNT(*) FROM " + table + "  WHERE " + whereUser + " = '" + username + "' AND turn_id = " + turnId + " AND game_id = " + gameId);
+	public static final String hasPlacedTurn(String table, int turnId, int gameId) {
+		return ("SELECT COUNT(*) FROM " + table + "  WHERE turn_id = " + turnId + " AND game_id = " + gameId);
 	}
 	
 	public static final String insertPlayer(String table, int gameId, int turnId, String username, int bonus, int score, String type) {
