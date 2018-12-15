@@ -49,7 +49,7 @@ class ScoreTest {
 		
 		addWordStartEnd(_letters, start, end, word.toCharArray());
 		
-		placeWord(_letters, row, start, end);
+		placeWord(_letters, row, start, end, true);
 		
 		var ebTest = runTest(start, row, true);
 		
@@ -72,12 +72,12 @@ class ScoreTest {
 		
 		addWordStartEnd(_letters, start, end, word.toCharArray());
 		
-		placeWord(_letters, row, start, end);
+		placeWord(_letters, row, start, end, true);
 		
-		var ebTest = runTest(start, row, true);
+		var quizTest = runTest(start, row, true);
 		
-		Assert.assertEquals(word, ebTest.getKey());
-		Assert.assertEquals(expectedScore, (int)ebTest.getValue());	
+		Assert.assertEquals(word, quizTest.getKey());
+		Assert.assertEquals(expectedScore, (int)quizTest.getValue());	
 	}
 	
 	@Test
@@ -95,18 +95,18 @@ class ScoreTest {
 		
 		addWordStartEnd(_letters, start, end, word.toCharArray());
 		
-		placeWord(_letters, row, start, end);
+		placeWord(_letters, row, start, end, true);
 		
-		var ebTest = runTest(start, row, true);
+		var brieTest = runTest(start, row, true);
 		
-		Assert.assertEquals(word, ebTest.getKey());
-		Assert.assertEquals(expectedScore, (int)ebTest.getValue());	
+		Assert.assertEquals(word, brieTest.getKey());
+		Assert.assertEquals(expectedScore, (int)brieTest.getValue());	
 		
-		return (int)ebTest.getValue();
+		return (int)brieTest.getValue();
 	}
 	
 	@Test
-	void testWord4() {
+	int TestWord4() {
 		
 		init();
 						
@@ -119,15 +119,15 @@ class ScoreTest {
 		var word = "wie";
 		
 		addWordStartEnd(_letters, start, end, word.toCharArray());
+				
+		placeWord(_letters, row, start, end, false);
 		
-		placeWord(_letters, row, start, end);
+		var wieTest = runTest(start, row, false);
 		
-		var ebTest = runTest(start, row, false);
+		Assert.assertEquals(word, wieTest.getKey());
+		Assert.assertEquals(expectedScore, (int)wieTest.getValue());	
 		
-		Assert.assertEquals(word, ebTest.getKey());
-		Assert.assertEquals(expectedScore, (int)ebTest.getValue());	
-		
-//		return (int)ebTest.getValue();
+		return (int)wieTest.getValue();
 	}
 	
 
@@ -135,14 +135,17 @@ class ScoreTest {
 	@Test
 	void Test2Words() {
 		
-		var expectedScore = 80;
+		var expectedScore = 70;
 		
 		Assert.assertEquals(expectedScore, TestWord3() + TestWord4());	
 	}
 	
 	Pair<String, Integer> runTest(int start, int row, boolean Horizontal)
 	{
-		return _boardCont.getPlacedWordFromChars(_letters, new Pair<Integer, Integer>(start,row), Horizontal, true);
+		if(Horizontal)
+			return _boardCont.getPlacedWordFromChars(_letters, new Pair<Integer, Integer>(start,row), Horizontal, true);
+		else
+			return _boardCont.getPlacedWordFromChars(_letters, new Pair<Integer, Integer>(row,start), Horizontal, true);
 	}
 	
 	void addWordStartEnd(char[] arr, int start, int end, char[] word)
@@ -155,19 +158,21 @@ class ScoreTest {
 		}
 	}
 	
-	void placeWord(char[] arr, int row, int start, int end)
+	void placeWord(char[] arr, int row, int start, int end, boolean horizontal)
 	{
 		for(int i = start; i <= end; i++)
 		{
 			try 
 			{
 				var letterValue = _db.SelectCount(String.format("SELECT `value` FROM symbol WHERE symbol = '%s'", arr[i]));
-								
-				_boardCont.placeTest(new Point(i,row), new Symbol(arr[i], letterValue));
+				
+				if(horizontal)
+					_boardCont.placeTest(new Point(i,row), new Symbol(arr[i], letterValue));
+				else
+					_boardCont.placeTest(new Point(row,i), new Symbol(arr[i], letterValue));
 			} 
 			catch (SQLException e) 
 			{
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
