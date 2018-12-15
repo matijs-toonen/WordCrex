@@ -51,10 +51,9 @@ class ScoreTest {
 		
 		placeWord(_letters, row, start, end, true);
 		
-		var ebTest = runTest(start, row, true);
+		var ebTest = runTest(start, end, row, true);
 		
-		Assert.assertEquals(word, ebTest.getKey());
-		Assert.assertEquals(expectedScore, (int)ebTest.getValue());	
+		Assert.assertEquals(expectedScore, (int)ebTest);	
 	}
 	
 	@Test
@@ -74,10 +73,9 @@ class ScoreTest {
 		
 		placeWord(_letters, row, start, end, true);
 		
-		var quizTest = runTest(start, row, true);
+		var quizTest = runTest(start, end, row, true);
 		
-		Assert.assertEquals(word, quizTest.getKey());
-		Assert.assertEquals(expectedScore, (int)quizTest.getValue());	
+		Assert.assertEquals(expectedScore, (int)quizTest);	
 	}
 	
 	@Test
@@ -95,12 +93,11 @@ class ScoreTest {
 		
 		placeWord(_letters, row, start, end, true);
 		
-		var brieTest = runTest(start, row, true);
+		var brieTest = runTest(start, end, row, true);
 		
-		Assert.assertEquals(word, brieTest.getKey());
-		Assert.assertEquals(expectedScore, (int)brieTest.getValue());	
+		Assert.assertEquals(expectedScore, (int)brieTest);	
 		
-		return (int)brieTest.getValue();
+		return (int)brieTest;
 	}
 	
 	@Test
@@ -118,16 +115,13 @@ class ScoreTest {
 				
 		placeWord(_letters, row, start, end, false);
 		
-		var wieTest = runTest(start, row, false);
+		var wieTest = runTest(start, end, row, false);
+	
+		Assert.assertEquals(expectedScore, (int)wieTest);	
 		
-		Assert.assertEquals(word, wieTest.getKey());
-		Assert.assertEquals(expectedScore, (int)wieTest.getValue());	
-		
-		return (int)wieTest.getValue();
+		return (int)wieTest;
 	}
-	
-
-	
+		
 	@Test
 	void Test2Words() {
 		
@@ -138,12 +132,9 @@ class ScoreTest {
 		Assert.assertEquals(expectedScore, TestWord3() + TestWord4());	
 	}
 	
-	Pair<String, Integer> runTest(int start, int row, boolean Horizontal)
+	int runTest(int start, int end, int colro, boolean horizontal)
 	{
-		if(Horizontal)
-			return _boardCont.getPlacedWordFromChars(_letters, new Pair<Integer, Integer>(start,row), Horizontal, true);
-		else
-			return _boardCont.getPlacedWordFromChars(_letters, new Pair<Integer, Integer>(row,start), Horizontal, true);
+		return _boardCont.calcScore(colro, start, end, horizontal, true);
 	}
 	
 	void addWordStartEnd(char[] arr, int start, int end, char[] word)

@@ -18,11 +18,13 @@ import javafx.scene.paint.Color;
 
 public class BoardTile extends Pane {
 	private Symbol _symbol;
+	private int _letterId;
 	private Label lblValue = new Label();
 	private Label lblSymbol = new Label();
-
-	public BoardTile(Symbol symbol) {
+	
+	public BoardTile(Symbol symbol, int letterId) {
 		super();
+		_letterId = letterId;
 		init(symbol);
 	}
 	
@@ -48,6 +50,10 @@ public class BoardTile extends Pane {
 
 		getChildren().removeAll(lblValue, lblSymbol);
 		getChildren().addAll(lblValue, lblSymbol);
+	}
+	
+	public int getLetterId() {
+		return _letterId;
 	}
 	
 	public Symbol getSymbol() {
