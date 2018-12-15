@@ -22,11 +22,17 @@ import javafx.scene.layout.VBox;
 
 public class GameController implements Initializable{
 	
-	private DatabaseController<Game> _db;
+	/*
+	 * PROPS
+	 */
+	private DatabaseController<Game> _db = new DatabaseController<Game>();;
 	private ArrayList<Game> _activeGames;
 	private AnchorPane _rootPane;
 	private ArrayList<Game> _finishedGames;
 	
+	/*
+	 * FIELDS
+	 */
 	@FXML
 	private VBox vboxGames, vboxFinishedGames;
 	
@@ -46,14 +52,15 @@ public class GameController implements Initializable{
 		});
 	}
 	
+	
+	/**
+	 * Get all games from database
+	 */
 	private void getGames() {
-		_db = new DatabaseController<Game>();
-		
-		var user = MainController.getUser();
-		String username = user.getUsername();
+		String username = MainController.getUser().getUsername();
 		
 		String gameCommandFinished = Game.getWinnerQuery(username); 
-		String gameCommandActive = Game.getAcitveQuery(username);
+		String gameCommandActive = Game.getActiveQuery(username);
 
 		try {
 			_activeGames = (ArrayList<Game>) _db.SelectAll(gameCommandActive, Game.class);
@@ -61,11 +68,14 @@ public class GameController implements Initializable{
 			
 			renderGames();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
 		}
 	}
 	
+	
+	/**
+	 * Render games in view
+	 */
 	private void renderGames() {
 		vboxGames.getChildren().clear();
 		vboxFinishedGames.getChildren().clear();
@@ -83,8 +93,11 @@ public class GameController implements Initializable{
 		});
 	}
 
-	//Custom function for handeling the onmouseclickEvent
-	public Consumer<MouseEvent> onLabelClick() {
+	/**
+	 * Handles user click
+	 * @return
+	 */
+	private Consumer<MouseEvent> onLabelClick() {
 		return (event -> {
 	    	var userLabel = (Label) event.getSource();
 	    	var parent = (GameItem) userLabel.getParent();
