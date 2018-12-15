@@ -7,7 +7,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="920.0" prefWidth="350.0" style="-fx-background-color: #FFFFFF;" styleClass="text" stylesheets="@../Application/application.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.SetHistoryController">
+<AnchorPane prefHeight="920.0" prefWidth="350.0" style="-fx-background-color: #FFFFFF;" styleClass="text" stylesheets="@../Application/application.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Text fill="#5c5e6a" layoutX="95.0" layoutY="47.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Zet geschiedenis">
          <font>

@@ -41,7 +41,9 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -85,7 +87,7 @@ public class BoardController implements Initializable {
 		_boardTiles = new HashMap<Point, BoardTilePane>();
         _currentHand = new ArrayList<BoardTile>();
         _fieldHand = new HashMap<Point, BoardTile>();
-		_currentGame = game;
+        _currentGame = game;
 		_currentTurn = new Turn(1);
 		getLetters();
 	}
@@ -152,13 +154,21 @@ public class BoardController implements Initializable {
 		reset.setVisible(false);
 	}
 	
+	
 	public void openHistory() throws IOException{
 		if(!_historyVisible) {
-			closeCommunicationFrame();
-			Parent historyFrame = FXMLLoader.load(getClass().getResource("/View/SetHistory.fxml"));
 			
-			rightBarAnchor.getChildren().setAll(historyFrame);
+			closeCommunicationFrame();
+			//Parent historyFrame = FXMLLoader.load(getClass().getResource("/View/SetHistory.fxml"));
+			
+			SetHistoryController setHistoryController = new SetHistoryController(_currentGame);        
+    		FXMLLoader historyFrame = new FXMLLoader(getClass().getResource("/View/SetHistory.fxml"));
+    		historyFrame.setController(setHistoryController);
+    		AnchorPane pane = historyFrame.load();
+    		
+			rightBarAnchor.getChildren().setAll(pane);
 			_historyVisible = true;
+			
 		}
 		else {
 			rightBarAnchor.getChildren().clear();
@@ -169,9 +179,13 @@ public class BoardController implements Initializable {
 	public void openChat() throws IOException {
 		if(!_chatVisible) {
 			closeCommunicationFrame();
-			Parent chatFrame = FXMLLoader.load(getClass().getResource("/View/Chat.fxml"));
 			
-			rightBarAnchor.getChildren().setAll(chatFrame);
+			ChatController chatController = new ChatController(_currentGame);        
+    		FXMLLoader chatFrame = new FXMLLoader(getClass().getResource("/View/Chat.fxml"));
+    		chatFrame.setController(chatController);
+    		HBox pane = chatFrame.load();
+			
+			rightBarAnchor.getChildren().setAll(pane);
 			_chatVisible = true;
 		}
 		else {

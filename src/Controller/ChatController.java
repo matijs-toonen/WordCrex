@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 import Model.ChatLine;
+import Model.Game;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -25,6 +26,7 @@ public class ChatController implements Initializable {
 	private ArrayList<ChatLine> _chatLines;
 	private boolean updatedOnce = false;
 	private boolean jumpToBottom = true;
+	private Game _currentGame;
 	
 	// TODO: remove dummy data
 	final String username = "test-player";
@@ -38,6 +40,10 @@ public class ChatController implements Initializable {
 	
 	@FXML
 	private TextField chatInput;
+	
+	public ChatController(Game currentGame) {
+		_currentGame = currentGame;
+	}
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
