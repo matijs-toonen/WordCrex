@@ -60,10 +60,10 @@ public class BoardTilePane extends Pane {
 		}
 	}
 	
-	private void showBoardTile() {
+	private void showBoardTile(boolean shouldAdd) {
 		getChildren().remove(_boardTile);
 		
-		if(_boardTile != null)
+		if(shouldAdd && _boardTile != null)
 			getChildren().add(_boardTile);
 	}
 	
@@ -73,12 +73,12 @@ public class BoardTilePane extends Pane {
 	
 	public void setBoardTile(BoardTile newBoardTile) {
 		_boardTile = newBoardTile;
-		showBoardTile();
+		showBoardTile(true);
 	}
 	
 	public void removeBoardTile() {
+		showBoardTile(false);
 		_boardTile = null;
-		showBoardTile();
 	}
 	
 	public Character getBoardTileSymbolAsChar() {

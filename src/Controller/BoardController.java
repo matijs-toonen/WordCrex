@@ -848,9 +848,7 @@ public class BoardController implements Initializable {
 	}
 	
 	private void updatePaneWithNewLetters() {
-		System.out.println("hier");
 		var exisitingTurns = getTurns();
-		resetFieldHand();
 		
 		exisitingTurns.entrySet().forEach(turn -> {
 			var cords = turn.getKey();
@@ -858,16 +856,32 @@ public class BoardController implements Initializable {
 			var boardTile = createBoardTile(cords, turn.getValue());
 			boardTilePane.setBoardTile(boardTile);
 		});
+		
+		resetBoard();
+	}
+	
+	private void resetFieldHand() {
+		_fieldHand.entrySet().forEach(handLetter -> {
+			var cords = handLetter.getKey();
+			
+			var tilePane = _boardTiles.get(cords);
+			tilePane.removeBoardTile();
+			_board.updateStatus(cords, PositionStatus.Open);
+		});	
+
+		_fieldHand.clear();
 	}
 	
 	private void resetBoard() {
 		_fieldHand.entrySet().forEach(tile -> {
 			var cords = tile.getKey();
 			var boardTilePane = _boardTiles.get(tile.getKey());
+			
 			boardTilePane.removeBoardTile();
-			System.out.println("hier");
 			_board.updateStatus(cords, PositionStatus.Open);
 		});
+		
+		_fieldHand.clear();
 	}
 	
 	private ArrayList<HandLetter> getExistingHandLetters() {
@@ -900,19 +914,6 @@ public class BoardController implements Initializable {
 		getLetters();
 		
 		return handLetters;
-	}
-	
-	private void resetFieldHand() {
-		_fieldHand.entrySet().forEach(handLetter -> {
-			System.out.println("heir");
-			var cords = handLetter.getKey();
-			
-			var tilePane = _boardTiles.get(cords);
-			tilePane.removeBoardTile();
-			_board.updateStatus(cords, PositionStatus.Open);
-		});	
-
-		_fieldHand.clear();
 	}
 	
 	private void addTurn() {		
