@@ -227,12 +227,18 @@ WHERE
                 AND g.game_id = 528); 
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-set @gameid = 528;
 
-INSERT INTO turnplayer1 (game_id, turn_id, username_player1, turnaction_type)
-VALUES( @gameid, 2, 'sjors', 'resign');
-INSERT INTO turnplayer2 (game_id, turn_id, username_player2, turnaction_type)
-VALUES( @gameid, 2, 'matijs', 'play');
+select count(*)
+from turnplayer1
+where game_id = 504;
+
+select count(*)
+from turnplayer2
+where game_id = 504;
+
+insert into turnplayer1(game_id, turn_id, username_player1, turnaction_type)
+values(504, 1, 'tom', 'resign');
+
 
 select * from game where answer_player2 = 'unknown';
 select * from answer;

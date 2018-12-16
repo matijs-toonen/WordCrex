@@ -342,17 +342,9 @@ public class BoardController implements Initializable {
 
 		try 
 		{
-			var updateStatement = TurnPlayer.getTurnPlayerUpdateQuery(checkPlayer(), "resign", _currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername());
-			
+			var updateStatement = TurnPlayer.getTurnPlayerUpdateQuery(checkPlayer(), "resign", _currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername());			
 			_db.Update(updateStatement);
-			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		try 
-		{
+				
 			if(checkPlayer())
 			{
 				_db.Update("UPDATE turnplayer1 " + 
