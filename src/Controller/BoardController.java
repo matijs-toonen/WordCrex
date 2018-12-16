@@ -855,6 +855,7 @@ public class BoardController implements Initializable {
 	
 	private void updatePaneWithNewLetters() {
 		var exisitingTurns = getTurns();
+		resetBoard();
 		
 		exisitingTurns.entrySet().forEach(turn -> {
 			var cords = turn.getKey();
@@ -862,8 +863,6 @@ public class BoardController implements Initializable {
 			var boardTile = createBoardTile(cords, turn.getValue());
 			boardTilePane.setBoardTile(boardTile);
 		});
-		
-		resetBoard();
 	}
 	
 	private void resetFieldHand() {
