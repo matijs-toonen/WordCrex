@@ -88,6 +88,6 @@ public class SetHistory {
 	}
 	
 	public String getWoord2() {
-		return _woorddeel1.replace(",", "").replace(" ", "");
+		return _woorddeel2.replace(",", "").replace(" ", "");
 	}
 }

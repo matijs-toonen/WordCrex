@@ -102,7 +102,7 @@ public class BoardController implements Initializable {
 		_boardTiles = new HashMap<Point, BoardTilePane>();
         _currentHand = new ArrayList<BoardTile>();
         _fieldHand = new HashMap<Point, BoardTile>();
-        getLetters();
+        getLettersAndValidate();
 	}
 	
 
@@ -115,7 +115,7 @@ public class BoardController implements Initializable {
 		this(game, new Turn(1));
 	}
 
-	private void getLetters() {
+	private void getLettersAndValidate() {
 		_db = new DatabaseController<Symbol>();
 		var statement = Letter.getUnusedLetters(_currentGame.getGameId());
 		
@@ -124,6 +124,41 @@ public class BoardController implements Initializable {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		
+		checkValidPotSize();
+	}
+	
+	private void checkValidPotSize()
+	{
+		if(_letters.size() == 0)
+		{
+			try 
+			{
+				_db.Update("update game " + 
+							"set game_state = 'finished' " + 
+							"where game_id = " + _currentGame.getGameId() + "");
+				
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			AnchorPane pane = null;
+			try 
+			{		 
+				GameController con = new GameController(_rootPane);			
+				var panes = new FXMLLoader(getClass().getResource("/View/Games.fxml"));
+				
+				panes.setController(con);
+				pane = panes.load();
+				
+			}
+			catch(Exception ex) {
+				Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+			}		
+			_rootPane.getChildren().setAll(pane);
+			
 		}
 	}
 	
@@ -308,7 +343,6 @@ public class BoardController implements Initializable {
 				{
 					if(_db.Insert(statementTurnPlayer)) 
 					{
-						System.out.println(statementBoardPlayerArr);
 						if(_db.InsertBatch(statementBoardPlayerArr)) 
 						{
 							renewHand();
@@ -359,7 +393,7 @@ public class BoardController implements Initializable {
 		String insertQuery = Game.getPassQuery(_currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername(), checkPlayer());
 		
 		var _db = new DatabaseController<Game>();
-		
+
 		try {
 			_db.Insert(insertQuery);
 		} catch (SQLException e) {
@@ -612,16 +646,16 @@ public class BoardController implements Initializable {
 		
 		var tableOpponent = checkPlayer() ? "turnplayer2" : "turnplayer1";
 		var tableMe = checkPlayer() ? "turnplayer1" : "turnplayer2";
-		var hasPlacedOpponent = needsToWaitForHandLetters(tableOpponent);
+		var needsToPlaceOpponent = needsToWaitForHandLetters(tableOpponent);
 		var needsToPlaceOwn = needsToWaitForHandLetters(tableMe);
-
+		
 		if(needsToPlaceOwn) {
 			var handLetters = getHandLetters();
 			visualizeHand(handLetters);
 			return;
 		}
 		
-		getGeneratedLetters(hasPlacedOpponent);	
+		getGeneratedLetters(needsToPlaceOpponent);	
 	}
 	
 	private void visualizeHand(ArrayList<HandLetter> handLetters) {
@@ -680,9 +714,12 @@ public class BoardController implements Initializable {
 		var oppPlayerNum = ownPlayerNum == 1 ? 2 : 1;
 		
 		try
-		{			
+		{
+			if(ownScore == 0)
+				return true;
+			
 			if(ownScore == oppScore)
-			{				
+			{
 				var statement = String.format("UPDATE turnplayer%s "
 						+ "SET bonus = %s "
 						+ "WHERE game_id = %s "
@@ -917,7 +954,7 @@ public class BoardController implements Initializable {
 			handLetters.add(createHandLetter());
 		}
 		
-		getLetters();
+		getLettersAndValidate();
 		
 		return handLetters;
 	}
