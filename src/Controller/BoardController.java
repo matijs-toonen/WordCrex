@@ -84,7 +84,7 @@ public class BoardController implements Initializable {
 	private Button btnTest, btnShuffle;
 	
 	@FXML
-	private Pane panePlayField, paneHand, boardPane, waitingPane, errorMessagePane;
+	private Pane panePlayField, paneHand, boardPane, waitingPane, errorMessagePane, blockedOverplay;
 	
 	@FXML
 	private AnchorPane rightBarAnchor;
@@ -145,11 +145,12 @@ public class BoardController implements Initializable {
 		dragOnHand();
 	}
 	
+	
 	/**
 	 * disable the board and show waiting animation
 	 */
 	private void disableBoard() {
-		boardPane.setDisable(true);
+		blockedOverplay.setVisible(true);
 		waitingPane.setVisible(true);
 		boardPane.setStyle("-fx-opacity: 0.3");
 	}
@@ -158,16 +159,19 @@ public class BoardController implements Initializable {
 	 * disable the board and show waiting animation
 	 */
 	private void enableBoard() {
-		boardPane.setDisable(false);
+		blockedOverplay.setVisible(false);
 		waitingPane.setVisible(false);
 		boardPane.setStyle("-fx-opacity: 1.0");
 	}
+	
 	
 	/**
 	 * Hide error message
 	 */
 	public void hideErrorMessage() {
+		blockedOverplay.setVisible(false);
 		boardPane.setStyle("-fx-opacity: 1.0");
+		
 		errorMessagePane.setVisible(false);
 	}
 	
@@ -175,7 +179,9 @@ public class BoardController implements Initializable {
 	 * Hide error message
 	 */
 	private void showErrorMessage(String text) {
+		blockedOverplay.setVisible(true);
 		boardPane.setStyle("-fx-opacity: 0.3");
+		
 		errorPaneLabel.setText(text);
 		errorMessagePane.setVisible(true);
 	}
