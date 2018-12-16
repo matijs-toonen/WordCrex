@@ -77,13 +77,13 @@ public class BoardController implements Initializable {
 	private boolean _historyVisible;
 	
 	@FXML
-	private Label lblScore1, lblScore2, lblPlayer1, lblPlayer2;
+	private Label lblScore1, lblScore2, lblPlayer1, lblPlayer2, errorPaneLabel;
 	
 	@FXML
 	private Button btnTest, btnShuffle;
 	
 	@FXML
-	private Pane panePlayField, paneHand;
+	private Pane panePlayField, paneHand, boardPane, waitingPane, errorMessagePane;
 	
 	@FXML
 	private AnchorPane rightBarAnchor;
@@ -112,7 +112,7 @@ public class BoardController implements Initializable {
 
 	private void getLetters() {
 		_db = new DatabaseController<Symbol>();
-		var statement = "SELECT * FROM letter NATURAL JOIN symbol WHERE game_id = " + _currentGame.getGameId();
+		var statement = Letter.getUnusedLetters(_currentGame.getGameId());
 		
 		try {
 			_letters = (ArrayList<Letter>)_db.SelectAll(statement, Letter.class);
@@ -137,7 +137,42 @@ public class BoardController implements Initializable {
 
 		createField(false);
 		createHand(false);
-		dragOnHand();	
+		dragOnHand();
+	}
+	
+	/**
+	 * disable the board and show waiting animation
+	 */
+	private void disableBoard() {
+		boardPane.setDisable(true);
+		waitingPane.setVisible(true);
+		boardPane.setStyle("-fx-opacity: 0.3");
+	}
+	
+	/**
+	 * disable the board and show waiting animation
+	 */
+	private void enableBoard() {
+		boardPane.setDisable(false);
+		waitingPane.setVisible(false);
+		boardPane.setStyle("-fx-opacity: 1.0");
+	}
+	
+	/**
+	 * Hide error message
+	 */
+	public void hideErrorMessage() {
+		boardPane.setStyle("-fx-opacity: 1.0");
+		errorMessagePane.setVisible(false);
+	}
+	
+	/**
+	 * Hide error message
+	 */
+	private void showErrorMessage(String text) {
+		boardPane.setStyle("-fx-opacity: 0.3");
+		errorPaneLabel.setText(text);
+		errorMessagePane.setVisible(true);
 	}
 	
 	private void scoreRefreshThread() {
@@ -212,7 +247,7 @@ public class BoardController implements Initializable {
 				var wordsData = getUniqueWordData();
 				
 				var statementTurnPlayer = "";
-				var statementBoardPlayer = new StringBuilder();
+				var statementBoardPlayer = new ArrayList<String>();
 				var playerNum = checkPlayerIfPlayer1() ? 1 : 2;
 				var score = 0;
 				
@@ -227,54 +262,60 @@ public class BoardController implements Initializable {
 								
 				statementTurnPlayer = String.format("INSERT INTO turnplayer%1$s \n"
 						+ "(game_id, turn_id, username_player%1$s, bonus, score, turnaction_type) \n"
-						+ "VALUES(%2$s, %3$s, %4$s, %5$s, %6$s, %7$s)"
+						+ "VALUES(%2$s, %3$s, '%4$s', %5$s, %6$s, '%7$s')"
 						,playerNum, gameId, turnId, username, 0, score, "play");
 				
-				System.out.println(statementTurnPlayer);
+				var uniqueLettersData = new HashMap<Integer, Pair<Character, Point>>();
 				
-				statementBoardPlayer.append("START TRANSACTION;\n");
-				statementBoardPlayer.append(String.format("INSERT INTO boardplayer%1$s \n"
-						+ "(game_id, username, turn_id, letter_id, tile_x, tile_y) \n"
-						+ "VALUES"
-						, playerNum));
-				
-				var dataSize = wordsData.size();
-
-				var dataCount = 0;
 				for(var wordData : wordsData)
 				{
-					dataCount++;
+					var lettersData = wordData.getLetters();
 					
-					var letters = wordData.getLetters();
-					var letterSize = letters.size();
-					
-					var letterCount = 0;
-					
-					Iterator<Map.Entry<Integer, Pair<Character, Point>>> entries = letters.entrySet().iterator();
-					
-					while(entries.hasNext())
-					{						
-						Map.Entry<Integer, Pair<Character, Point>> letterData = entries.next();
+					lettersData.entrySet().forEach(letterData -> {
 						
 						var letterId = letterData.getKey();
-						var tileX = (int) letterData.getValue().getValue().getX();
-						var tileY = (int) letterData.getValue().getValue().getY();
+						var letterCharCord = letterData.getValue();
 						
-						if(dataCount == dataSize)
-							letterCount++;
+						if(!uniqueLettersData.containsKey(letterId))
+							uniqueLettersData.put(letterId, letterCharCord);
 						
-						if(letterCount == letterSize)
-							statementBoardPlayer.append(String.format("\n(%1$s, %2$s, %3$s, %4$s, %5$s, %6$s);"
-									,gameId, username, turnId, letterId, tileX, tileY));
-						else
-							statementBoardPlayer.append(String.format("\n(%1$s, %2$s, %3$s, %4$s, %5$s, %6$s),"
-									,gameId, username, turnId, letterId, tileX, tileY));
-					}
+					});
 				}
 				
-				statementBoardPlayer.append("\nCOMMIT;");
+				uniqueLettersData.entrySet().forEach(letterData -> {
+					
+					var letterId = letterData.getKey();
+					var tileX = (int) letterData.getValue().getValue().getX()+1;
+					var tileY = (int) letterData.getValue().getValue().getY()+1;
+					
+					statementBoardPlayer.add(String.format("INSERT INTO boardplayer%1$s \n"
+							+ "(game_id, username, turn_id, letter_id, tile_x, tile_y) \n"
+							+ "VALUES (%2$s, '%3$s', %4$s, %5$s, %6$s, %7$s);"
+							, playerNum,gameId, username, turnId, letterId, tileX, tileY));
+				});
+								
+				String[] statementBoardPlayerArr = new String[statementBoardPlayer.size()];
+				statementBoardPlayerArr = statementBoardPlayer.toArray(statementBoardPlayerArr);
 				
-				System.out.println(statementBoardPlayer);
+				for(var statement : statementBoardPlayerArr)
+				{
+					System.out.println(statement);
+				}
+	
+				// TODO uncomment
+//				try 
+//				{
+//					if(_db.Insert(statementTurnPlayer)) 
+//					{
+//						if(_db.InsertBatch(statementBoardPlayerArr)) 
+//						{
+//							renewHand();
+//						}
+//					}
+//				}
+//				catch(SQLException e) {
+//					e.printStackTrace();
+//				}
 			}
 		}
 		else
@@ -284,7 +325,6 @@ public class BoardController implements Initializable {
 	private LinkedList<WordData> getUniqueWordData()
 	{
 		var uniqueWordsData = new LinkedList<WordData>();
-		
 				
 		for(Point point : _fieldHand.keySet())
 		{
@@ -608,6 +648,8 @@ public class BoardController implements Initializable {
 	}
 	
 	private void visualizeHand(ArrayList<HandLetter> handLetters) {
+		paneHand.getChildren().clear();
+		_currentHand.clear();
 		int x = 0;
 		int y = 13;
 
@@ -622,7 +664,6 @@ public class BoardController implements Initializable {
 				boardTile.setMinWidth(39);
 				boardTile.setMinHeight(39);
 				
-				paneHand.getChildren().add(boardTile);
 				_currentHand.add(boardTile);
 			}
 		};
@@ -630,6 +671,7 @@ public class BoardController implements Initializable {
 		placeHand(false);		
 	}
 	
+	// TODO HERE
 	private void getGeneratedLetters(boolean checkGenerated){
 		if(checkGenerated) {
 			waitForVisualizeNewHandLetters();
@@ -651,27 +693,53 @@ public class BoardController implements Initializable {
 		return handLetters.get(0).getLetters().size();
 	}
 	
+	// TODO HERE
 	private void waitForVisualizeNewHandLetters(){	
+		
+		disableBoard();
+		
+		
 		var thread = new Thread() {
 			public void run() {
 				var handLetters = getExistingHandLetters();
 				int tries = 0;
+				
+				
+				
+//				while(true) {
+//					Thread.sleep(1000);
+//					handLetters = getExistingHandLetters();
+//					
+//					var amount = getAmountLetters(handLetters);
+//					if(amount == 0 || amount != 7 || tries < 4) {
+//						
+//					}
+//					break;
+//				}
+
 				while(getAmountLetters(handLetters) == 0 || getAmountLetters(handLetters) != 7 || tries < 4) {
-	    			try {
+					
+					try {
 						Thread.sleep(1000);
 						handLetters = getExistingHandLetters();
 						
-						tries++;
+						if(getAmountLetters(handLetters) > 0) {
+							tries++;	
+						}
+						
 						if (getAmountLetters(handLetters) == 0)
 							tries = 0;
 					
 					} catch (Exception e) {
-						System.out.println(e.getMessage());
+						e.printStackTrace();
 					}
 				}
+				
 				final var finalHandLetters = handLetters;
+				
 				Platform.runLater(() -> {
 	            	visualizeHand(finalHandLetters);
+	            	enableBoard();
 		        });
 			}
 		};
@@ -706,6 +774,8 @@ public class BoardController implements Initializable {
 		for(int i = 0; i < 7; i++) {
 			handLetters.add(createHandLetter());
 		}
+		
+		getLetters();
 		
 		return handLetters;
 	}
@@ -762,15 +832,22 @@ public class BoardController implements Initializable {
 	}
 		
 	private HandLetter createHandLetter() {
-		return new HandLetter(_currentGame, _currentTurn, createLetter());
+		var letter = createLetter();
+		if(letter == null)
+			return null;
+		
+		return new HandLetter(_currentGame, _currentTurn, letter);
 	}
 	
 	private Letter createLetter() {
-		var number = _random.nextInt(_letters.size());
+		var amountOfLetters = _letters.size();
+		if(amountOfLetters == 0) 
+			return null;
+		
+		var number = _random.nextInt(amountOfLetters);
 		var rndLetter = _letters.get(number);
 		
-		var statement = "INSERT INTO handletter VALUES (" + _currentGame.getGameId() + ", " + _currentTurn.getTurnId() + ", " + rndLetter.getLetterId() + ")"; 
-		
+		var statement = HandLetter.insertLetter(_currentGame.getGameId(), _currentTurn.getTurnId(), rndLetter.getLetterId());
 		try {
 			if(_db.Insert(statement)) {
 				_letters.remove(number);
