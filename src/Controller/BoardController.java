@@ -507,11 +507,6 @@ public class BoardController implements Initializable {
 		}
 	}
 	
-	private void updateField()
-	{
-		
-	}
-	
 	private void createField(boolean test) 
 	{
 		var existingTurns = getTurns();
