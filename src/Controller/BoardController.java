@@ -126,7 +126,6 @@ public class BoardController implements Initializable {
 			e.printStackTrace();
 		}
 		
-		//kijken of de pot valid is 
 		checkValidPotSize();
 	}
 	
@@ -395,7 +394,7 @@ public class BoardController implements Initializable {
 		String insertQuery = Game.getPassQuery(_currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername(), checkPlayer());
 		
 		var _db = new DatabaseController<Game>();
-		
+		System.out.println(insertQuery);
 		try {
 			_db.Insert(insertQuery);
 		} catch (SQLException e) {
@@ -648,8 +647,10 @@ public class BoardController implements Initializable {
 		
 		var tableOpponent = checkPlayer() ? "turnplayer2" : "turnplayer1";
 		var tableMe = checkPlayer() ? "turnplayer1" : "turnplayer2";
-		var hasPlacedOpponent = needsToWaitForHandLetters(tableOpponent);
+		var needsToPlaceOpponent = needsToWaitForHandLetters(tableOpponent);
 		var needsToPlaceOwn = needsToWaitForHandLetters(tableMe);
+		System.out.println("opp " + needsToPlaceOpponent);
+		System.out.println("me " +needsToPlaceOwn);
 
 		if(needsToPlaceOwn) {
 			var handLetters = getHandLetters();
@@ -657,7 +658,7 @@ public class BoardController implements Initializable {
 			return;
 		}
 		
-		getGeneratedLetters(hasPlacedOpponent);	
+		getGeneratedLetters(needsToPlaceOpponent);	
 	}
 	
 	private void visualizeHand(ArrayList<HandLetter> handLetters) {
@@ -716,9 +717,9 @@ public class BoardController implements Initializable {
 		var oppPlayerNum = ownPlayerNum == 1 ? 2 : 1;
 		
 		try
-		{			
-			if(ownScore == oppScore)
-			{				
+		{
+			if(ownScore == oppScore && ownScore > 0)
+			{
 				var statement = String.format("UPDATE turnplayer%s "
 						+ "SET bonus = %s "
 						+ "WHERE game_id = %s "
@@ -954,9 +955,6 @@ public class BoardController implements Initializable {
 		}
 		
 		getLettersAndValidate();
-		//checkValidPotSize();
-		
-		
 		
 		return handLetters;
 	}
