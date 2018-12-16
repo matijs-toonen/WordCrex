@@ -339,31 +339,17 @@ public class BoardController implements Initializable {
 	
 	public void resignGame()
 	{		
-
 		try 
 		{
-			var updateStatement = TurnPlayer.getTurnPlayerUpdateQuery(checkPlayer(), "resign", _currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername());			
-			_db.Update(updateStatement);
-				
-			if(checkPlayer())
-			{
-				_db.Update("UPDATE turnplayer1 " + 
-						"SET " + 
-						"turnaction_type = 'resign' " + 
-						"WHERE " + 
-						"game_id = " + _currentGame.getGameId() + " " + 
-						"AND turn_id = " + _currentTurn.getTurnId() + " " + 
-						"AND username_player1 = " + MainController.getUser().getUsername() + "");
-			}
-			else 
-			{
-				_db.Update("UPDATE turnplayer2 " + 
-						"SET " + 
-						"turnaction_type = 'resign' " + 
-						"WHERE " + 
-						"game_id = " + _currentGame.getGameId() + " " + 
-						"AND turn_id = " + _currentTurn.getTurnId() + " " + 
-						"AND username_player2 = " + MainController.getUser().getUsername() + "");
+			var table = checkPlayer() ? "turnplayer1" : "turnplayer2";
+			var getStatement = TurnPlayer.getExistingTurn(table, _currentGame.getGameId());
+			var type = "resign";
+			if(_db.SelectCount(getStatement) == 0) {
+				var insertStatement = TurnPlayer.getTurnPlayerInsertQuery(checkPlayer(), type, _currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername());
+				_db.Insert(insertStatement);
+			}else {
+				var updateStatement = TurnPlayer.getTurnPlayerUpdateQuery(checkPlayer(), type, _currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername());
+				_db.Update(updateStatement);
 			}
 			
 			_db.Update("UPDATE game " + 
@@ -387,9 +373,6 @@ public class BoardController implements Initializable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		
-		
 				
 		AnchorPane pane = null;
 		try {

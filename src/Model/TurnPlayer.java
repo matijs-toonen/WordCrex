@@ -71,6 +71,28 @@ public class TurnPlayer {
 		}
 	}
 	
+	public static final String getExistingTurn(String table, int gameId) {
+		
+		return ("SELECT COUNT(*) " + 
+				"FROM " + table + 
+				" WHERE game_id = " + gameId);
+	}
+	
+	public static final String getTurnPlayerInsertQuery(boolean isFirstPlayer, String type, int gameId, int turnId, String username) {
+		String table = "turnplayer";
+		String whereUser = "username_player";
+		if(isFirstPlayer) {
+			table += "1";
+			whereUser += "1";
+		}else {
+			table += "2";
+			whereUser += "2";
+		}
+		
+		return ("INSERT INTO " + table + " (game_id, turn_id, username_player1, turnaction_type) " + 
+				"values(" + gameId + ", " + turnId + ", '" + username + "', '" + type + "');");
+	}
+	
 	public static final String getTurnPlayerUpdateQuery(boolean isFirstPlayer, String type, int gameId, int turnId, String username) {
 		String table = "turnplayer";
 		String whereUser = "username_player";
