@@ -191,7 +191,7 @@ public class BoardController implements Initializable {
 		Thread chatThread = new Thread(){
 		    public void run(){
 		    	
-		    	while(true &&  MainController.getUser() != null) {
+		    	while(MainController.getUser() != null) {
 		    		refreshScore();
 	    			
 	    			try {
@@ -257,7 +257,7 @@ public class BoardController implements Initializable {
 			{
 				var wordsData = getUniqueWordData();
 				
-				if(wordsData.size() > 1)
+				if(wordsData.size() > 1 && _currentTurn.getTurnId() == 1)
 				{
 					showErrorMessage("Je mag maar 1 woord leggen");
 					return;
