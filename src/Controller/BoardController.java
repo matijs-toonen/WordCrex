@@ -680,12 +680,12 @@ public class BoardController implements Initializable {
 		{			
 			if(ownScore == oppScore)
 			{				
-				var statement = String.format("UPDATE turnplayer%s"
+				var statement = String.format("UPDATE turnplayer%s "
 						+ "SET bonus = %s "
 						+ "WHERE game_id = %s "
 						+ "AND turn_id = %s "
 						+ "AND score = %s ",oppPlayerNum, bonus, gameId, turnId, oppScore);
-								
+
 				if(_db.Update(statement))
 					oppScore += bonus;
 			}
