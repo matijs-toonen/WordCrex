@@ -689,6 +689,8 @@ public class BoardController implements Initializable {
 				if(_db.Update(statement))
 					oppScore += bonus;
 			}
+			
+			var usedLetters = (ArrayList<TurnBoardLetter>)_db.SelectAll("SELECT letter_id FROM turnboardletter where game_id = " + gameId, TurnBoardLetter.class);
 
 			if(ownScore > oppScore)
 			{
@@ -704,6 +706,10 @@ public class BoardController implements Initializable {
 				
 				for(var boardPlayer : playerBoard)
 				{
+					var letterId = boardPlayer.getLetterId();
+					if(usedLetters.contains(letterId)) 
+						continue;
+
 					var insertStatement = String.format("INSERT INTO turnboardletter "
 							+ "(letter_id, game_id, turn_id, tile_x, tile_y)"
 							+ "VALUES"
@@ -737,6 +743,10 @@ public class BoardController implements Initializable {
 				
 				for(var boardPlayer : playerBoard)
 				{
+					var letterId = boardPlayer.getLetterId();
+					if(usedLetters.contains(letterId)) 
+						continue;
+					
 					var insertStatement = String.format("INSERT INTO turnboardletter "
 							+ "(letter_id, game_id, turn_id, tile_x, tile_y)"
 							+ "VALUES"
