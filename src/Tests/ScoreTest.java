@@ -22,7 +22,7 @@ class ScoreTest {
 	{
 		_db = new DatabaseController();
 		
-		_boardCont = new BoardController(new Game(0));
+		_boardCont = new BoardController(new Game(0), null);
 		
 		_boardCont.initializeTest();
 		
