@@ -403,7 +403,7 @@ public class BoardController implements Initializable {
 		try 
 		{
 			var updateStatement = TurnPlayer.getTurnPlayerUpdateQuery(checkPlayerIfPlayer1(), "resign", _currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername());
-			
+
 			_db.Update(updateStatement);
 			
 		} catch (SQLException e) {
@@ -752,12 +752,9 @@ public class BoardController implements Initializable {
 				
 				String[] statementBoardPlayerArr = new String[insertStatements.size()];
 				statementBoardPlayerArr = insertStatements.toArray(statementBoardPlayerArr);
-				
 
-				
 				oppInsert = true;
 				ownInsert = _db.InsertBatch(statementBoardPlayerArr);
-				
 			}
 			else
 			{

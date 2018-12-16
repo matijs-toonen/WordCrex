@@ -88,7 +88,7 @@ public class TurnPlayer {
 						"WHERE " + 
 						"game_id = " + gameId + " " + 
 						"AND turn_id = " + turnId + " " + 
-						"AND " + whereUser + " = " + username+ ")");
+						"AND " + whereUser + " = '" + username + "'");
 	}
 	
 	public static final String hasPlacedTurn(String table, int turnId, int gameId) {
