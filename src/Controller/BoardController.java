@@ -343,7 +343,6 @@ public class BoardController implements Initializable {
 				{
 					if(_db.Insert(statementTurnPlayer)) 
 					{
-						System.out.println(statementBoardPlayerArr);
 						if(_db.InsertBatch(statementBoardPlayerArr)) 
 						{
 							renewHand();
@@ -394,7 +393,7 @@ public class BoardController implements Initializable {
 		String insertQuery = Game.getPassQuery(_currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername(), checkPlayer());
 		
 		var _db = new DatabaseController<Game>();
-		System.out.println(insertQuery);
+
 		try {
 			_db.Insert(insertQuery);
 		} catch (SQLException e) {
@@ -649,9 +648,7 @@ public class BoardController implements Initializable {
 		var tableMe = checkPlayer() ? "turnplayer1" : "turnplayer2";
 		var needsToPlaceOpponent = needsToWaitForHandLetters(tableOpponent);
 		var needsToPlaceOwn = needsToWaitForHandLetters(tableMe);
-		System.out.println("opp " + needsToPlaceOpponent);
-		System.out.println("me " +needsToPlaceOwn);
-
+		
 		if(needsToPlaceOwn) {
 			var handLetters = getHandLetters();
 			visualizeHand(handLetters);
@@ -694,7 +691,6 @@ public class BoardController implements Initializable {
 			var scores = getScores();
 			if(insertScore(scores.getKey(), scores.getValue()))
 			{
-				System.out.println("hier");
 				_currentTurn.incrementId();
 				var handLetters = generateHandLetters();
 				updatePaneWithNewLetters();
@@ -722,7 +718,7 @@ public class BoardController implements Initializable {
 			if(ownScore == 0)
 				return true;
 			
-			if(ownScore == oppScore && ownScore > 0)
+			if(ownScore == oppScore)
 			{
 				var statement = String.format("UPDATE turnplayer%s "
 						+ "SET bonus = %s "
