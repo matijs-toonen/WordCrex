@@ -50,6 +50,6 @@ public class Letter {
 	}
 	
 	public static final String getUnusedLetters(int gameId) {
-		return ("SELECT * FROM letter WHERE game_id = "+ gameId + " AND letter_id NOT IN (SELECT letter_id FROM handletter WHERE game_id = " + gameId + ")");
+		return ("SELECT * FROM letter NATURAL JOIN symbol WHERE game_id = "+ gameId + " AND letter_id NOT IN (SELECT letter_id FROM handletter WHERE game_id = " + gameId + ")");
 	}
 }

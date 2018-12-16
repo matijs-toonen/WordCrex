@@ -1,6 +1,5 @@
 package Controller;
 
-import java.awt.List;
 import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
@@ -11,10 +10,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
@@ -314,7 +311,6 @@ public class BoardController implements Initializable {
 	private LinkedList<WordData> getUniqueWordData()
 	{
 		var uniqueWordsData = new LinkedList<WordData>();
-		
 				
 		for(Point point : _fieldHand.keySet())
 		{
@@ -623,7 +619,6 @@ public class BoardController implements Initializable {
 				boardTile.setMinWidth(39);
 				boardTile.setMinHeight(39);
 				
-				paneHand.getChildren().add(boardTile);
 				_currentHand.add(boardTile);
 			}
 		};
@@ -782,7 +777,7 @@ public class BoardController implements Initializable {
 		if(letter == null)
 			return null;
 		
-		return new HandLetter(_currentGame, _currentTurn, createLetter());
+		return new HandLetter(_currentGame, _currentTurn, letter);
 	}
 	
 	private Letter createLetter() {
@@ -796,6 +791,7 @@ public class BoardController implements Initializable {
 		var statement = HandLetter.insertLetter(_currentGame.getGameId(), _currentTurn.getTurnId(), rndLetter.getLetterId());
 		try {
 			if(_db.Insert(statement)) {
+				_letters.remove(number);
 				return rndLetter;
 			}
 		} catch (SQLException e) {
