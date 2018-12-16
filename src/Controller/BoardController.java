@@ -141,7 +141,7 @@ public class BoardController implements Initializable {
 		scoreRefreshThread();
 
 		createField(false);
-		createHand(false);
+		createHand();
 		dragOnHand();
 	}
 	
@@ -405,15 +405,14 @@ public class BoardController implements Initializable {
 	}
 	
 	public void renewHand() {
-		createHand(true);
+		createHand();
 	}
 	
-	private boolean needsToWaitForHandLetters() {
-		var table = checkPlayer() ? "turnplayer2" : "turnplayer1";
+	private boolean needsToWaitForHandLetters(String table) {
+		
 		var query = TurnPlayer.hasPlacedTurn(table, _currentTurn.getTurnId(), _currentGame.getGameId());
 		try {
-			var shoud = _db.SelectCount(query) == 0;
-			return shoud;
+			return _db.SelectCount(query) == 0;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -607,20 +606,22 @@ public class BoardController implements Initializable {
 	}
 	
 	
-	private void createHand(boolean checkGenerated) {
+	private void createHand() {
 		_currentHand.clear();
 		_db = new DatabaseController<HandLetter>();
 		
-		
-		if(checkGenerated) {
-			var check = needsToWaitForHandLetters();
-			_currentTurn.incrementId();
-			getGeneratedLetters(check);
+		var tableOpponent = checkPlayer() ? "turnplayer2" : "turnplayer1";
+		var tableMe = checkPlayer() ? "turnplayer1" : "turnplayer2";
+		var hasPlacedOpponent = needsToWaitForHandLetters(tableOpponent);
+		var needsToPlaceOwn = needsToWaitForHandLetters(tableMe);
+
+		if(needsToPlaceOwn) {
+			var handLetters = getHandLetters();
+			visualizeHand(handLetters);
 			return;
 		}
 		
-		var handLetters = getHandLetters();
-		visualizeHand(handLetters);		
+		getGeneratedLetters(hasPlacedOpponent);	
 	}
 	
 	private void visualizeHand(ArrayList<HandLetter> handLetters) {
@@ -649,12 +650,14 @@ public class BoardController implements Initializable {
 	
 	private void getGeneratedLetters(boolean checkGenerated){
 		if(checkGenerated) {
+			_currentTurn.incrementId();
 			waitForVisualizeNewHandLetters();
 		}
 		else {
 			var scores = getScores();
 			if(insertScore(scores.getKey(), scores.getValue()))
 			{
+				_currentTurn.incrementId();
 				var handLetters = generateHandLetters();
 				updatePaneWithNewLetters();
 				visualizeHand(handLetters);
@@ -670,7 +673,7 @@ public class BoardController implements Initializable {
 		var bonus = 5;
 		
 		var gameId = _currentGame.getGameId();
-		var turnId = _currentTurn.getTurnId()-1;
+		var turnId = _currentTurn.getTurnId();
 		
 		var ownPlayerNum = checkPlayerIfPlayer1() ? 1 : 2;
 		
@@ -778,7 +781,7 @@ public class BoardController implements Initializable {
 		try
 		{
 			var gameId = _currentGame.getGameId();
-			var turnId = _currentTurn.getTurnId()-1;
+			var turnId = _currentTurn.getTurnId();
 			
 			var ownPlayerNum = checkPlayerIfPlayer1() ? 1 : 2;
 			
