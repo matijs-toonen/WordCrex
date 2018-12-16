@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
+import Model.Game;
 import Model.SetHistory;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -24,10 +25,14 @@ public class SetHistoryController implements Initializable {
 	
 	private DatabaseController<SetHistory> _db;
 	private ArrayList<SetHistory> _setHistoryItems;
-	private final int gameId = 502;
+	private Game _currentGame;
 	
 	@FXML
 	private VBox itemWrapper;
+	
+	public SetHistoryController(Game currentGame) {
+		_currentGame = currentGame;
+	}
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -62,10 +67,9 @@ public class SetHistoryController implements Initializable {
 	
 	private void updateHistory() {
 		try {
-			String selectStatement = SetHistory.getQuery(gameId);
+			String selectStatement = SetHistory.getQuery(_currentGame.getGameId());
 			_setHistoryItems = (ArrayList<SetHistory>) _db.SelectAll(selectStatement, SetHistory.class);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
