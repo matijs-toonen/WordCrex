@@ -161,7 +161,8 @@ public class BoardController implements Initializable {
 	public void initialize(URL location, ResourceBundle resources) {
 		lblPlayer1.setText(MainController.getUser().getUsername());
 		lblPlayer1.setStyle("-fx-font-size: 28");
-		lblPlayer2.setText(_currentGame.getOpponent());
+        var opponent = getOpponent();
+        lblPlayer2.setText(opponent);
 		lblPlayer2.setStyle("-fx-font-size: 28");
 		lblScore1.setText("1");
 		lblScore1.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 25 0 0 25");
@@ -175,6 +176,12 @@ public class BoardController implements Initializable {
 		dragOnHand();
 	}
 	
+    private String getOpponent() {
+        if(_currentGame.getOpponent() == null)
+            return checkPlayerIfPlayer1() ? _currentGame.getUser2() : _currentGame.getUser1();
+        
+        return _currentGame.getOpponent();
+    }
 	
 	/**
 	 * disable the board and show waiting animation
