@@ -126,9 +126,7 @@ public class BoardController implements Initializable {
 
 		createField(false);
 		createHand(false);
-		dragOnHand();
-		
-		
+		dragOnHand();	
 	}
 	
 	private void scoreRefreshThread() {
@@ -199,8 +197,7 @@ public class BoardController implements Initializable {
 	
 	public void clickSkipTurn() {
 		System.out.println("User clicked skip turn");
-		boolean isFirstPlayer = _currentGame.getUser1().equals(MainController.getUser().getUsername());
-		String insertQuery = Game.getPassQuery(_currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername(), isFirstPlayer);
+		String insertQuery = Game.getPassQuery(_currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername(), checkPlayer());
 		
 		var _db = new DatabaseController<Game>();
 		
@@ -210,7 +207,7 @@ public class BoardController implements Initializable {
 			e.printStackTrace();
 		}
 		
-		// TODO: mathijs renew hand code
+		renewHand();
 	}
 	
 	public void reset() {
@@ -218,20 +215,7 @@ public class BoardController implements Initializable {
 		reset.setVisible(false);
 	}
 	
-	public void acceptWord() {
-		System.out.println("hier");
-		//TODO insert word in db
-		
-		var table = checkPlayer() ? "turnplayer1" : "turnplayer2";
-		
-		var insertQuery = TurnPlayer.insertPlayer(table, _currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername(), 0, 0, "play");
-		try {
-			_db.Insert(insertQuery);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+	public void renewHand() {
 		createHand(true);
 	}
 	
