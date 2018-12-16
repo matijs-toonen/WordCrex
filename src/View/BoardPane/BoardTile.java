@@ -30,12 +30,12 @@ public class BoardTile extends Pane {
 	
 	private void init(Symbol symbol) {
 		_symbol = symbol;
-		lblValue.setLayoutX(20);
-		lblValue.setTextFill(Color.GREEN);
+		lblValue.setLayoutX(25);
+		lblValue.getStyleClass().add("tileValue");
 
 		lblSymbol.setLayoutX(12);
 		lblSymbol.setLayoutY(8);
-		lblSymbol.setTextFill(Color.BLUE);
+		lblSymbol.getStyleClass().add("tileSymbol");
 		
 		if(_symbol == null) {
 			lblSymbol.setText("#");

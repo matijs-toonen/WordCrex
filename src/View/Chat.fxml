@@ -17,7 +17,7 @@
          <items>
             <AnchorPane maxHeight="-Infinity" prefHeight="50.0" prefWidth="350.0" style="-fx-border-width: 0 0 1 0; -fx-background-color: white; -fx-border-color: #E8E9EC;">
                <children>
-                  <Text layoutX="141.0" layoutY="29.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username" />
+                  <Text layoutX="141.0" layoutY="29.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Chatten" />
                </children>
             </AnchorPane>
             <AnchorPane prefHeight="175.0" prefWidth="350.0" style="-fx-background-color: white;">

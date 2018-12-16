@@ -32,7 +32,6 @@ public class ChatController implements Initializable {
 	private Game _currentGame;
 	private String _username = MainController.getUser().getUsername();
 	
-	
 	/*
 	 * FIELDS
 	 */
@@ -44,6 +43,7 @@ public class ChatController implements Initializable {
 	
 	@FXML
 	private TextField chatInput;
+	
 	
 	public ChatController(Game currentGame) {
 		_currentGame = currentGame;

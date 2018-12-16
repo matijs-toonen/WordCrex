@@ -36,12 +36,12 @@ public class BoardTilePane extends Pane {
 	}
 	
 	private void init() {
-		lblValue.setLayoutX(20);
-		lblValue.setTextFill(Color.GREEN);
+		lblValue.setLayoutX(25);
+		lblValue.getStyleClass().add("tileValue");
 
-		lblSymbol.setLayoutX(12);
+		lblSymbol.setLayoutX(15);
 		lblSymbol.setLayoutY(8);
-		lblSymbol.setTextFill(Color.BLUE);
+		lblSymbol.getStyleClass().add("tileSymbol");
 
 		getChildren().removeAll(lblValue, lblSymbol);
 		getChildren().addAll(lblValue, lblSymbol);

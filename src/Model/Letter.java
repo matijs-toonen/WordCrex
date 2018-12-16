@@ -43,4 +43,9 @@ public class Letter {
 	public int getLetterId() {
 		return _letterId;
 	}
+	
+	
+	public static final String getLetterQuery(int gameId, int turnId, int letterId) {		
+		return "INSERT INTO handletter VALUES (" + gameId + ", " + turnId + ", " + letterId + ")"; 
+	}
 }

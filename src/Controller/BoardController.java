@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.ResourceBundle;
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -25,10 +24,12 @@ import java.util.stream.Collectors;
 import Model.Game;
 import Model.HandLetter;
 import Model.Letter;
+import Model.Score;
 import Model.Symbol;
 import Model.Tile;
 import Model.Turn;
 import Model.TurnBoardLetter;
+import Model.TurnPlayer;
 import Model.Word;
 import Model.WordData;
 import Model.Board.Board;
@@ -36,12 +37,12 @@ import Model.Board.PositionStatus;
 import Tests.BoardTileTest;
 import View.BoardPane.BoardTile;
 import View.BoardPane.BoardTilePane;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
@@ -50,7 +51,6 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -71,6 +71,7 @@ public class BoardController implements Initializable {
 	private Board _board;
     private ArrayList<BoardTile> _currentHand;
     private HashMap<Point, BoardTile> _fieldHand;
+    private Score _currentScore;
 
 	private boolean _chatVisible;
 	private boolean _historyVisible;
@@ -118,18 +119,58 @@ public class BoardController implements Initializable {
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		lblPlayer1.setText("BaderAli99");
+		lblPlayer1.setText(MainController.getUser().getUsername());
 		lblPlayer1.setStyle("-fx-font-size: 28");
-		lblPlayer2.setText("SchurkTurk");
+		lblPlayer2.setText(_currentGame.getOpponent());
 		lblPlayer2.setStyle("-fx-font-size: 28");
 		lblScore1.setText("1");
 		lblScore1.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 25 0 0 25");
 		lblScore2.setText("9");
 		lblScore2.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 0 25 25 0");
+		
+		scoreRefreshThread();
 
 		createField(false);
 		createHand(false);
-		dragOnHand();
+		dragOnHand();	
+	}
+	
+	private void scoreRefreshThread() {
+		
+		Thread chatThread = new Thread(){
+		    public void run(){
+		    	
+		    	while(true) {
+		    		refreshScore();
+	    			
+	    			try {
+						Thread.sleep(2000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+	    		}
+		    }
+		};
+		
+		chatThread.setDaemon(true);
+		chatThread.start();
+	}
+	
+	private void refreshScore() {
+		var _dbScore = new DatabaseController<Score>();
+		String scoreQuery = Score.getScoreFromGameQuery(_currentGame.getGameId());
+		
+		try {
+			_currentScore = (Score) _db.SelectFirst(scoreQuery, Score.class);
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		
+		Platform.runLater(() -> {
+			lblScore1.setText(Integer.toString(_currentScore.getOwnScore()));
+			lblScore2.setText(Integer.toString(_currentScore.getOpponentScore()));
+	    });
+		
 	}
 
 	public void initializeTest()
@@ -270,17 +311,46 @@ public class BoardController implements Initializable {
 			return false;
 	}
 	
+	public void clickSkipTurn() {
+		System.out.println("User clicked skip turn");
+		String insertQuery = Game.getPassQuery(_currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername(), checkPlayer());
+		
+		var _db = new DatabaseController<Game>();
+		
+		try {
+			_db.Insert(insertQuery);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		renewHand();
+	}
+	
 	public void reset() {
 		resetFieldHand();
 		reset.setVisible(false);
 	}
 	
-	public void acceptWord() {
-		System.out.println("hier");
-		//TODO insert word in db
-		
-		addTurn();
+	public void renewHand() {
 		createHand(true);
+	}
+	private boolean needsToWaitForHandLetters() {
+		var table = checkPlayer() ? "turnplayer2" : "turnplayer1";
+		var query = TurnPlayer.hasPlacedTurn(table, _currentTurn.getTurnId(), _currentGame.getGameId());
+		System.out.println(query);
+		try {
+			var shoud = _db.SelectCount(query) == 0;
+			System.out.println(shoud + " table " + table + " turn " + _currentTurn.getTurnId());
+			return shoud;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	private boolean checkPlayer() {
+		return MainController.getUser().getUsername().equals(_currentGame.getUser1());
 	}
 	
 	public void openHistory() throws IOException{
@@ -457,10 +527,24 @@ public class BoardController implements Initializable {
 		return  allTiles.size() == 1 ? allTiles.get(0) : null;
 	}
 	
+	
 	private void createHand(boolean checkGenerated) {
 		_currentHand.clear();
 		_db = new DatabaseController<HandLetter>();
-		var handLetters = getHandLetters(checkGenerated);
+		var handLetters = new ArrayList<HandLetter>();
+		
+		if(checkGenerated) {
+			var check = needsToWaitForHandLetters();
+			_currentTurn.incrementId();
+			getGeneratedLetters(check);
+			return;
+		}
+		
+		handLetters = getHandLetters();
+		visualizeHand(handLetters);
+	}
+	
+	private void visualizeHand(ArrayList<HandLetter> handLetters) {
 		int x = 0;
 		int y = 13;
 
@@ -470,48 +554,73 @@ public class BoardController implements Initializable {
 				boardTile.setDraggableEvents();
 				boardTile.setLayoutX(x);
 				boardTile.setLayoutY(y);
-				boardTile.setStyle("-fx-background-color: pink; -fx-background-radius: 6");
+				boardTile.setStyle("-fx-background-color: #3B86FF; -fx-background-radius: 6");
 				y += 44.5;
 				boardTile.setMinWidth(39);
 				boardTile.setMinHeight(39);
+				
 				paneHand.getChildren().add(boardTile);
 				_currentHand.add(boardTile);
 			}
 		};
-		placeHand(false);
+		
+		placeHand(false);		
 	}
 	
-	private ArrayList<HandLetter> getHandLetters(boolean checkGenerated) {
+	private void getGeneratedLetters(boolean checkGenerated){
 		if(checkGenerated) {
-			return checkNewHandLetter();
+			waitForVisualizeNewHandLetters();
 		}
+		else {
+			var handLetters = generateHandLetters();
+			visualizeHand(handLetters);
+		}
+	}
+	
+	private ArrayList<HandLetter> getHandLetters() {
 		var handLetters = getExistingHandLetters();
 		return handLetters.size() == 0 ? generateHandLetters() : handLetters; 
 	}
 	
-	private ArrayList<HandLetter> checkNewHandLetter(){
-		return new Callable<ArrayList<HandLetter>>() {
-			@Override
-			public ArrayList<HandLetter> call() {
+	private int getAmountLetters(ArrayList<HandLetter> handLetters) {
+		if(handLetters.isEmpty())
+			return 0;
+		return handLetters.get(0).getLetters().size();
+	}
+	
+	private void waitForVisualizeNewHandLetters(){	
+		var thread = new Thread() {
+			public void run() {
 				var handLetters = getExistingHandLetters();
-				while(handLetters.size() == 0) {
+				int tries = 0;
+				while(getAmountLetters(handLetters) == 0 || getAmountLetters(handLetters) != 7 || tries < 4) {
 	    			try {
 						Thread.sleep(1000);
 						handLetters = getExistingHandLetters();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
+						
+						tries++;
+						if (getAmountLetters(handLetters) == 0)
+							tries = 0;
+					
+					} catch (Exception e) {
+						System.out.println(e.getMessage());
 					}
 				}
-				return handLetters;
+				final var finalHandLetters = handLetters;
+				Platform.runLater(() -> {
+	            	visualizeHand(finalHandLetters);
+		        });
 			}
-		}.call();
+		};
+		
+		thread.setDaemon(true);
+		thread.start();
 	}
 	
 	private ArrayList<HandLetter> getExistingHandLetters() {
 		_db = new DatabaseController<HandLetter>();
 		
 		var statement = Game.getExisitingHandLetters(_currentGame.getGameId(), _currentTurn.getTurnId());
-		
 		ArrayList<HandLetter> handLetters = new ArrayList<HandLetter>();
 		
 		try {
@@ -551,29 +660,15 @@ public class BoardController implements Initializable {
 		_fieldHand.clear();
 	}
 	
-	private void addTurn() {
-		_currentTurn.incrementId();
+	private void addTurn() {		
 		var turnStatement = Turn.getInsertNewTurn(_currentGame.getGameId(), _currentTurn.getTurnId());
 		
 		try {
-			var turn = _db.InsertWithReturnKeys(turnStatement, getNewTurn());
+			_db.Insert(turnStatement);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-	
-	private Function<ResultSet, Turn> getNewTurn() {
-		return (resultSet -> {
-			Turn turn = null;
-			try {
-				turn = new Turn(resultSet, DatabaseController.getColumns(resultSet.getMetaData()));
-			} catch (SQLException e) {
-
-			}
-//			_currentTurn = turn;
-			return turn;
-		});
 	}
 	
 	private void placeHand(boolean shuffle) {
