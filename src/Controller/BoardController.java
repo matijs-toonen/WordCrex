@@ -625,6 +625,8 @@ public class BoardController implements Initializable {
 	}
 	
 	private void visualizeHand(ArrayList<HandLetter> handLetters) {
+		paneHand.getChildren().clear();
+		_currentHand.clear();
 		int x = 0;
 		int y = 13;
 
