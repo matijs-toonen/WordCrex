@@ -848,6 +848,7 @@ public class BoardController implements Initializable {
 	}
 	
 	private void updatePaneWithNewLetters() {
+		System.out.println("hier");
 		var exisitingTurns = getTurns();
 		resetFieldHand();
 		
@@ -857,14 +858,15 @@ public class BoardController implements Initializable {
 			var boardTile = createBoardTile(cords, turn.getValue());
 			boardTilePane.setBoardTile(boardTile);
 		});
-		
-		resetBoard();
 	}
 	
 	private void resetBoard() {
 		_fieldHand.entrySet().forEach(tile -> {
+			var cords = tile.getKey();
 			var boardTilePane = _boardTiles.get(tile.getKey());
 			boardTilePane.removeBoardTile();
+			System.out.println("hier");
+			_board.updateStatus(cords, PositionStatus.Open);
 		});
 	}
 	
@@ -902,6 +904,7 @@ public class BoardController implements Initializable {
 	
 	private void resetFieldHand() {
 		_fieldHand.entrySet().forEach(handLetter -> {
+			System.out.println("heir");
 			var cords = handLetter.getKey();
 			
 			var tilePane = _boardTiles.get(cords);
