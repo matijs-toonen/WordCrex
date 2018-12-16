@@ -20,6 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import Model.BoardPlayer;
 import Model.Game;
 import Model.HandLetter;
 import Model.Letter;
@@ -634,15 +635,148 @@ public class BoardController implements Initializable {
 		placeHand(false);		
 	}
 	
-	// TODO HERE
 	private void getGeneratedLetters(boolean checkGenerated){
 		if(checkGenerated) {
 			waitForVisualizeNewHandLetters();
 		}
 		else {
-			var handLetters = generateHandLetters();
-			visualizeHand(handLetters);
+			var scores = getScores();
+			if(insertScore(scores.getKey(), scores.getValue()))
+			{
+				var handLetters = generateHandLetters();
+				visualizeHand(handLetters);
+			}
 		}
+	}
+	
+	private boolean insertScore(int ownScore, int oppScore)
+	{
+		var ownInsert = false;
+		var oppInsert = false;
+		
+		var bonus = 5;
+		
+		var gameId = _currentGame.getGameId();
+		var turnId = _currentTurn.getTurnId();
+		
+		var ownPlayerNum = checkPlayerIfPlayer1() ? 1 : 2;
+		
+		var oppPlayerNum = ownPlayerNum == 1 ? 2 : 1;
+		
+		try
+		{			
+			if(ownScore == oppScore)
+			{				
+				var statement = String.format("UPDATE turnplayer%s"
+						+ "SET bonus = %s"
+						+ "WHERE game_id = %s"
+						+ "AND turn_id = %s"
+						+ "AND score = %s",oppPlayerNum, bonus, gameId, turnId, oppScore);
+								
+				if(_db.Update(statement))
+					oppScore += bonus;
+			}
+
+			if(ownScore > oppScore)
+			{
+				var selectStatement = String.format("SELECT letter_id, game_id, turn_id, tile_x, tile_y "
+						+ "FROM boardplayer%s "
+						+ "WHERE game_id = %s "
+						+ "AND turn_id = %s", ownPlayerNum, gameId, turnId);
+				
+				ArrayList<BoardPlayer> playerBoard = (ArrayList<BoardPlayer>) 
+						_db.SelectAll(selectStatement, BoardPlayer.class);
+				
+				ArrayList<String> insertStatements = new ArrayList<String>();
+				
+				for(var boardPlayer : playerBoard)
+				{
+					var insertStatement = String.format("INSERT INTO turnboardletter "
+							+ "(letter_id, game_id, turn_id, tile_x, tile_y)"
+							+ "VALUES"
+							+ "(%s, %s, %s, %s, %s)"
+							, boardPlayer.getLetterId(), boardPlayer.getGameId(), boardPlayer.getTurnId(),
+							boardPlayer.getLetterX(), boardPlayer.getLetterY());
+					
+					insertStatements.add(insertStatement);
+				}
+				
+				String[] statementBoardPlayerArr = new String[insertStatements.size()];
+				statementBoardPlayerArr = insertStatements.toArray(statementBoardPlayerArr);
+				
+
+				
+				oppInsert = true;
+				ownInsert = _db.InsertBatch(statementBoardPlayerArr);
+				
+			}
+			else
+			{
+				var selectStatement = String.format("SELECT letter_id, game_id, turn_id, tile_x, tile_y "
+						+ "FROM boardplayer%s "
+						+ "WHERE game_id = %s "
+						+ "AND turn_id = %s", oppPlayerNum, gameId, turnId);
+				
+				ArrayList<BoardPlayer> playerBoard = (ArrayList<BoardPlayer>) 
+						_db.SelectAll(selectStatement, BoardPlayer.class);
+				
+				ArrayList<String> insertStatements = new ArrayList<String>();
+				
+				for(var boardPlayer : playerBoard)
+				{
+					var insertStatement = String.format("INSERT INTO turnboardletter "
+							+ "(letter_id, game_id, turn_id, tile_x, tile_y)"
+							+ "VALUES"
+							+ "(%s, %s, %s, %s, %s)"
+							, boardPlayer.getLetterId(), boardPlayer.getGameId(), boardPlayer.getTurnId(),
+							boardPlayer.getLetterX(), boardPlayer.getLetterY());
+					
+					insertStatements.add(insertStatement);
+				}
+				
+				String[] statementBoardPlayerArr = new String[insertStatements.size()];
+				statementBoardPlayerArr = insertStatements.toArray(statementBoardPlayerArr);
+				
+				oppInsert = _db.InsertBatch(statementBoardPlayerArr);
+				ownInsert = true;
+			}
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return ownInsert == oppInsert;
+	}
+		
+	private Pair<Integer, Integer> getScores()
+	{
+		Pair<Integer, Integer> ownOppScore = null;
+		try
+		{
+			var gameId = _currentGame.getGameId();
+			var turnId = _currentTurn.getTurnId();
+			
+			var ownPlayerNum = checkPlayerIfPlayer1() ? 1 : 2;
+			
+			var opponentPlayerNum = ownPlayerNum == 1 ? 2 : 1;
+			
+			var ownScore = _db.SelectCount(String.format("SELECT score FROM turnplayer%1$s "
+					+ "WHERE game_id = %2$s "
+					+ "AND turn_id = %3$s", ownPlayerNum, gameId, turnId));
+			
+			var opponentScore = _db.SelectCount(String.format("SELECT score FROM turnplayer%1$s "
+					+ "WHERE game_id = %2$s "
+					+ "AND turn_id = %3$s",opponentPlayerNum, gameId, turnId)); 
+			
+			ownOppScore = new Pair<>(ownScore, opponentScore);
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return ownOppScore;
 	}
 	
 	private ArrayList<HandLetter> getHandLetters() {
@@ -656,11 +790,9 @@ public class BoardController implements Initializable {
 		return handLetters.get(0).getLetters().size();
 	}
 	
-	// TODO HERE
 	private void waitForVisualizeNewHandLetters(){	
 		
 		disableBoard();
-		
 		
 		var thread = new Thread() {
 			public void run() {
