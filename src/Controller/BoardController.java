@@ -1,6 +1,5 @@
 package Controller;
 
-import java.awt.List;
 import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
@@ -11,10 +10,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
@@ -98,22 +95,19 @@ public class BoardController implements Initializable {
 	private AnchorPane screenPane;
 	
 	
-	public BoardController(Game game, Turn turn) {
+	public BoardController(Game game, Turn turn, AnchorPane rootPane) {
 		_currentGame = game;
 		_currentTurn = turn;
+		_rootPane = rootPane;
 		_board = new Board();
 		_boardTiles = new HashMap<Point, BoardTilePane>();
         _currentHand = new ArrayList<BoardTile>();
         _fieldHand = new HashMap<Point, BoardTile>();
         getLetters();
 	}
-	
-	public BoardController(AnchorPane rootPane) {
-		_rootPane = rootPane;
-	}
-	
-	public BoardController(Game game) {
-		this(game, new Turn(1));
+
+	public BoardController(Game game, AnchorPane rootPane) {
+		this(game, new Turn(1), rootPane);
 	}
 
 	private void getLetters() {
@@ -339,40 +333,40 @@ public class BoardController implements Initializable {
 	
 	public void resignGame()
 	{		
-		try 
-		{
-			var table = checkPlayer() ? "turnplayer1" : "turnplayer2";
-			var getStatement = TurnPlayer.getExistingTurn(table, _currentGame.getGameId());
-			var type = "resign";
-			if(_db.SelectCount(getStatement) == 0) {
-				var insertStatement = TurnPlayer.getTurnPlayerInsertQuery(checkPlayer(), type, _currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername());
-				_db.Insert(insertStatement);
-			}else {
-				var updateStatement = TurnPlayer.getTurnPlayerUpdateQuery(checkPlayer(), type, _currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername());
-				_db.Update(updateStatement);
-			}
-			
-			_db.Update("UPDATE game " + 
-					"SET " + 
-					"game.game_state = 'resigned' " + 
-					"WHERE " + 
-					"game.game_id = (SELECT " + 
-					"g.game_id " + 
-					"FROM " + 
-					"game AS g " + 
-					"JOIN " + 
-					"turnplayer1 AS p1 ON p1.game_id = g.game_id " + 
-					"JOIN " + 
-					"turnplayer2 AS p2 ON p2.game_id = g.game_id " + 
-					"WHERE " + 
-					"p1.turnaction_type = 'resign' " + 
-					"OR p2.turnaction_type = 'resign' " + 
-					"AND g.game_id = " + _currentGame.getGameId() + "); ");
-			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try 
+//		{
+//			var table = checkPlayer() ? "turnplayer1" : "turnplayer2";
+//			var getStatement = TurnPlayer.getExistingTurn(table, _currentGame.getGameId());
+//			var type = "resign";
+//			if(_db.SelectCount(getStatement) == 0) {
+//				var insertStatement = TurnPlayer.getTurnPlayerInsertQuery(checkPlayer(), type, _currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername());
+//				_db.Insert(insertStatement);
+//			}else {
+//				var updateStatement = TurnPlayer.getTurnPlayerUpdateQuery(checkPlayer(), type, _currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername());
+//				_db.Update(updateStatement);
+//			}
+//			
+//			_db.Update("UPDATE game " + 
+//					"SET " + 
+//					"game.game_state = 'resigned' " + 
+//					"WHERE " + 
+//					"game.game_id = (SELECT " + 
+//					"g.game_id " + 
+//					"FROM " + 
+//					"game AS g " + 
+//					"JOIN " + 
+//					"turnplayer1 AS p1 ON p1.game_id = g.game_id " + 
+//					"JOIN " + 
+//					"turnplayer2 AS p2 ON p2.game_id = g.game_id " + 
+//					"WHERE " + 
+//					"p1.turnaction_type = 'resign' " + 
+//					"OR p2.turnaction_type = 'resign' " + 
+//					"AND g.game_id = " + _currentGame.getGameId() + "); ");
+//			
+//		} catch (SQLException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 				
 		AnchorPane pane = null;
 		try {
