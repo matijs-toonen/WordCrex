@@ -578,7 +578,7 @@ public class BoardController implements Initializable {
 		var boardTile = new BoardTile(turn.getSymbol(), turn.getLetterId());
 		boardTile.setMinWidth(39);
 		boardTile.setMinHeight(39);
-		boardTile.setStyle("-fx-background-color: pink; -fx-background-radius: 6");
+		boardTile.setStyle("-fx-background-color: #43425D; -fx-background-radius: 6");
 		_board.updateStatus(cords, PositionStatus.Taken);
 		return boardTile;
 	}
@@ -590,7 +590,9 @@ public class BoardController implements Initializable {
 		String tileQuery = Game.getExistingTiles(_currentGame.getGameId(), _currentTurn.getTurnId());
 		try {
 			((ArrayList<TurnBoardLetter>)_db.SelectAll(tileQuery, TurnBoardLetter.class)).forEach(turn -> {
-				turns.put(turn.getTileCords(), turn);	
+				var cords = turn.getTileCords();
+				var point = new Point((int) cords.getX() - 1, (int) cords.getY() - 1);
+				turns.put(point, turn);	
 			});
 		}
 		catch(SQLException e) {
