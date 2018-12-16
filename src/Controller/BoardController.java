@@ -615,17 +615,13 @@ public class BoardController implements Initializable {
 	private void createHand(boolean checkGenerated) {
 		_currentHand.clear();
 		_db = new DatabaseController<HandLetter>();
-		var handLetters = new ArrayList<HandLetter>();
 		
+		var check = needsToWaitForHandLetters();
 		if(checkGenerated) {
-			var check = needsToWaitForHandLetters();
 			_currentTurn.incrementId();
-			getGeneratedLetters(check);
-			return;
 		}
-		
-		handLetters = getHandLetters();
-		visualizeHand(handLetters);
+		getGeneratedLetters(check);
+		return;
 	}
 	
 	private void visualizeHand(ArrayList<HandLetter> handLetters) {
