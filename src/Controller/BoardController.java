@@ -584,7 +584,7 @@ public class BoardController implements Initializable {
 		var boardTile = new BoardTile(turn.getSymbol(), turn.getLetterId());
 		boardTile.setMinWidth(39);
 		boardTile.setMinHeight(39);
-		boardTile.setStyle("-fx-background-color: pink; -fx-background-radius: 6");
+		boardTile.setStyle("-fx-background-color: #43425D; -fx-background-radius: 6");
 		_board.updateStatus(cords, PositionStatus.Taken);
 		return boardTile;
 	}
@@ -596,7 +596,9 @@ public class BoardController implements Initializable {
 		String tileQuery = Game.getExistingTiles(_currentGame.getGameId(), _currentTurn.getTurnId());
 		try {
 			((ArrayList<TurnBoardLetter>)_db.SelectAll(tileQuery, TurnBoardLetter.class)).forEach(turn -> {
-				turns.put(turn.getTileCords(), turn);	
+				var cords = turn.getTileCords();
+				var point = new Point((int) cords.getX() - 1, (int) cords.getY() - 1);
+				turns.put(point, turn);	
 			});
 		}
 		catch(SQLException e) {
@@ -657,6 +659,7 @@ public class BoardController implements Initializable {
 			if(insertScore(scores.getKey(), scores.getValue()))
 			{
 				var handLetters = generateHandLetters();
+				updatePaneWithNewLetters();
 				visualizeHand(handLetters);
 			}
 		}
@@ -680,12 +683,12 @@ public class BoardController implements Initializable {
 		{			
 			if(ownScore == oppScore)
 			{				
-				var statement = String.format("UPDATE turnplayer%s"
+				var statement = String.format("UPDATE turnplayer%s "
 						+ "SET bonus = %s "
 						+ "WHERE game_id = %s "
 						+ "AND turn_id = %s "
 						+ "AND score = %s ",oppPlayerNum, bonus, gameId, turnId, oppScore);
-								
+
 				if(_db.Update(statement))
 					oppScore += bonus;
 			}
@@ -855,6 +858,7 @@ public class BoardController implements Initializable {
 			var boardTile = createBoardTile(cords, turn.getValue());
 			boardTilePane.setBoardTile(boardTile);
 		});
+		placeHand(false);
 	}
 	
 	private ArrayList<HandLetter> getExistingHandLetters() {
