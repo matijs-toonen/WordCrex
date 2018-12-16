@@ -83,7 +83,7 @@ public class BoardController implements Initializable {
 	private Button btnTest, btnShuffle;
 	
 	@FXML
-	private Pane panePlayField, paneHand;
+	private Pane panePlayField, paneHand, boardPane, waitingPane;
 	
 	@FXML
 	private AnchorPane rightBarAnchor;
@@ -103,6 +103,8 @@ public class BoardController implements Initializable {
         _fieldHand = new HashMap<Point, BoardTile>();
         getLetters();
 	}
+	
+
 	
 	public BoardController(AnchorPane rootPane) {
 		_rootPane = rootPane;
@@ -139,7 +141,25 @@ public class BoardController implements Initializable {
 
 		createField(false);
 		createHand(false);
-		dragOnHand();	
+		dragOnHand();
+	}
+	
+	/**
+	 * disable the board and show waiting animation
+	 */
+	private void disableBoard() {
+		boardPane.setDisable(true);
+		waitingPane.setVisible(true);
+		boardPane.setStyle("-fx-opacity: 0.3");
+	}
+	
+	/**
+	 * disable the board and show waiting animation
+	 */
+	private void enableBoard() {
+		boardPane.setDisable(false);
+		waitingPane.setVisible(false);
+		boardPane.setStyle("-fx-opacity: 1");
 	}
 	
 	private void scoreRefreshThread() {
