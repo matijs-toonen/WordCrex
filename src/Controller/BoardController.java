@@ -690,7 +690,7 @@ public class BoardController implements Initializable {
 					oppScore += bonus;
 			}
 
-			else if(ownScore > oppScore)
+			if(ownScore > oppScore)
 			{
 				var selectStatement = String.format("SELECT letter_id, game_id, turn_id, tile_x, tile_y "
 						+ "FROM boardplayer%s "
