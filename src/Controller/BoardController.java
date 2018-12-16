@@ -855,6 +855,7 @@ public class BoardController implements Initializable {
 			var boardTile = createBoardTile(cords, turn.getValue());
 			boardTilePane.setBoardTile(boardTile);
 		});
+		placeHand(false);
 	}
 	
 	private ArrayList<HandLetter> getExistingHandLetters() {
