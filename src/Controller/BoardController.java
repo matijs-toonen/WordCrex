@@ -159,7 +159,7 @@ public class BoardController implements Initializable {
 	private void enableBoard() {
 		boardPane.setDisable(false);
 		waitingPane.setVisible(false);
-		boardPane.setStyle("-fx-opacity: 1");
+		boardPane.setStyle("-fx-opacity: 1.0");
 	}
 	
 	private void scoreRefreshThread() {
