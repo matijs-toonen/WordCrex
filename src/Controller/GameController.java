@@ -124,7 +124,7 @@ public class GameController implements Initializable{
 	private void loadBoard(Game game, Turn turn) {
 		AnchorPane pane = null;
 		try {
-			var con = new BoardController(game, turn);
+			var con = new BoardController(game, turn, _rootPane);
 			var panes = new FXMLLoader(getClass().getResource("/View/Board.fxml"));
 			panes.setController(con);
 			pane = panes.load();

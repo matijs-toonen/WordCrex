@@ -250,7 +250,7 @@ public class ChallengeController implements Initializable  {
 	private void loadBoard(int gameId) {
 		AnchorPane pane = null;
 		try {
-			var con = new BoardController(new Game(gameId));
+			var con = new BoardController(new Game(gameId), _rootPane);
 			var panes = new FXMLLoader(getClass().getResource("/View/Board.fxml"));
 			panes.setController(con);
 			pane = panes.load();

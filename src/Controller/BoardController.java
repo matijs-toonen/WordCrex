@@ -95,24 +95,19 @@ public class BoardController implements Initializable {
 	@FXML
 	private AnchorPane screenPane;	
 	
-	public BoardController(Game game, Turn turn) {
+	public BoardController(Game game, Turn turn, AnchorPane rootPane) {
 		_currentGame = game;
 		_currentTurn = turn;
+		_rootPane = rootPane;
 		_board = new Board();
 		_boardTiles = new HashMap<Point, BoardTilePane>();
         _currentHand = new ArrayList<BoardTile>();
         _fieldHand = new HashMap<Point, BoardTile>();
         getLettersAndValidate();
 	}
-	
 
-	
-	public BoardController(AnchorPane rootPane) {
-		_rootPane = rootPane;
-	}
-	
-	public BoardController(Game game) {
-		this(game, new Turn(1));
+	public BoardController(Game game, AnchorPane rootPane) {
+		this(game, new Turn(1), rootPane);
 	}
 
 	private void getLettersAndValidate() {
