@@ -242,7 +242,7 @@ public class BoardController implements Initializable {
 	
 	public void playTurn()
 	{
-		if(!hasNotPlacedFirstMid())
+		if(!isMiddleOpen())
 		{	
 			if(!_board.allChainedToMiddle())
 				showErrorMessage("Niet alle tiles zitten aan elkaar");
@@ -343,12 +343,9 @@ public class BoardController implements Initializable {
 		return uniqueWordsData;
 	}
 	
-	private boolean hasNotPlacedFirstMid()
+	private boolean isMiddleOpen()
 	{		
-		if(_currentTurn.getTurnId() == 1)
-			return _board.canPlace(_board.getMiddle());
-		else
-			return false;
+		return _board.canPlace(_board.getMiddle());
 	}
 	
 	public void clickSkipTurn() {
