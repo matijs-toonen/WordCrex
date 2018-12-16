@@ -467,6 +467,11 @@ public class BoardController implements Initializable {
 		}
 	}
 	
+	private void updateField()
+	{
+		
+	}
+	
 	private void createField(boolean test) 
 	{
 		var existingTurns = getTurns();
@@ -562,7 +567,7 @@ public class BoardController implements Initializable {
 			e.printStackTrace();
 		}
 	}
-	
+		
 	private HashMap<Point, TurnBoardLetter> getTurns() {
 		_db = new DatabaseController<TurnBoardLetter>();
 		var turns = new HashMap<Point, TurnBoardLetter>();
