@@ -26,9 +26,30 @@ public class Letter {
 			_letterId = columns.contains("letter_id") ? rs.getInt("letter_id") : null;
 			_game = columns.contains("game_id") ? new Game(rs.getInt("game_id")) : null;
 			_letterSet = columns.contains("symbol_letterset_code") ? new LetterSet(rs.getString("symbol_letterset_code")) : null;
-			_symbol = columns.contains("symbol") ? new Symbol(rs.getString("symbol").charAt(0)) : null;
+			_symbol = columns.contains("symbol") ? new Symbol(rs, columns) : null;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public Game getGame() {
+		return _game;
+	}
+	
+	public Symbol getSymbol() {
+		return _symbol;
+	}
+	
+	public int getLetterId() {
+		return _letterId;
+	}
+	
+	
+	public static final String getLetterQuery(int gameId, int turnId, int letterId) {		
+		return "INSERT INTO handletter VALUES (" + gameId + ", " + turnId + ", " + letterId + ")"; 
+	}
+	
+	public static final String getUnusedLetters(int gameId) {
+		return ("SELECT * FROM pot NATURAL JOIN letter NATURAL JOIN symbol WHERE game_id = " + gameId);
 	}
 }

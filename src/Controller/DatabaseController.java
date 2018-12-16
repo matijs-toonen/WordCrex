@@ -1,6 +1,7 @@
 package Controller;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -40,6 +41,20 @@ public class DatabaseController <T> {
 	{
 		state.close();
 		conn.close();
+	}
+	
+	public int SelectCount(String statement) throws SQLException {
+		Connection conn = OpenConnection();
+		Statement state = conn.createStatement();
+		ResultSet resultSet = state.executeQuery(statement);
+		
+		resultSet.first();
+		
+		int total = resultSet.getInt(1);
+		
+		resultSet.close();
+		CloseConnection(conn, state);
+		return total;
 	}
 
 	public T SelectLast(String statement, Class<T> type) throws SQLException {
@@ -120,7 +135,7 @@ public class DatabaseController <T> {
 	public static ArrayList<String> getColumns(ResultSetMetaData metaData) throws SQLException{
 		ArrayList<String> columns = new ArrayList<String>();
 		for(int i = 1; i <= metaData.getColumnCount(); i++) {
-			columns.add(metaData.getColumnName(i));
+			columns.add(metaData.getColumnLabel(i));
 		}
 		 
 		return columns;
@@ -130,11 +145,62 @@ public class DatabaseController <T> {
 	{
 		Connection conn = OpenConnection();
 		Statement state = conn.createStatement();
+		
 		int results = state.executeUpdate(statement);
 		
 		CloseConnection(conn, state);
 		
 		return results > 0;
+	}
+	
+	public boolean UpdateBatch (String... statements) throws SQLException
+	{
+		Connection conn = OpenConnection();
+		Statement state = conn.createStatement();
+		
+		for(var statement : statements) {
+			state.addBatch(statement);
+		}
+		
+		int[] results = state.executeBatch();
+		
+		CloseConnection(conn, state);
+		
+		return results.length > 0;
+	}
+	
+	public T UpdateWithReturnKeys(String statement, Function<ResultSet, T> action) throws SQLException {
+		Connection conn = OpenConnection();
+		PreparedStatement preparedState = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS);
+		
+		int results = preparedState.executeUpdate();
+		if(results == 0) 
+			return null;
+		
+		var generatedKeys = preparedState.getGeneratedKeys();
+		var returnValue = action.apply(generatedKeys);
+		
+		generatedKeys.close();
+		CloseConnection(conn, preparedState);
+		return returnValue;
+	}
+	
+	public T DeleteWithReturnKeys(String statement, Function<ResultSet, T> action) throws SQLException {
+		return UpdateWithReturnKeys(statement, action);
+	}
+	
+	public T InsertWithReturnKeys(String statement, Function<ResultSet, T> action) throws SQLException {
+		return UpdateWithReturnKeys(statement, action);
+	}
+	
+	public boolean DeleteBatch (String... statements) throws SQLException
+	{
+		return UpdateBatch(statements);
+	}
+	
+	public boolean InsertBatch (String... statements) throws SQLException
+	{
+		return UpdateBatch(statements);
 	}
 	
 	public boolean Delete (String statement) throws SQLException

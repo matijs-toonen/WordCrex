@@ -26,4 +26,16 @@ public class Turn {
 			e.printStackTrace();
 		}
 	}
+	
+	public int getTurnId() {
+		return _turnId;
+	}
+	
+	public void incrementId() {
+		_turnId++;
+	}
+	
+	public static final String getInsertNewTurn(int gameId, int turnId) {
+		return("INSERT INTO turn VALUES(" + gameId + ", " + turnId + ")");
+	}
 }

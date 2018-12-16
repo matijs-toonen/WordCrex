@@ -285,3 +285,8 @@ WHERE
 
 
 select * from hand;
+
+
+-- unused letters
+
+SELECT * FROM letter where game_id = 503 and letter_id NOT IN (SELECT letter_id FROM handletter where game_id = 503); 

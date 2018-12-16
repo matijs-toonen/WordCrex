@@ -1,8 +1,8 @@
 package Model;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class HandLetter {
 	
@@ -11,25 +11,45 @@ public class HandLetter {
 	 */
 	private Game _game;
 	private Turn _turn;
-	private Letter _letter;
-	
-	
+	private ArrayList<Letter> _letters = new ArrayList<Letter>();
+
 	/*
 	 * Const
 	 */
-	public HandLetter(Game game, Turn turn, Letter letter) {
+	public HandLetter(Game game, Turn turn, Letter... letters) {
 		_game = game;
 		_turn = turn;
-		_letter = letter;
+		addLetters(letters);
 	}
 	
 	public HandLetter(ResultSet rs, ArrayList<String> columns) {
-		try {
-			_game = columns.contains("game_id") ? new Game(rs.getInt("game_id")) : null;
-			_turn = columns.contains("turn_id") ? new Turn(rs.getInt("turn_id")) : null;
-			_letter = columns.contains("letter_id") ? new Letter(rs.getInt("letter_id")) : null;
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		_game = columns.contains("game_id") ? new Game(rs, columns) : null;
+		_turn = columns.contains("turn_id") ? new Turn(rs, columns) : null;
+		_letters.add(columns.contains("letter_id") ? new Letter(rs, columns) : null);
+	}
+	
+	public int getGameId() {
+		return _game.getGameId();
+	}
+	
+	public int getTurnId() {
+		return _turn.getTurnId();
+	}
+	
+	public ArrayList<Letter> getLetters() {
+		return _letters;
+	}
+	
+	public void addLetters(Letter... letters) {
+		for(var letter : letters) 
+			_letters.add(letter);
+	}
+	
+	public static Optional<HandLetter> getHandByGameAndTurn(ArrayList<HandLetter> handLetters, int gameId, int turnId){
+		return handLetters.stream().filter(handLetter -> handLetter.getGameId() == gameId && handLetter.getTurnId() == turnId).findFirst();
+	}
+	
+	public final static String insertLetter(int gameId, int turnId, int letterId) {
+		return ("INSERT INTO handletter VALUES (" + gameId + ", " + turnId + ", " + letterId + ")");
 	}
 }

@@ -62,7 +62,7 @@ public class MainController implements Initializable {
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		loadPane("Games");
+		loadPaneWithParam("Games", GameController.class);
 		
 		menuWrapper.getChildren().clear();
 		
@@ -91,13 +91,13 @@ public class MainController implements Initializable {
 	@FXML
 	private void loadGames(MouseEvent event)
 	{
-		loadPane("Games");
+		loadPaneWithParam("Games", GameController.class);
 	}
 	
 	@FXML
 	private void loadChallenge(MouseEvent event)
 	{
-		loadPane("Challenge");
+		loadPaneWithParam("Challenge", ChallengeController.class);
 	}
 	
 	@FXML
@@ -146,8 +146,32 @@ public class MainController implements Initializable {
 		}
 	}
 
-	private void loadPane(String paneName) {
+	private <T> void loadPaneWithParam(String paneName, Class<T> controller) {
+		
 		//Parent root = null;
+		AnchorPane pane = null;
+		try {
+			T con = null;
+			
+			if(controller.equals(ChallengeController.class)) 
+				con = (T) new ChallengeController(screenPane);
+			
+			else if(controller.equals(GameController.class)) 
+				con = (T) new GameController(screenPane);
+			
+			var panes = new FXMLLoader(getClass().getResource("/View/" + paneName + ".fxml"));
+			panes.setController(con);
+			pane = panes.load();
+			
+		}
+		catch(Exception ex) {
+			Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		//borderPane.setCenter(root);
+		screenPane.getChildren().setAll(pane);
+	}
+	
+	private void loadPane(String paneName) {
 		AnchorPane pane = null;
 		try {
 			pane = FXMLLoader.load(getClass().getResource("/View/" + paneName + ".fxml"));

@@ -4,11 +4,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
-
-
 import java.util.List;
-
 import Model.WordState.*;
+
+import Model.WordState.WordState;
 
 public class Word {
 	

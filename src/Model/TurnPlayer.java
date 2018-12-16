@@ -3,6 +3,8 @@ package Model;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
+import Controller.MainController;
 import Model.TurnAction.*;
 
 public class TurnPlayer {
@@ -67,5 +69,41 @@ public class TurnPlayer {
 		default:
 			return null;
 		}
+	}
+	
+	public static final String getTurnPlayerUpdateQuery(boolean isFirstPlayer, String type, int gameId, int turnId, String username) {
+		String table = "turnplayer";
+		String whereUser = "username_player";
+		if(isFirstPlayer) {
+			table += "1";
+			whereUser += "1";
+		}else {
+			table += "2";
+			whereUser += "2";
+		}
+		
+		return ("UPDATE " + table + 
+						" SET " + 
+						"turnaction_type = '" + type + "' " + 
+						"WHERE " + 
+						"game_id = " + gameId + " " + 
+						"AND turn_id = " + turnId + " " + 
+						"AND " + whereUser + " = " + username+ ")");
+	}
+	
+	public static final String hasPlacedTurn(String table, int turnId, int gameId) {
+		return ("SELECT COUNT(*) FROM " + table + "  WHERE turn_id = " + turnId + " AND game_id = " + gameId);
+	}
+	
+	public static final String insertPlayer(String table, int gameId, int turnId, String username, int bonus, int score, String type) {
+		String whereUser = "username";
+		if(table.equals("turnplayer2"))
+			whereUser += "_player2";
+		else
+			whereUser += "_player1";
+		
+		return ("INSERT INTO " + table
+				+ " (`game_id`, `turn_id`, " + whereUser + ", `bonus`, `score`, `turnaction_type`)"
+				+ " VALUES (" + gameId + ", "+ turnId + ", '" + username + "', "+ bonus + ", "+ score + ", '" + type + "');");
 	}
 }

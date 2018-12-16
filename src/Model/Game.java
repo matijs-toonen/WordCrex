@@ -148,6 +148,20 @@ public class Game {
  				"GROUP BY g.game_id;", username, username, username, GameStatus.getGameStatus(GameStatus.Playing));
  	}
  	
+ 	public static final String getTurnFromActiveGame(int gameId) {
+ 		return ("SELECT IF(MAX(turn_id) IS NULL, 1, MAX(turn_id)) " + 
+ 				"FROM handletter " + 
+ 				"WHERE game_id = " + gameId);
+ 	}
+ 	
+ 	public static final String getExistingTiles(int gameId, int turnId) {
+ 		return ("SELECT * FROM turnboardletter NATURAL JOIN letter NATURAL JOIN symbol WHERE game_id = " + gameId + " AND turn_id < " + turnId);
+ 	}
+ 	
+ 	public static final String getExisitingHandLetters(int gameId, int turnId) {
+ 		return("SELECT * FROM handletter NATURAL JOIN letter NATURAL JOIN symbol where game_id = " + gameId + " AND turn_id = " + turnId);
+ 	}
+ 	
  	public static final String getActiveQueryObserver() {
 		return ("select game_id, game_state, username_player1, username_player2 "
 				+ "from game "
@@ -205,5 +219,15 @@ public class Game {
  		return String.format(
  				"INSERT INTO turn (turn.game_id, turn.turn_id)\n" + 
  				"VALUES (%d, (SELECT IFNULL(max(t.turn_id), 0) + 1 FROM turn AS t WHERE t.game_id = %d));", gameId, gameId);
+ 	}
+ 	
+ 	public static final String getPassQuery(int gameId, int turnId, String username, boolean isFirstPlayer) {
+ 		String tableName = isFirstPlayer ? "turnplayer1" : "turnplayer2";
+ 		String columnName = isFirstPlayer ? "username_player1" : "username_player2";
+ 		
+ 		return String.format(
+ 				"INSERT INTO %s\n" + 
+ 				"  (game_id, turn_id, %s, bonus, score, turnaction_type)\n" + 
+ 				"VALUES ('%d', '%d', '%s', '0', '0', 'pass')", tableName, columnName, gameId, turnId, username);
  	}
 }

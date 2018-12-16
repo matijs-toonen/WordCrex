@@ -184,6 +184,66 @@
 	-fx-border-color: #3B86FF;
 }
 
+.tile6L {
+	-fx-background-color: #5EE2A0;
+	-fx-background-radius: 6;
+}
+
+.tile4W {
+	-fx-background-color: #FEC163;
+	-fx-background-radius: 6;
+}
+
+.tile4L {
+	-fx-background-color: #A3A1FB;
+	-fx-background-radius: 6;
+}
+
+.tile3W {
+	-fx-background-color: #FF6565;
+	-fx-background-radius: 6;
+}
+
+.tile2L {
+	-fx-background-color: #56D9FE;
+	-fx-background-radius: 6;
+}
+
+.tile0 {
+	-fx-background-color: #E8E9EC;
+	-fx-background-radius: 6;
+}
+
+.tileCenter {
+	-fx-background-color: #43425D;
+	-fx-background-radius: 6;
+	-fx-background-image: url("../Resources/logo.png");
+	-fx-background-repeat: no-repeat;
+	-fx-background-position: center; 
+	-fx-background-size: 30 30;
+}
+
+.tileValue {
+	-fx-text-fill: white;
+}
+
+.tileSymbol {
+	-fx-text-fill: white;
+	-fx-font-size: 18px;
+	-fx-font-weight: bold;
+	-fx-text-align: center;
+}
+
+.rightArrow {
+	-fx-padding: 0 5;
+	-fx-background-color: #FFFFFF;
+}
+
+.rightArrow:hover {
+	-fx-background-color: #f2f2f2;
+	-fx-background-radius: 25;
+}
+
 .scroll-pane > .viewport {
 	-fx-background-color: transparent;
 }
@@ -234,4 +294,8 @@
     -fx-background-color :derive(black,90.0%);
     -fx-background-insets : 2.0, 0.0, 0.0;
     -fx-background-radius : 2.0em;
+}
+
+.backPanel{
+	-fx-background-color: white;
 }
