@@ -141,7 +141,7 @@ public class BoardController implements Initializable {
 		scoreRefreshThread();
 
 		createField(false);
-		createHand(false);
+		createHand();
 		dragOnHand();
 	}
 	
@@ -214,7 +214,6 @@ public class BoardController implements Initializable {
 		try {
 			_currentScore = (Score) _db.SelectFirst(scoreQuery, Score.class);
 		} catch (SQLException e) {
-			System.out.println(e.getMessage());
 		}
 		
 		Platform.runLater(() -> {
@@ -305,15 +304,11 @@ public class BoardController implements Initializable {
 				String[] statementBoardPlayerArr = new String[statementBoardPlayer.size()];
 				statementBoardPlayerArr = statementBoardPlayer.toArray(statementBoardPlayerArr);
 				
-				for(var statement : statementBoardPlayerArr)
-				{
-					System.out.println(statement);
-				}
-
 				try 
 				{
 					if(_db.Insert(statementTurnPlayer)) 
 					{
+						System.out.println(statementBoardPlayerArr);
 						if(_db.InsertBatch(statementBoardPlayerArr)) 
 						{
 							renewHand();
@@ -361,7 +356,6 @@ public class BoardController implements Initializable {
 	}
 	
 	public void clickSkipTurn() {
-		System.out.println("User clicked skip turn");
 		String insertQuery = Game.getPassQuery(_currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername(), checkPlayer());
 		
 		var _db = new DatabaseController<Game>();
@@ -411,17 +405,14 @@ public class BoardController implements Initializable {
 	}
 	
 	public void renewHand() {
-		createHand(true);
+		createHand();
 	}
 	
-	private boolean needsToWaitForHandLetters() {
-		var table = checkPlayer() ? "turnplayer2" : "turnplayer1";
+	private boolean needsToWaitForHandLetters(String table) {
+		
 		var query = TurnPlayer.hasPlacedTurn(table, _currentTurn.getTurnId(), _currentGame.getGameId());
-		System.out.println(query);
 		try {
-			var shoud = _db.SelectCount(query) == 0;
-			System.out.println(shoud + " table " + table + " turn " + _currentTurn.getTurnId());
-			return shoud;
+			return _db.SelectCount(query) == 0;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -615,20 +606,22 @@ public class BoardController implements Initializable {
 	}
 	
 	
-	private void createHand(boolean checkGenerated) {
+	private void createHand() {
 		_currentHand.clear();
 		_db = new DatabaseController<HandLetter>();
 		
-		
-		if(checkGenerated) {
-			var check = needsToWaitForHandLetters();
-			_currentTurn.incrementId();
-			getGeneratedLetters(check);
+		var tableOpponent = checkPlayer() ? "turnplayer2" : "turnplayer1";
+		var tableMe = checkPlayer() ? "turnplayer1" : "turnplayer2";
+		var hasPlacedOpponent = needsToWaitForHandLetters(tableOpponent);
+		var needsToPlaceOwn = needsToWaitForHandLetters(tableMe);
+
+		if(needsToPlaceOwn) {
+			var handLetters = getHandLetters();
+			visualizeHand(handLetters);
 			return;
 		}
 		
-		var handLetters = getHandLetters();
-		visualizeHand(handLetters);		
+		getGeneratedLetters(hasPlacedOpponent);	
 	}
 	
 	private void visualizeHand(ArrayList<HandLetter> handLetters) {
@@ -657,12 +650,14 @@ public class BoardController implements Initializable {
 	
 	private void getGeneratedLetters(boolean checkGenerated){
 		if(checkGenerated) {
+			_currentTurn.incrementId();
 			waitForVisualizeNewHandLetters();
 		}
 		else {
 			var scores = getScores();
 			if(insertScore(scores.getKey(), scores.getValue()))
 			{
+				_currentTurn.incrementId();
 				var handLetters = generateHandLetters();
 				updatePaneWithNewLetters();
 				visualizeHand(handLetters);
@@ -678,7 +673,7 @@ public class BoardController implements Initializable {
 		var bonus = 5;
 		
 		var gameId = _currentGame.getGameId();
-		var turnId = _currentTurn.getTurnId()-1;
+		var turnId = _currentTurn.getTurnId();
 		
 		var ownPlayerNum = checkPlayerIfPlayer1() ? 1 : 2;
 		
@@ -697,6 +692,8 @@ public class BoardController implements Initializable {
 				if(_db.Update(statement))
 					oppScore += bonus;
 			}
+			
+			var usedLetters = (ArrayList<TurnBoardLetter>)_db.SelectAll("SELECT letter_id FROM turnboardletter where game_id = " + gameId, TurnBoardLetter.class);
 
 			if(ownScore > oppScore)
 			{
@@ -712,6 +709,10 @@ public class BoardController implements Initializable {
 				
 				for(var boardPlayer : playerBoard)
 				{
+					var letterId = boardPlayer.getLetterId();
+					if(usedLetters.stream().filter(letter -> letter.getLetterId() == letterId).findFirst().isPresent()) 
+						continue;
+
 					var insertStatement = String.format("INSERT INTO turnboardletter "
 							+ "(letter_id, game_id, turn_id, tile_x, tile_y)"
 							+ "VALUES"
@@ -745,6 +746,10 @@ public class BoardController implements Initializable {
 				
 				for(var boardPlayer : playerBoard)
 				{
+					var letterId = boardPlayer.getLetterId();
+					if(usedLetters.stream().filter(letter -> letter.getLetterId() == letterId).findFirst().isPresent())
+						continue;
+					
 					var insertStatement = String.format("INSERT INTO turnboardletter "
 							+ "(letter_id, game_id, turn_id, tile_x, tile_y)"
 							+ "VALUES"
@@ -776,7 +781,7 @@ public class BoardController implements Initializable {
 		try
 		{
 			var gameId = _currentGame.getGameId();
-			var turnId = _currentTurn.getTurnId()-1;
+			var turnId = _currentTurn.getTurnId();
 			
 			var ownPlayerNum = checkPlayerIfPlayer1() ? 1 : 2;
 			
@@ -786,13 +791,9 @@ public class BoardController implements Initializable {
 					+ "WHERE game_id = %2$s "
 					+ "AND turn_id = %3$s", ownPlayerNum, gameId, turnId));
 			
-			System.out.println(ownScore);
-			
 			var opponentScore = _db.SelectCount(String.format("SELECT score FROM turnplayer%1$s "
 					+ "WHERE game_id = %2$s "
 					+ "AND turn_id = %3$s",opponentPlayerNum, gameId, turnId));
-			
-			System.out.println(opponentScore);
 			
 			ownOppScore = new Pair<>(ownScore, opponentScore);
 		}
@@ -982,7 +983,6 @@ public class BoardController implements Initializable {
 				return rndLetter;
 			}
 		} catch (SQLException e) {
-			System.out.println(e.getMessage());
 		}
 		return null;
 	}
