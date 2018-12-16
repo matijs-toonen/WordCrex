@@ -245,10 +245,16 @@ public class BoardController implements Initializable {
 		if(!hasNotPlacedFirstMid())
 		{	
 			if(!_board.allChainedToMiddle())
-				System.err.println("Not all tiles connected to the middle");
+				showErrorMessage("Niet alle tiles zitten aan elkaar");
 			else
 			{
 				var wordsData = getUniqueWordData();
+				
+				if(wordsData.size() > 1)
+				{
+					showErrorMessage("Je mag maar 1 woord leggen");
+					return;
+				}
 				
 				var statementTurnPlayer = "";
 				var statementBoardPlayer = new ArrayList<String>();
@@ -268,9 +274,7 @@ public class BoardController implements Initializable {
 						+ "(game_id, turn_id, username_player%1$s, bonus, score, turnaction_type) \n"
 						+ "VALUES(%2$s, %3$s, '%4$s', %5$s, %6$s, '%7$s')"
 						,playerNum, gameId, turnId, username, 0, score, "play");
-				
-				var uniqueLettersData = new HashMap<Integer, Pair<Character, Point>>();
-				
+								
 				for(var wordData : wordsData)
 				{
 					var lettersData = wordData.getLetters();
@@ -278,25 +282,17 @@ public class BoardController implements Initializable {
 					lettersData.entrySet().forEach(letterData -> {
 						
 						var letterId = letterData.getKey();
-						var letterCharCord = letterData.getValue();
+						var tileX = (int) letterData.getValue().getValue().getX()+1;
+						var tileY = (int) letterData.getValue().getValue().getY()+1;
 						
-						if(!uniqueLettersData.containsKey(letterId))
-							uniqueLettersData.put(letterId, letterCharCord);
-						
+						statementBoardPlayer.add(String.format("INSERT INTO boardplayer%1$s \n"
+								+ "(game_id, username, turn_id, letter_id, tile_x, tile_y) \n"
+								+ "VALUES (%2$s, '%3$s', %4$s, %5$s, %6$s, %7$s);"
+								, playerNum,gameId, username, turnId, letterId, tileX, tileY));
 					});
 				}
 				
-				uniqueLettersData.entrySet().forEach(letterData -> {
-					
-					var letterId = letterData.getKey();
-					var tileX = (int) letterData.getValue().getValue().getX()+1;
-					var tileY = (int) letterData.getValue().getValue().getY()+1;
-					
-					statementBoardPlayer.add(String.format("INSERT INTO boardplayer%1$s \n"
-							+ "(game_id, username, turn_id, letter_id, tile_x, tile_y) \n"
-							+ "VALUES (%2$s, '%3$s', %4$s, %5$s, %6$s, %7$s);"
-							, playerNum,gameId, username, turnId, letterId, tileX, tileY));
-				});
+
 								
 				String[] statementBoardPlayerArr = new String[statementBoardPlayer.size()];
 				statementBoardPlayerArr = statementBoardPlayer.toArray(statementBoardPlayerArr);
@@ -323,7 +319,7 @@ public class BoardController implements Initializable {
 			}
 		}
 		else
-			System.err.println("Middle field not used");
+			showErrorMessage("Middelste tile moet gevuld zijn");
 	}
 	
 	private LinkedList<WordData> getUniqueWordData()
