@@ -202,8 +202,19 @@ WHERE
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
+set @gameid = 502;
+set @turnid = 1;
 
+select letter_id,game_id,turn_id,tile_x,tile_y
+from boardplayer1
+where game_id = @gameid and turn_id = @turnid;
 
+select letter_id,game_id,turn_id,tile_x,tile_y
+from boardplayer2
+where game_id = @gameid and turn_id = @turnid;
+
+delete from turn where game_id = 513;
+delete from game where game_id = 513;
 select * from game where answer_player2 = 'unknown';
 select * from answer;
 select * from gamestate;
