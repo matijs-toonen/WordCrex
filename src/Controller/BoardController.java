@@ -161,7 +161,8 @@ public class BoardController implements Initializable {
 	public void initialize(URL location, ResourceBundle resources) {
 		lblPlayer1.setText(MainController.getUser().getUsername());
 		lblPlayer1.setStyle("-fx-font-size: 28");
-		lblPlayer2.setText(_currentGame.getOpponent());
+		var opponent = getOpponent();
+		lblPlayer2.setText(opponent);
 		lblPlayer2.setStyle("-fx-font-size: 28");
 		lblScore1.setText("1");
 		lblScore1.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 25 0 0 25");
@@ -173,6 +174,13 @@ public class BoardController implements Initializable {
 		createField(false);
 		createHand();
 		dragOnHand();
+	}
+	
+	private String getOpponent() {
+		if(_currentGame.getOpponent() == null)
+			return checkPlayerIfPlayer1() ? _currentGame.getUser2() : _currentGame.getUser1();
+		
+		return _currentGame.getOpponent();
 	}
 	
 	
@@ -385,7 +393,7 @@ public class BoardController implements Initializable {
 	}
 	
 	public void clickSkipTurn() {
-		String insertQuery = Game.getPassQuery(_currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername(), checkPlayer());
+		String insertQuery = Game.getPassQuery(_currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername(), checkPlayerIfPlayer1());
 		
 		var _db = new DatabaseController<Game>();
 
@@ -402,7 +410,7 @@ public class BoardController implements Initializable {
 	{		
 		try 
 		{
-			var updateStatement = TurnPlayer.getTurnPlayerUpdateQuery(checkPlayer(), "resign", _currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername());
+			var updateStatement = TurnPlayer.getTurnPlayerUpdateQuery(checkPlayerIfPlayer1(), "resign", _currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername());
 			
 			_db.Update(updateStatement);
 			
@@ -449,10 +457,6 @@ public class BoardController implements Initializable {
 		return false;
 	}
 
-	private boolean checkPlayer() {
-		return MainController.getUser().getUsername().equals(_currentGame.getUser1());
-	}
-	
 	public void openHistory() throws IOException{
 		if(!_historyVisible) {
 			
@@ -639,8 +643,8 @@ public class BoardController implements Initializable {
 		_currentHand.clear();
 		_db = new DatabaseController<HandLetter>();
 		
-		var tableOpponent = checkPlayer() ? "turnplayer2" : "turnplayer1";
-		var tableMe = checkPlayer() ? "turnplayer1" : "turnplayer2";
+		var tableOpponent = checkPlayerIfPlayer1() ? "turnplayer2" : "turnplayer1";
+		var tableMe = checkPlayerIfPlayer1() ? "turnplayer1" : "turnplayer2";
 		var needsToPlaceOpponent = needsToWaitForHandLetters(tableOpponent);
 		var needsToPlaceOwn = needsToWaitForHandLetters(tableMe);
 		
