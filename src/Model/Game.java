@@ -155,7 +155,7 @@ public class Game {
  	}
  	
  	public static final String getExistingTiles(int gameId, int turnId) {
- 		return ("SELECT * FROM turnboardletter NATURAL JOIN letter WHERE game_id = " + gameId + " AND turn_id < " + turnId);
+ 		return ("SELECT * FROM turnboardletter NATURAL JOIN letter NATURAL JOIN symbol WHERE game_id = " + gameId + " AND turn_id < " + turnId);
  	}
  	
  	public static final String getExisitingHandLetters(int gameId, int turnId) {

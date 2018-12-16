@@ -305,21 +305,20 @@ public class BoardController implements Initializable {
 				{
 					System.out.println(statement);
 				}
-	
-				// TODO uncomment
-//				try 
-//				{
-//					if(_db.Insert(statementTurnPlayer)) 
-//					{
-//						if(_db.InsertBatch(statementBoardPlayerArr)) 
-//						{
-//							renewHand();
-//						}
-//					}
-//				}
-//				catch(SQLException e) {
-//					e.printStackTrace();
-//				}
+
+				try 
+				{
+					if(_db.Insert(statementTurnPlayer)) 
+					{
+						if(_db.InsertBatch(statementBoardPlayerArr)) 
+						{
+							renewHand();
+						}
+					}
+				}
+				catch(SQLException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		else
@@ -406,6 +405,7 @@ public class BoardController implements Initializable {
 	
 	public void reset() {
 		resetFieldHand();
+		placeHand(false);
 		reset.setVisible(false);
 	}
 	
@@ -520,11 +520,7 @@ public class BoardController implements Initializable {
 						var cords = new Point(i, j);
 						if(existingTurns.containsKey(cords)) {
 							var turn = existingTurns.get(cords);
-							boardTile = new BoardTile(turn.getSymbol(), turn.getLetterId());
-							boardTile.setMinWidth(39);
-							boardTile.setMinHeight(39);
-							boardTile.setStyle("-fx-background-color: pink; -fx-background-radius: 6");
-							_board.updateStatus(cords, PositionStatus.Taken);
+							boardTile = createBoardTile(cords, turn);
 						}
 						var tilePane = new BoardTilePane(tile);
 						tilePane.setDropEvents(createDropEvents());
@@ -581,6 +577,15 @@ public class BoardController implements Initializable {
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	private BoardTile createBoardTile(Point cords, TurnBoardLetter turn) {
+		var boardTile = new BoardTile(turn.getSymbol(), turn.getLetterId());
+		boardTile.setMinWidth(39);
+		boardTile.setMinHeight(39);
+		boardTile.setStyle("-fx-background-color: pink; -fx-background-radius: 6");
+		_board.updateStatus(cords, PositionStatus.Taken);
+		return boardTile;
 	}
 	
 	private HashMap<Point, TurnBoardLetter> getTurns() {
@@ -646,7 +651,6 @@ public class BoardController implements Initializable {
 		placeHand(false);		
 	}
 	
-	// TODO HERE
 	private void getGeneratedLetters(boolean checkGenerated){
 		if(checkGenerated) {
 			waitForVisualizeNewHandLetters();
@@ -669,35 +673,18 @@ public class BoardController implements Initializable {
 	}
 	
 	// TODO HERE
-	private void waitForVisualizeNewHandLetters(){	
-		
+	private void waitForVisualizeNewHandLetters(){
 		disableBoard();
-		
 		
 		var thread = new Thread() {
 			public void run() {
 				var handLetters = getExistingHandLetters();
 				int tries = 0;
-				
-				
-				
-//				while(true) {
-//					Thread.sleep(1000);
-//					handLetters = getExistingHandLetters();
-//					
-//					var amount = getAmountLetters(handLetters);
-//					if(amount == 0 || amount != 7 || tries < 4) {
-//						
-//					}
-//					break;
-//				}
-
 				while(getAmountLetters(handLetters) == 0 || getAmountLetters(handLetters) != 7 || tries < 4) {
-					
 					try {
 						Thread.sleep(1000);
 						handLetters = getExistingHandLetters();
-						
+
 						if(getAmountLetters(handLetters) > 0) {
 							tries++;	
 						}
@@ -713,6 +700,7 @@ public class BoardController implements Initializable {
 				final var finalHandLetters = handLetters;
 				
 				Platform.runLater(() -> {
+					updatePaneWithNewLetters();
 	            	visualizeHand(finalHandLetters);
 	            	enableBoard();
 		        });
@@ -721,6 +709,18 @@ public class BoardController implements Initializable {
 		
 		thread.setDaemon(true);
 		thread.start();
+	}
+	
+	private void updatePaneWithNewLetters() {
+		var exisitingTurns = getTurns();
+		resetFieldHand();
+		
+		exisitingTurns.entrySet().forEach(turn -> {
+			var cords = turn.getKey();
+			var boardTilePane = _boardTiles.get(cords);
+			var boardTile = createBoardTile(cords, turn.getValue());
+			boardTilePane.setBoardTile(boardTile);
+		});
 	}
 	
 	private ArrayList<HandLetter> getExistingHandLetters() {
@@ -764,7 +764,6 @@ public class BoardController implements Initializable {
 			_board.updateStatus(cords, PositionStatus.Open);
 		});	
 
-		placeHand(false);
 		_fieldHand.clear();
 	}
 	
