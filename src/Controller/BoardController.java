@@ -862,9 +862,10 @@ public class BoardController implements Initializable {
 	}
 	
 	private void resetBoard() {
-		for(var tile : _currentHand) {
-			paneHand.getChildren().remove(tile);
-		}
+		_fieldHand.entrySet().forEach(tile -> {
+			var boardTilePane = _boardTiles.get(tile.getKey());
+			boardTilePane.removeBoardTile();
+		});
 	}
 	
 	private ArrayList<HandLetter> getExistingHandLetters() {
