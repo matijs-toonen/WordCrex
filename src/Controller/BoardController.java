@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -173,18 +174,61 @@ public class BoardController implements Initializable {
 				{
 					score += wordData.getScore();
 				}
+				
+				var gameId = _currentGame.getGameId();
+				var turnId = _currentTurn.getTurnId();
+				var username = MainController.getUser().getUsername();
 								
-				statementTurnPlayer = String.format("INSERT INTO turnplayer%1$s "
-						+ "(game_id, turn_id, username_player%1$s, bonus, score, turnaction_type)"
+				statementTurnPlayer = String.format("INSERT INTO turnplayer%1$s \n"
+						+ "(game_id, turn_id, username_player%1$s, bonus, score, turnaction_type) \n"
 						+ "VALUES(%2$s, %3$s, %4$s, %5$s, %6$s, %7$s)"
-						,playerNum, _currentGame.getGameId(), _currentTurn.getTurnId(), 
-						MainController.getUser().getUsername(), 0, score, "play");
+						,playerNum, gameId, turnId, username, 0, score, "play");
 				
 				System.out.println(statementTurnPlayer);
 				
-				statementBoardPlayer.append(String.format("INSERT INTO boardplayer%1$s "
-						+ "(game_id, username, turn_id, letter_id, tile_x, tile_y)"
+				statementBoardPlayer.append("START TRANSACTION;\n");
+				statementBoardPlayer.append(String.format("INSERT INTO boardplayer%1$s \n"
+						+ "(game_id, username, turn_id, letter_id, tile_x, tile_y) \n"
+						+ "VALUES"
 						, playerNum));
+				
+				var dataSize = wordsData.size();
+
+				var dataCount = 0;
+				for(var wordData : wordsData)
+				{
+					dataCount++;
+					
+					var letters = wordData.getLetters();
+					var letterSize = letters.size();
+					
+					var letterCount = 0;
+					
+					Iterator<Map.Entry<Integer, Pair<Character, Point>>> entries = letters.entrySet().iterator();
+					
+					while(entries.hasNext())
+					{						
+						Map.Entry<Integer, Pair<Character, Point>> letterData = entries.next();
+						
+						var letterId = letterData.getKey();
+						var tileX = (int) letterData.getValue().getValue().getX();
+						var tileY = (int) letterData.getValue().getValue().getY();
+						
+						if(dataCount == dataSize)
+							letterCount++;
+						
+						if(letterCount == letterSize)
+							statementBoardPlayer.append(String.format("\n(%1$s, %2$s, %3$s, %4$s, %5$s, %6$s);"
+									,gameId, username, turnId, letterId, tileX, tileY));
+						else
+							statementBoardPlayer.append(String.format("\n(%1$s, %2$s, %3$s, %4$s, %5$s, %6$s),"
+									,gameId, username, turnId, letterId, tileX, tileY));
+					}
+				}
+				
+				statementBoardPlayer.append("\nCOMMIT;");
+				
+				System.out.println(statementBoardPlayer);
 			}
 		}
 		else
