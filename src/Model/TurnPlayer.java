@@ -3,6 +3,8 @@ package Model;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
+import Controller.MainController;
 import Model.TurnAction.*;
 
 public class TurnPlayer {
@@ -67,5 +69,25 @@ public class TurnPlayer {
 		default:
 			return null;
 		}
+	}
+	
+	public static final String getTurnPlayerUpdateQuery(boolean isFirstPlayer, String type, int gameId, int turnId, String username) {
+		String table = "turnplayer";
+		String whereUser = "username_player";
+		if(isFirstPlayer) {
+			table += "1";
+			whereUser += "1";
+		}else {
+			table += "2";
+			whereUser += "2";
+		}
+		
+		return ("UPDATE " + table + 
+						" SET " + 
+						"turnaction_type = '" + type + "' " + 
+						"WHERE " + 
+						"game_id = " + gameId + " " + 
+						"AND turn_id = " + turnId + " " + 
+						"AND " + whereUser + " = " + username+ ")");
 	}
 }

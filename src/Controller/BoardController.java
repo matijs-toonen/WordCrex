@@ -25,6 +25,7 @@ import Model.Symbol;
 import Model.Tile;
 import Model.Turn;
 import Model.TurnBoardLetter;
+import Model.TurnPlayer;
 import Model.Word;
 import Model.Board.Board;
 import Model.Board.PositionStatus;
@@ -179,28 +180,9 @@ public class BoardController implements Initializable {
 	{		
 		try 
 		{
-			if(checkPlayer())
-			{
-				_db.Update("UPDATE turnplayer1 " + 
-						"SET " + 
-						"turnaction_type = 'resign' " + 
-						"WHERE " + 
-						"game_id = " + _currentGame.getGameId() + " " + 
-						"AND turn_id = " + _currentTurn.getTurnId() + " " + 
-						"AND username_player1 = " + MainController.getUser().getUsername() + "");
-			}
-			else 
-			{
-				_db.Update("UPDATE turnplayer2 " + 
-						"SET " + 
-						"turnaction_type = 'resign' " + 
-						"WHERE " + 
-						"game_id = " + _currentGame.getGameId() + " " + 
-						"AND turn_id = " + _currentTurn.getTurnId() + " " + 
-						"AND username_player2 = " + MainController.getUser().getUsername() + "");
-			}
+			var updateStatement = TurnPlayer.getTurnPlayerUpdateQuery(checkPlayer(), "resign", _currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername());
 			
-			
+			_db.Update(updateStatement);
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
