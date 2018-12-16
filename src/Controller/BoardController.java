@@ -256,15 +256,12 @@ public class BoardController implements Initializable {
 					return;
 				}
 				
+				var wordData = wordsData.get(0);
+				
 				var statementTurnPlayer = "";
 				var statementBoardPlayer = new ArrayList<String>();
 				var playerNum = checkPlayerIfPlayer1() ? 1 : 2;
-				var score = 0;
-				
-				for(var wordData : wordsData)
-				{
-					score += wordData.getScore();
-				}
+				var score = wordData.getScore();
 				
 				var gameId = _currentGame.getGameId();
 				var turnId = _currentTurn.getTurnId();
@@ -275,22 +272,20 @@ public class BoardController implements Initializable {
 						+ "VALUES(%2$s, %3$s, '%4$s', %5$s, %6$s, '%7$s')"
 						,playerNum, gameId, turnId, username, 0, score, "play");
 								
-				for(var wordData : wordsData)
-				{
-					var lettersData = wordData.getLetters();
+
+				var lettersData = wordData.getLetters();
+				
+				lettersData.entrySet().forEach(letterData -> {
 					
-					lettersData.entrySet().forEach(letterData -> {
-						
-						var letterId = letterData.getKey();
-						var tileX = (int) letterData.getValue().getValue().getX()+1;
-						var tileY = (int) letterData.getValue().getValue().getY()+1;
-						
-						statementBoardPlayer.add(String.format("INSERT INTO boardplayer%1$s \n"
-								+ "(game_id, username, turn_id, letter_id, tile_x, tile_y) \n"
-								+ "VALUES (%2$s, '%3$s', %4$s, %5$s, %6$s, %7$s);"
-								, playerNum,gameId, username, turnId, letterId, tileX, tileY));
-					});
-				}
+					var letterId = letterData.getKey();
+					var tileX = (int) letterData.getValue().getValue().getX()+1;
+					var tileY = (int) letterData.getValue().getValue().getY()+1;
+					
+					statementBoardPlayer.add(String.format("INSERT INTO boardplayer%1$s \n"
+							+ "(game_id, username, turn_id, letter_id, tile_x, tile_y) \n"
+							+ "VALUES (%2$s, '%3$s', %4$s, %5$s, %6$s, %7$s);"
+							, playerNum,gameId, username, turnId, letterId, tileX, tileY));
+				});
 				
 
 								
@@ -948,12 +943,11 @@ public class BoardController implements Initializable {
 	private ArrayList<WordData> getWordData(Point cords)
 	{
 		var completeWordData = new ArrayList<WordData>();
-		
 
 		var wordsWithScore = getPlacedWordsWithScore(cords);
-		
+				
 		for(var word : wordsWithScore)
-		{								
+		{
 			completeWordData.add(new WordData(word.getKey(), word.getValue(), 
 					getPlacedWordWithLetterCords(cords, word.getKey())));
 		}
