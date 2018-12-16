@@ -217,7 +217,8 @@ public class BoardController implements Initializable {
 				var wordsData = getUniqueWordData();
 				
 				var statementTurnPlayer = "";
-				var statementBoardPlayer = new StringBuilder();
+				var statementBoardPlayer = new String[7];
+//				var statementBoardPlayer = new StringBuilder();
 				var playerNum = checkPlayerIfPlayer1() ? 1 : 2;
 				var score = 0;
 				
@@ -232,20 +233,19 @@ public class BoardController implements Initializable {
 								
 				statementTurnPlayer = String.format("INSERT INTO turnplayer%1$s \n"
 						+ "(game_id, turn_id, username_player%1$s, bonus, score, turnaction_type) \n"
-						+ "VALUES(%2$s, %3$s, %4$s, %5$s, %6$s, %7$s)"
+						+ "VALUES(%2$s, %3$s, '%4$s', %5$s, %6$s, '%7$s')"
 						,playerNum, gameId, turnId, username, 0, score, "play");
 				
 				System.out.println(statementTurnPlayer);
 				
-				statementBoardPlayer.append("START TRANSACTION;\n");
-				statementBoardPlayer.append(String.format("INSERT INTO boardplayer%1$s \n"
-						+ "(game_id, username, turn_id, letter_id, tile_x, tile_y) \n"
-						+ "VALUES"
-						, playerNum));
+//				statementBoardPlayer.append("START TRANSACTION;\n");
+				
+//				statementBoardPlayer.append(String.format();
 				
 				var dataSize = wordsData.size();
 
 				var dataCount = 0;
+				var statement = 0;
 				for(var wordData : wordsData)
 				{
 					dataCount++;
@@ -268,18 +268,43 @@ public class BoardController implements Initializable {
 						if(dataCount == dataSize)
 							letterCount++;
 						
-						if(letterCount == letterSize)
-							statementBoardPlayer.append(String.format("\n(%1$s, %2$s, %3$s, %4$s, %5$s, %6$s);"
-									,gameId, username, turnId, letterId, tileX, tileY));
-						else
-							statementBoardPlayer.append(String.format("\n(%1$s, %2$s, %3$s, %4$s, %5$s, %6$s),"
-									,gameId, username, turnId, letterId, tileX, tileY));
+						if(letterCount == letterSize) {
+							statementBoardPlayer[statement] = String.format("INSERT INTO boardplayer%1$s \n"
+									+ "(game_id, username, turn_id, letter_id, tile_x, tile_y) \n"
+									+ "VALUES"
+									, playerNum);
+							statementBoardPlayer[statement] += String.format("\n(%1$s, '%2$s', %3$s, %4$s, %5$s, %6$s);"
+									,gameId, username, turnId, letterId, tileX, tileY); 
+//							statementBoardPlayer.append();
+						}
+							
+						else {
+							statementBoardPlayer[statement] = String.format("INSERT INTO boardplayer%1$s \n"
+									+ "(game_id, username, turn_id, letter_id, tile_x, tile_y) \n"
+									+ "VALUES"
+									, playerNum);
+
+							statementBoardPlayer[statement] += String.format("\n(%1$s, '%2$s', %3$s, %4$s, %5$s, %6$s);"
+									,gameId, username, turnId, letterId, tileX, tileY); 
+						}
+						statement ++;
+							
 					}
 				}
 				
-				statementBoardPlayer.append("\nCOMMIT;");
+//				statementBoardPlayer.append("\nCOMMIT;");
 				
 				System.out.println(statementBoardPlayer);
+				try {
+					if(_db.Insert(statementTurnPlayer)) {
+						if(_db.InsertBatch(statementBoardPlayer)) {
+							renewHand();
+						}
+					}
+				}
+				catch(SQLException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		else
