@@ -668,7 +668,7 @@ public class BoardController implements Initializable {
 		var bonus = 5;
 		
 		var gameId = _currentGame.getGameId();
-		var turnId = _currentTurn.getTurnId();
+		var turnId = _currentTurn.getTurnId()-1;
 		
 		var ownPlayerNum = checkPlayerIfPlayer1() ? 1 : 2;
 		
@@ -679,10 +679,10 @@ public class BoardController implements Initializable {
 			if(ownScore == oppScore)
 			{				
 				var statement = String.format("UPDATE turnplayer%s"
-						+ "SET bonus = %s"
-						+ "WHERE game_id = %s"
-						+ "AND turn_id = %s"
-						+ "AND score = %s",oppPlayerNum, bonus, gameId, turnId, oppScore);
+						+ "SET bonus = %s "
+						+ "WHERE game_id = %s "
+						+ "AND turn_id = %s "
+						+ "AND score = %s ",oppPlayerNum, bonus, gameId, turnId, oppScore);
 								
 				if(_db.Update(statement))
 					oppScore += bonus;
@@ -766,7 +766,7 @@ public class BoardController implements Initializable {
 		try
 		{
 			var gameId = _currentGame.getGameId();
-			var turnId = _currentTurn.getTurnId();
+			var turnId = _currentTurn.getTurnId()-1;
 			
 			var ownPlayerNum = checkPlayerIfPlayer1() ? 1 : 2;
 			
@@ -776,9 +776,13 @@ public class BoardController implements Initializable {
 					+ "WHERE game_id = %2$s "
 					+ "AND turn_id = %3$s", ownPlayerNum, gameId, turnId));
 			
+			System.out.println(ownScore);
+			
 			var opponentScore = _db.SelectCount(String.format("SELECT score FROM turnplayer%1$s "
 					+ "WHERE game_id = %2$s "
-					+ "AND turn_id = %3$s",opponentPlayerNum, gameId, turnId)); 
+					+ "AND turn_id = %3$s",opponentPlayerNum, gameId, turnId));
+			
+			System.out.println(opponentScore);
 			
 			ownOppScore = new Pair<>(ownScore, opponentScore);
 		}
