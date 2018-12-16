@@ -705,7 +705,7 @@ public class BoardController implements Initializable {
 		
 		try
 		{
-			if(ownScore == 0)
+			if(ownScore == 0 && oppScore == 0)
 				return true;
 			
 			if(ownScore == oppScore)
