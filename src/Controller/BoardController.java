@@ -257,6 +257,12 @@ public class BoardController implements Initializable {
 					return;
 				}
 				
+				if(wordsData.size() == 0)
+				{
+					showErrorMessage("Je moet 1 woord leggen");
+					return;
+				}
+				
 				var wordData = wordsData.get(0);
 				
 				var statementTurnPlayer = "";
