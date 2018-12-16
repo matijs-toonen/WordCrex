@@ -215,6 +215,14 @@ public class Game {
  				, usernameFrom, usernameTo);
  	}
  	
+ 	public static final String getResignQuery(int gameId) {
+ 		return ("UPDATE game " + 
+ 				"SET " + 
+ 				"game_state = 'resigned' " + 
+ 				"WHERE " + 
+ 				"game_id = " + gameId);
+ 	}
+ 	
  	public static final String getNewTurnQuery(int gameId) {
  		return String.format(
  				"INSERT INTO turn (turn.game_id, turn.turn_id)\n" + 

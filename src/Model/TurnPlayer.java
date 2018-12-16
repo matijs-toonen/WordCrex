@@ -91,6 +91,22 @@ public class TurnPlayer {
 						"AND " + whereUser + " = '" + username + "'");
 	}
 	
+	public static final String getResignQuery(boolean isFirstPlayer, String type, int gameId, int turnId, String username) {
+		String table = "turnplayer";
+		String whereUser = "username_player";
+		if(isFirstPlayer) {
+			table += "1";
+			whereUser += "1";
+		}else {
+			table += "2";
+			whereUser += "2";
+		}
+		
+		return ("INSERT INTO " + table +
+				" (game_id, turn_id, " + whereUser + ", bonus, score, turnaction_type) " +
+				" VALUES (" + gameId + ", " + turnId + ", '" + username + "', 0, 0, '" + type + "')");
+	}
+	
 	public static final String hasPlacedTurn(String table, int turnId, int gameId) {
 		return ("SELECT COUNT(*) FROM " + table + "  WHERE turn_id = " + turnId + " AND game_id = " + gameId);
 	}
