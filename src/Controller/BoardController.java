@@ -151,7 +151,7 @@ public class BoardController implements Initializable {
 			}
 			catch(Exception ex) {
 				Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
-			}		
+			}
 			_rootPane.getChildren().setAll(pane);
 			
 		}
@@ -947,11 +947,11 @@ public class BoardController implements Initializable {
 			addTurn();
 		}
 		
+		getLettersAndValidate();
+		
 		for(int i = 0; i < 7; i++) {
 			handLetters.add(createHandLetter());
 		}
-		
-		getLettersAndValidate();
 		
 		return handLetters;
 	}
