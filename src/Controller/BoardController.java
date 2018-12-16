@@ -694,6 +694,7 @@ public class BoardController implements Initializable {
 			var scores = getScores();
 			if(insertScore(scores.getKey(), scores.getValue()))
 			{
+				System.out.println("hier");
 				_currentTurn.incrementId();
 				var handLetters = generateHandLetters();
 				updatePaneWithNewLetters();
@@ -718,6 +719,9 @@ public class BoardController implements Initializable {
 		
 		try
 		{
+			if(ownScore == 0)
+				return true;
+			
 			if(ownScore == oppScore && ownScore > 0)
 			{
 				var statement = String.format("UPDATE turnplayer%s "
