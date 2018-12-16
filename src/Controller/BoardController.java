@@ -413,6 +413,7 @@ public class BoardController implements Initializable {
 	public void renewHand() {
 		createHand(true);
 	}
+	
 	private boolean needsToWaitForHandLetters() {
 		var table = checkPlayer() ? "turnplayer2" : "turnplayer1";
 		var query = TurnPlayer.hasPlacedTurn(table, _currentTurn.getTurnId(), _currentGame.getGameId());
@@ -858,7 +859,15 @@ public class BoardController implements Initializable {
 			var boardTile = createBoardTile(cords, turn.getValue());
 			boardTilePane.setBoardTile(boardTile);
 		});
-		placeHand(false);
+		
+		resetBoard();
+	}
+	
+	private void resetBoard() {
+		_fieldHand.entrySet().forEach(tile -> {
+			var boardTilePane = _boardTiles.get(tile.getKey());
+			boardTilePane.removeBoardTile();
+		});
 	}
 	
 	private ArrayList<HandLetter> getExistingHandLetters() {
