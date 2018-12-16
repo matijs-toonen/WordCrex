@@ -17,7 +17,7 @@
    <left>
       <ImageView fitHeight="960.0" fitWidth="800.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
          <image>
-            <Image url="https://cdn.wallscloud.net/converted/3637731710-vector-leaves-art-0gq3-800x960-MM-100.jpg" />
+            <Image url="@../Resources/loginBackground.jpg" />
          </image>
       </ImageView>
    </left>

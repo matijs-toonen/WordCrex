@@ -118,6 +118,7 @@
            </children>
             </Pane>
             <AnchorPane fx:id="rightBarAnchor" layoutX="965.0" prefHeight="900.0" prefWidth="390.0" />
+      <Pane fx:id="blockedOverplay" prefHeight="2000.0" prefWidth="2000.0" visible="false"/>
       <AnchorPane fx:id="errorMessagePane" layoutX="265.0" layoutY="325.0" style="-fx-background-color: #202020; -fx-background-radius: 15;" visible="false">
          <children>
             <VBox alignment="TOP_CENTER" prefWidth="300.0">
