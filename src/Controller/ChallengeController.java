@@ -135,7 +135,8 @@ public class ChallengeController implements Initializable  {
 			// get item values
 	    	var btnReaction = (Button) event.getSource();
 	    	var challengeItem = (ChallengeItem) btnReaction.getParent();
-	    	var gameId = challengeItem.getGame().getGameId();
+	    	var game = challengeItem.getGame();
+	    	var gameId = game.getGameId();
 	    	var type = btnReaction.getText();
 	    	
 	    	// get awnser value
@@ -156,7 +157,7 @@ public class ChallengeController implements Initializable  {
 				if (awnser.equals("accepted")) {
 					_dbGame.Update(turnQuery);
 					insertLetters(gameId);
-					loadBoard(gameId);
+					loadBoard(game);
 	    		}
 				
 			} catch (SQLException e) {
@@ -247,10 +248,10 @@ public class ChallengeController implements Initializable  {
 		}
 	}
 	
-	private void loadBoard(int gameId) {
+	private void loadBoard(Game game) {
 		AnchorPane pane = null;
 		try {
-			var con = new BoardController(new Game(gameId), _rootPane);
+			var con = new BoardController(game, _rootPane);
 			var panes = new FXMLLoader(getClass().getResource("/View/Board.fxml"));
 			panes.setController(con);
 			pane = panes.load();

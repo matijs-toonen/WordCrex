@@ -385,7 +385,7 @@ public class BoardController implements Initializable {
 	}
 	
 	public void clickSkipTurn() {
-		String insertQuery = Game.getPassQuery(_currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername(), checkPlayer());
+		String insertQuery = Game.getPassQuery(_currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername(), checkPlayerIfPlayer1());
 		
 		var _db = new DatabaseController<Game>();
 
@@ -402,7 +402,7 @@ public class BoardController implements Initializable {
 	{		
 		try 
 		{
-			var updateStatement = TurnPlayer.getTurnPlayerUpdateQuery(checkPlayer(), "resign", _currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername());
+			var updateStatement = TurnPlayer.getTurnPlayerUpdateQuery(checkPlayerIfPlayer1(), "resign", _currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername());
 			
 			_db.Update(updateStatement);
 			
@@ -449,7 +449,7 @@ public class BoardController implements Initializable {
 		return false;
 	}
 
-	private boolean checkPlayer() {
+	private boolean checkPlayerIfPlayer1() {
 		return MainController.getUser().getUsername().equals(_currentGame.getUser1());
 	}
 	
@@ -491,12 +491,7 @@ public class BoardController implements Initializable {
 			_chatVisible = false;
 		}
 	}
-		
-	private boolean checkPlayerIfPlayer1()
-	{		
-		return MainController.getUser().getUsername().equals(_currentGame.getUser1());
-	}
-	
+
 	private void closeCommunicationFrame() {
 		if(_historyVisible) {
 			rightBarAnchor.getChildren().clear();
@@ -639,8 +634,8 @@ public class BoardController implements Initializable {
 		_currentHand.clear();
 		_db = new DatabaseController<HandLetter>();
 		
-		var tableOpponent = checkPlayer() ? "turnplayer2" : "turnplayer1";
-		var tableMe = checkPlayer() ? "turnplayer1" : "turnplayer2";
+		var tableOpponent = checkPlayerIfPlayer1() ? "turnplayer2" : "turnplayer1";
+		var tableMe = checkPlayerIfPlayer1() ? "turnplayer1" : "turnplayer2";
 		var needsToPlaceOpponent = needsToWaitForHandLetters(tableOpponent);
 		var needsToPlaceOwn = needsToWaitForHandLetters(tableMe);
 		
