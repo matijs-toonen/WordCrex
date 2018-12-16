@@ -298,20 +298,19 @@ public class BoardController implements Initializable {
 					System.out.println(statement);
 				}
 	
-				// TODO uncomment
-//				try 
-//				{
-//					if(_db.Insert(statementTurnPlayer)) 
-//					{
-//						if(_db.InsertBatch(statementBoardPlayerArr)) 
-//						{
-//							renewHand();
-//						}
-//					}
-//				}
-//				catch(SQLException e) {
-//					e.printStackTrace();
-//				}
+				try 
+				{
+					if(_db.Insert(statementTurnPlayer)) 
+					{
+						if(_db.InsertBatch(statementBoardPlayerArr)) 
+						{
+							renewHand();
+						}
+					}
+				}
+				catch(SQLException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		else
