@@ -1,5 +1,6 @@
 package Controller;
 
+import java.awt.List;
 import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
@@ -9,9 +10,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.ResourceBundle;
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -21,23 +26,25 @@ import java.util.stream.Collectors;
 import Model.Game;
 import Model.HandLetter;
 import Model.Letter;
+import Model.Score;
 import Model.Symbol;
 import Model.Tile;
 import Model.Turn;
 import Model.TurnBoardLetter;
 import Model.TurnPlayer;
 import Model.Word;
+import Model.WordData;
 import Model.Board.Board;
 import Model.Board.PositionStatus;
 import Tests.BoardTileTest;
 import View.BoardPane.BoardTile;
 import View.BoardPane.BoardTilePane;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
@@ -46,7 +53,6 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -68,10 +74,10 @@ public class BoardController implements Initializable {
     private ArrayList<BoardTile> _currentHand;
     private HashMap<Point, BoardTile> _fieldHand;
     private AnchorPane _rootPane;
+    private Score _currentScore;
 
 	private boolean _chatVisible;
 	private boolean _historyVisible;
-	private boolean _firstPlacedWord = false;
 	
 	@FXML
 	private Label lblScore1, lblScore2, lblPlayer1, lblPlayer2;
@@ -123,18 +129,58 @@ public class BoardController implements Initializable {
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		lblPlayer1.setText(_currentGame.getUser1());
+		lblPlayer1.setText(MainController.getUser().getUsername());
 		lblPlayer1.setStyle("-fx-font-size: 28");
-		lblPlayer2.setText(_currentGame.getUser2());
+		lblPlayer2.setText(_currentGame.getOpponent());
 		lblPlayer2.setStyle("-fx-font-size: 28");
 		lblScore1.setText("1");
 		lblScore1.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 25 0 0 25");
 		lblScore2.setText("9");
 		lblScore2.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 0 25 25 0");
+		
+		scoreRefreshThread();
 
 		createField(false);
 		createHand(false);
-		dragOnHand();
+		dragOnHand();	
+	}
+	
+	private void scoreRefreshThread() {
+		
+		Thread chatThread = new Thread(){
+		    public void run(){
+		    	
+		    	while(true) {
+		    		refreshScore();
+	    			
+	    			try {
+						Thread.sleep(2000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+	    		}
+		    }
+		};
+		
+		chatThread.setDaemon(true);
+		chatThread.start();
+	}
+	
+	private void refreshScore() {
+		var _dbScore = new DatabaseController<Score>();
+		String scoreQuery = Score.getScoreFromGameQuery(_currentGame.getGameId());
+		
+		try {
+			_currentScore = (Score) _db.SelectFirst(scoreQuery, Score.class);
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		
+		Platform.runLater(() -> {
+			lblScore1.setText(Integer.toString(_currentScore.getOwnScore()));
+			lblScore2.setText(Integer.toString(_currentScore.getOpponentScore()));
+	    });
+		
 	}
 
 	public void initializeTest()
@@ -162,18 +208,132 @@ public class BoardController implements Initializable {
 	
 	public void playTurn()
 	{
-		System.out.println(_currentGame.getGameId() + " " + _currentTurn.getTurnId() + " " + MainController.getUser().getUsername() + " " + _fieldHand);
-		fieldhandReader();
-		if(checkPlayer())
-		{
-			
+		if(!hasNotPlacedFirstMid())
+		{	
+			if(!_board.allChainedToMiddle())
+				System.err.println("Not all tiles connected to the middle");
+			else
+			{
+				var wordsData = getUniqueWordData();
+				
+				var statementTurnPlayer = "";
+				var statementBoardPlayer = new StringBuilder();
+				var playerNum = checkPlayerIfPlayer1() ? 1 : 2;
+				var score = 0;
+				
+				for(var wordData : wordsData)
+				{
+					score += wordData.getScore();
+				}
+				
+				var gameId = _currentGame.getGameId();
+				var turnId = _currentTurn.getTurnId();
+				var username = MainController.getUser().getUsername();
+								
+				statementTurnPlayer = String.format("INSERT INTO turnplayer%1$s \n"
+						+ "(game_id, turn_id, username_player%1$s, bonus, score, turnaction_type) \n"
+						+ "VALUES(%2$s, %3$s, %4$s, %5$s, %6$s, %7$s)"
+						,playerNum, gameId, turnId, username, 0, score, "play");
+				
+				System.out.println(statementTurnPlayer);
+				
+				statementBoardPlayer.append("START TRANSACTION;\n");
+				statementBoardPlayer.append(String.format("INSERT INTO boardplayer%1$s \n"
+						+ "(game_id, username, turn_id, letter_id, tile_x, tile_y) \n"
+						+ "VALUES"
+						, playerNum));
+				
+				var dataSize = wordsData.size();
+
+				var dataCount = 0;
+				for(var wordData : wordsData)
+				{
+					dataCount++;
+					
+					var letters = wordData.getLetters();
+					var letterSize = letters.size();
+					
+					var letterCount = 0;
+					
+					Iterator<Map.Entry<Integer, Pair<Character, Point>>> entries = letters.entrySet().iterator();
+					
+					while(entries.hasNext())
+					{						
+						Map.Entry<Integer, Pair<Character, Point>> letterData = entries.next();
+						
+						var letterId = letterData.getKey();
+						var tileX = (int) letterData.getValue().getValue().getX();
+						var tileY = (int) letterData.getValue().getValue().getY();
+						
+						if(dataCount == dataSize)
+							letterCount++;
+						
+						if(letterCount == letterSize)
+							statementBoardPlayer.append(String.format("\n(%1$s, %2$s, %3$s, %4$s, %5$s, %6$s);"
+									,gameId, username, turnId, letterId, tileX, tileY));
+						else
+							statementBoardPlayer.append(String.format("\n(%1$s, %2$s, %3$s, %4$s, %5$s, %6$s),"
+									,gameId, username, turnId, letterId, tileX, tileY));
+					}
+				}
+				
+				statementBoardPlayer.append("\nCOMMIT;");
+				
+				System.out.println(statementBoardPlayer);
+			}
 		}
 		else
+			System.err.println("Middle field not used");
+	}
+	
+	private LinkedList<WordData> getUniqueWordData()
+	{
+		var uniqueWordsData = new LinkedList<WordData>();
+		
+				
+		for(Point point : _fieldHand.keySet())
 		{
+			var wordsData = getWordData(point);
 			
+			for(var wordData : wordsData)
+			{
+				uniqueWordsData.add(wordData);
+			}
 		}
 		
+		for(int i = 0; i < uniqueWordsData.size(); i++)
+		{
+			for(int j = 0; j < uniqueWordsData.size(); j++)
+			{
+				if(uniqueWordsData.get(i).hasSameLetterIds(uniqueWordsData.get(j).getLetterIds()))
+					uniqueWordsData.remove(j);
+			}
+		}
 		
+		return uniqueWordsData;
+	}
+	
+	private boolean hasNotPlacedFirstMid()
+	{		
+		if(_currentTurn.getTurnId() == 1)
+			return _board.canPlace(_board.getMiddle());
+		else
+			return false;
+	}
+	
+	public void clickSkipTurn() {
+		System.out.println("User clicked skip turn");
+		String insertQuery = Game.getPassQuery(_currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername(), checkPlayer());
+		
+		var _db = new DatabaseController<Game>();
+		
+		try {
+			_db.Insert(insertQuery);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		renewHand();
 	}
 	
 	public void resignGame()
@@ -206,16 +366,30 @@ public class BoardController implements Initializable {
 	}
 	
 	public void reset() {
-		resetHand();
+		resetFieldHand();
 		reset.setVisible(false);
 	}
 	
-	public void acceptWord() {
-		System.out.println("hier");
-		//TODO insert word in db
-		
-		addTurn();
+	public void renewHand() {
 		createHand(true);
+	}
+	private boolean needsToWaitForHandLetters() {
+		var table = checkPlayer() ? "turnplayer2" : "turnplayer1";
+		var query = TurnPlayer.hasPlacedTurn(table, _currentTurn.getTurnId(), _currentGame.getGameId());
+		System.out.println(query);
+		try {
+			var shoud = _db.SelectCount(query) == 0;
+			System.out.println(shoud + " table " + table + " turn " + _currentTurn.getTurnId());
+			return shoud;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	private boolean checkPlayer() {
+		return MainController.getUser().getUsername().equals(_currentGame.getUser1());
 	}
 	
 	public void openHistory() throws IOException{
@@ -256,22 +430,8 @@ public class BoardController implements Initializable {
 			_chatVisible = false;
 		}
 	}
-	
-	private ArrayList<String> fieldhandReader()
-	{
-		ArrayList<String> cords;
 		
-		for(Point point : _fieldHand.keySet())
-		{
-			String key = point.toString();
-			
-			System.out.println(key);
-		}
-		
-		return null;		
-	}
-	
-	private boolean checkPlayer()
+	private boolean checkPlayerIfPlayer1()
 	{		
 		return MainController.getUser().getUsername().equals(_currentGame.getUser1());
 	}
@@ -321,7 +481,7 @@ public class BoardController implements Initializable {
 						var cords = new Point(i, j);
 						if(existingTurns.containsKey(cords)) {
 							var turn = existingTurns.get(cords);
-							boardTile = new BoardTile(turn.getSymbol());
+							boardTile = new BoardTile(turn.getSymbol(), turn.getLetterId());
 							boardTile.setMinWidth(39);
 							boardTile.setMinHeight(39);
 							boardTile.setStyle("-fx-background-color: pink; -fx-background-radius: 6");
@@ -406,61 +566,100 @@ public class BoardController implements Initializable {
 		return  allTiles.size() == 1 ? allTiles.get(0) : null;
 	}
 	
+	
 	private void createHand(boolean checkGenerated) {
 		_currentHand.clear();
 		_db = new DatabaseController<HandLetter>();
-		var handLetters = getHandLetters(checkGenerated);
+		var handLetters = new ArrayList<HandLetter>();
+		
+		if(checkGenerated) {
+			var check = needsToWaitForHandLetters();
+			_currentTurn.incrementId();
+			getGeneratedLetters(check);
+			return;
+		}
+		
+		handLetters = getHandLetters();
+		visualizeHand(handLetters);
+	}
+	
+	private void visualizeHand(ArrayList<HandLetter> handLetters) {
 		int x = 0;
 		int y = 13;
 
 		for(var handLetter : handLetters) {
 			for(var letter : handLetter.getLetters()) {
-				var boardTile = new BoardTile(letter.getSymbol());
+				var boardTile = new BoardTile(letter.getSymbol(), letter.getLetterId());
 				boardTile.setDraggableEvents();
 				boardTile.setLayoutX(x);
 				boardTile.setLayoutY(y);
-				boardTile.setStyle("-fx-background-color: pink; -fx-background-radius: 6");
+				boardTile.setStyle("-fx-background-color: #3B86FF; -fx-background-radius: 6");
 				y += 44.5;
 				boardTile.setMinWidth(39);
 				boardTile.setMinHeight(39);
+				
 				paneHand.getChildren().add(boardTile);
 				_currentHand.add(boardTile);
 			}
 		};
-		placeHand(false);
+		
+		placeHand(false);		
 	}
 	
-	private ArrayList<HandLetter> getHandLetters(boolean checkGenerated) {
+	private void getGeneratedLetters(boolean checkGenerated){
 		if(checkGenerated) {
-			return checkNewHandLetter();
+			waitForVisualizeNewHandLetters();
 		}
+		else {
+			var handLetters = generateHandLetters();
+			visualizeHand(handLetters);
+		}
+	}
+	
+	private ArrayList<HandLetter> getHandLetters() {
 		var handLetters = getExistingHandLetters();
 		return handLetters.size() == 0 ? generateHandLetters() : handLetters; 
 	}
 	
-	private ArrayList<HandLetter> checkNewHandLetter(){
-		return new Callable<ArrayList<HandLetter>>() {
-			@Override
-			public ArrayList<HandLetter> call() {
+	private int getAmountLetters(ArrayList<HandLetter> handLetters) {
+		if(handLetters.isEmpty())
+			return 0;
+		return handLetters.get(0).getLetters().size();
+	}
+	
+	private void waitForVisualizeNewHandLetters(){	
+		var thread = new Thread() {
+			public void run() {
 				var handLetters = getExistingHandLetters();
-				while(handLetters.size() == 0) {
+				int tries = 0;
+				while(getAmountLetters(handLetters) == 0 || getAmountLetters(handLetters) != 7 || tries < 4) {
 	    			try {
 						Thread.sleep(1000);
 						handLetters = getExistingHandLetters();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
+						
+						tries++;
+						if (getAmountLetters(handLetters) == 0)
+							tries = 0;
+					
+					} catch (Exception e) {
+						System.out.println(e.getMessage());
 					}
 				}
-				return handLetters;
+				final var finalHandLetters = handLetters;
+				Platform.runLater(() -> {
+	            	visualizeHand(finalHandLetters);
+		        });
 			}
-		}.call();
+		};
+		
+		thread.setDaemon(true);
+		thread.start();
 	}
 	
 	private ArrayList<HandLetter> getExistingHandLetters() {
 		_db = new DatabaseController<HandLetter>();
 		
 		var statement = Game.getExisitingHandLetters(_currentGame.getGameId(), _currentTurn.getTurnId());
-		
 		ArrayList<HandLetter> handLetters = new ArrayList<HandLetter>();
 		
 		try {
@@ -487,7 +686,7 @@ public class BoardController implements Initializable {
 		return handLetters;
 	}
 	
-	private void resetHand() {
+	private void resetFieldHand() {
 		_fieldHand.entrySet().forEach(handLetter -> {
 			var cords = handLetter.getKey();
 			
@@ -500,29 +699,15 @@ public class BoardController implements Initializable {
 		_fieldHand.clear();
 	}
 	
-	private void addTurn() {
-		_currentTurn.incrementId();
+	private void addTurn() {		
 		var turnStatement = Turn.getInsertNewTurn(_currentGame.getGameId(), _currentTurn.getTurnId());
 		
 		try {
-			var turn = _db.InsertWithReturnKeys(turnStatement, getNewTurn());
+			_db.Insert(turnStatement);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-	
-	private Function<ResultSet, Turn> getNewTurn() {
-		return (resultSet -> {
-			Turn turn = null;
-			try {
-				turn = new Turn(resultSet, DatabaseController.getColumns(resultSet.getMetaData()));
-			} catch (SQLException e) {
-
-			}
-//			_currentTurn = turn;
-			return turn;
-		});
 	}
 	
 	private void placeHand(boolean shuffle) {
@@ -612,15 +797,14 @@ public class BoardController implements Initializable {
 				var boardTile = (BoardTilePane) event.getGestureTarget();
 				
 				var cords = boardTile.getCords();
-				
-				playTileSound();
-				
+								
 				if(!_board.canPlace(cords))
 					return;
 				
+				// Remove letter from fieldhand
 				if(sourceTile.getParent() instanceof BoardTilePane) {
 					var oldBoardTile = (BoardTilePane) sourceTile.getParent();
-					var oldCords = oldBoardTile.getCords();
+					var oldCords = oldBoardTile.getCords();						
 					_board.updateStatus(oldCords, PositionStatus.Open);
 					oldBoardTile.removeBoardTile();
 					_fieldHand.remove(oldCords);
@@ -638,10 +822,8 @@ public class BoardController implements Initializable {
 				event.acceptTransferModes(TransferMode.ANY);
 				event.setDropCompleted(true);
 				_board.updateStatus(cords, PositionStatus.Taken);
-
-				// TODO Add word collection from database and do something with the placed words
-				showPlacedWords(cords); // Only for testing purposes can remove after
-
+				
+				playTileSound();					
 				event.consume();
 			}
 		});
@@ -691,53 +873,97 @@ public class BoardController implements Initializable {
 		});
 	}
 	
-	private void showPlacedWords(Point cords)
+	private ArrayList<WordData> getWordData(Point cords)
 	{
-		try
-		{
-			var words = getPlacedWordsWithScore(cords);
-			
-			for(var word : words)
-			{
-				System.out.println("Word: " + word.getKey() + " Score: " + word.getValue() + " isMiddle: " + _firstPlacedWord + _currentTurn.getTurnId());
-			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
+		var completeWordData = new ArrayList<WordData>();
+		
+
+		var wordsWithScore = getPlacedWordsWithScore(cords);
+		
+		for(var word : wordsWithScore)
+		{								
+			completeWordData.add(new WordData(word.getKey(), word.getValue(), 
+					getPlacedWordWithLetterCords(cords, word.getKey())));
 		}
 
+		
+		return completeWordData;
+
+	}
+	
+	private HashMap<Integer,Pair<Character, Point>> getPlacedWordWithLetterCords(Point playedCord, String placedWord)
+	{
+		var placedWordWithLetterCords = new HashMap<Integer,Pair<Character, Point>>();
+		
+		var column = (int)playedCord.getX();
+		var row = (int)playedCord.getY();
+		
+		var wordHorWithStartEnd = collectLettersUntilSeperator(createCharArrFromCords(row, true), column, ' ');
+		var wordVerWithStartEnd = collectLettersUntilSeperator(createCharArrFromCords(column, false), row, ' ');
+		
+		var wordsWithStartEnd = new ArrayList<Pair<Pair<String, Pair<Integer, Integer>>, Boolean>>() { 
+			{ 
+				add(new Pair<>(
+						new Pair<>(wordHorWithStartEnd.getKey(), wordHorWithStartEnd.getValue()), true));
+				add(new Pair<>(
+						new Pair<>(wordVerWithStartEnd.getKey(), wordVerWithStartEnd.getValue()), false));
+			} };
+			
+		for(var wordWithStartEnd : wordsWithStartEnd)
+		{
+			var word = wordWithStartEnd.getKey().getKey().toLowerCase();
+			
+			if(!word.equals(placedWord.toLowerCase()))
+				continue;
+			
+			var horizontal = wordWithStartEnd.getValue();
+			var startEnd = wordWithStartEnd.getKey().getValue();
+			
+			var wordLetterCords = horizontal ? getWordLetterCords(row, startEnd, horizontal) :
+				getWordLetterCords(column, startEnd, horizontal);
+			
+			for(Map.Entry<Integer,Pair<Character, Point>> entry : wordLetterCords.entrySet())
+			{
+				var letterId = entry.getKey();
+				var letterCords = entry.getValue();
+				
+				placedWordWithLetterCords.put(letterId, letterCords);
+			}
+		}
+		
+		return placedWordWithLetterCords;
 	}
 		
 	private ArrayList<Pair<String, Integer>> getPlacedWordsWithScore(Point playedCord)
 	{
 		_db = new DatabaseController<Word>();
-		
-		// TODO add that this only gets checked after placing first letter on board
-		if(!_board.placedConnected(playedCord))
-			System.out.println("No tile connected");
-		else
-			System.out.println("Tile connected");
-				
+					
 		ArrayList<Pair<String, Integer>> placedWords = new ArrayList<Pair<String, Integer>>();
 		
 		var column = (int)playedCord.getX();
 		var row = (int)playedCord.getY();
 		
-		var horWordScore = getPlacedWordFromChars(createCharArrFromCords(row, true), playedCord, true);
-		var verWordScore = getPlacedWordFromChars(createCharArrFromCords(column, false), playedCord, false);
+		var horWordStartEnd = getPlacedWordFromChars(createCharArrFromCords(row, true), playedCord, true);
+		var verWordStartEnd = getPlacedWordFromChars(createCharArrFromCords(column, false), playedCord, false);
 		
-		var wordsWithScore = new ArrayList<Pair<String, Integer>>() { 
-			{ add(new Pair<>(verWordScore.getKey(), verWordScore.getValue()));
-				add(new Pair<>(horWordScore.getKey(), horWordScore.getValue())); } };
+		var wordsWithStartEnd = new ArrayList<Pair<Pair<String, Pair<Integer, Integer>>, Boolean>>() { 
+			{ 
+				add( new Pair<>(
+						new Pair<>(horWordStartEnd.getKey(), 
+								new Pair<>(horWordStartEnd.getValue().getKey(), horWordStartEnd.getValue().getValue())
+								), true));
+				add( new Pair<>(
+						new Pair<>(verWordStartEnd.getKey(), 
+								new Pair<>(verWordStartEnd.getValue().getKey(), verWordStartEnd.getValue().getValue())
+								), false));
+			} };
 		
-		for(var wordWithScore : wordsWithScore)
+		for(var wordWithStartEnd : wordsWithStartEnd)
 		{
 			try 
 			{
-				var word = wordWithScore.getKey();
-				var score = wordWithScore.getValue();
-				
+				var word = wordWithStartEnd.getKey().getKey();
+								
 				var statement = String.format("SELECT word, state FROM dictionary "
 						+ "WHERE word = '%s'", word);
 				
@@ -751,7 +977,17 @@ public class BoardController implements Initializable {
 										
 					if(dictWord.getWord().equals(word.toLowerCase()) 
 							&& dictWord.getWordState().equals("accepted"))
-						placedWords.add(new Pair<>(dictWord.getWord(), score));
+					{
+						var startEnd = wordWithStartEnd.getKey().getValue();
+						var horizontal = wordWithStartEnd.getValue();
+						
+						var wordScore = 0;
+						
+						wordScore = horizontal ? getWordScore(startEnd, row, horizontal) : 
+							getWordScore(startEnd, column, horizontal);
+						
+						placedWords.add(new Pair<>(dictWord.getWord(), wordScore));
+					}
 				}	
 			} 
 			catch (SQLException e) 
@@ -800,60 +1036,22 @@ public class BoardController implements Initializable {
 		return arr.stream().map(String::valueOf).collect(Collectors.joining()).toCharArray();
 	}
 	
-	private Pair<String, Integer> getPlacedWordFromChars(char[] letters, Point placedCord, boolean horizontal)
+	private Pair<String, Pair<Integer, Integer>> getPlacedWordFromChars(char[] letters, Point placedCord, boolean horizontal)
 	{	
-		Pair<String, Integer> wordWithScore;
-		
-		if(horizontal)			
-		{
-			var wordWithStartEnd = collectLettersUntilSeperator(letters, (int)placedCord.getX(), ' ');
-			var word = wordWithStartEnd.getKey();
-			var score = getWordScore(wordWithStartEnd.getValue(), (int)placedCord.getY(), horizontal);
-			wordWithScore = new Pair<String, Integer>(word, score);
-		}
-		else
-		{
-			var wordWithStartEnd = collectLettersUntilSeperator(letters, (int)placedCord.getY(), ' ');
-			var word = wordWithStartEnd.getKey();
-			var score = getWordScore(wordWithStartEnd.getValue(), (int)placedCord.getX(), horizontal);
-			wordWithScore = new Pair<String, Integer>(word, score);
-		}
+		Pair<String, Pair<Integer, Integer>> wordWithStartEnd;
+				
+		wordWithStartEnd = horizontal ? collectLettersUntilSeperator(letters, (int)placedCord.getX(), ' ') :
+			collectLettersUntilSeperator(letters, (int)placedCord.getY(), ' ');
 			
-		return wordWithScore;
+		return wordWithStartEnd;
 	}
 	
-	public Pair<String, Integer> getPlacedWordFromChars(char[] letters, Pair<Integer, Integer> placedCord, boolean horizontal, boolean test)
-	{	
-		Pair<String, Integer> wordWithScore;
-		
-		if(horizontal)			
-		{
-			var wordWithStartEnd = collectLettersUntilSeperator(letters, placedCord.getKey(), ' ');
-			var word = wordWithStartEnd.getKey();
-			var score = getWordScore(wordWithStartEnd.getValue(), placedCord.getValue(), horizontal, test);
-			wordWithScore = new Pair<String, Integer>(word, score);
-		}
-		else
-		{
-			var wordWithStartEnd = collectLettersUntilSeperator(letters, placedCord.getValue(), ' ');
-			var word = wordWithStartEnd.getKey();
-			var score = getWordScore(wordWithStartEnd.getValue(), placedCord.getKey(), horizontal, test);
-			wordWithScore = new Pair<String, Integer>(word, score);
-		}
-			
-		return wordWithScore;
-	}
-	
-	private int getWordScore(Pair<Integer,Integer> endStart, int colro, boolean horizontal, boolean Testing)
+	private HashMap<Integer,Pair<Character, Point>> getWordLetterCords(int colro, Pair<Integer, Integer> startEnd, boolean horizontal)
 	{
-		var start = endStart.getKey();
-		var end = endStart.getValue();
+		var letterCords = new HashMap<Integer,Pair<Character, Point>>();
 		
-		var score = 0;
-		
-		var hasWordMulti = false;
-		
-		var wordMultiTiles = new ArrayList<BoardTileTest>();
+		var start = startEnd.getKey();
+		var end = startEnd.getValue();
 		
 		for(int i = start; i <= end; i++)
 		{
@@ -863,78 +1061,58 @@ public class BoardController implements Initializable {
 				cord = new Point(i, colro);
 			else
 				cord = new Point(colro, i);
-			
-			if(_boardTilesTest.containsKey(cord))
-			{
-				var tile = _boardTilesTest.get(cord);
-				
-				var letterScore = tile.getSymbol().getValue();
-				var bonusLetter = tile.getBonusLetter();
-				var bonusMulti = tile.getBonusValue();
-				
-				if(bonusMulti != 0 && bonusLetter != 'W')
-					score += letterScore * bonusMulti;
-				else
-					score += letterScore;
-					
-				if (bonusLetter == 'W')
-				{
-					hasWordMulti = true;
-					wordMultiTiles.add(tile);
-				}
-			}
-		}
-		
-		if(hasWordMulti)
-		{
-			for(var tile : wordMultiTiles)
-			{
-				score += score * tile.getBonusValue();
-			}
-		}
-		
-		return score;
-	}
-	
-	private int getWordScore(Pair<Integer,Integer> endStart, int colro, boolean horizontal)
-	{
-		var start = endStart.getKey();
-		var end = endStart.getValue();
-		var score = 0;
-		
-		var hasWordMulti = false;
-		
-		var wordMultiTiles = new ArrayList<BoardTilePane>();
-		
-		for(int i = start; i <= end; i++)
-		{
-			Point cord = null;
-			
-			if(horizontal)
-				cord = new Point(i, colro);
-			else
-				cord = new Point(colro, i);
-			
-			// Coordinate altijd horizontaal coordinaat
-			System.out.println(cord.getX() + " " + cord.getY() );
-			
-			if(_currentTurn.getTurnId() == 1)
-			{
-				if(cord.equals(new Point(7,7)))
-				{
-					_firstPlacedWord = true;
-				}
-			}
 			
 			if(_boardTiles.containsKey(cord))
 			{
 				var tile = _boardTiles.get(cord);
 				
-				var letterScore = tile.getBoardTile().getSymbol().getValue();
-				var bonusLetter = tile.getBonusLetter();
-				var bonusMulti = tile.getBonusValue();
+				letterCords.put(tile.getBoardTile().getLetterId(), new Pair<>(tile.getBoardTileSymbolAsChar(), cord));
+			}
+		}
+		
+		return letterCords;
+	}
+	
+	private int getWordScore(Pair<Integer,Integer> startEnd, int colro, boolean horizontal)
+	{
+		var start = startEnd.getKey();
+		var end = startEnd.getValue();
 				
-				if(bonusMulti != 0 && bonusLetter != 'W')
+		return calcScore(colro, start, end, horizontal, false);
+	}
+	
+	public int calcScore(int colro , int start, int end, boolean horizontal, boolean testing)
+	{
+		var wordMultiTiles = new ArrayList<Object>();
+		
+		var tileCollection = testing ? _boardTilesTest : _boardTiles;
+				
+		var score = 0;
+		
+		var hasWordMulti = false;
+		
+		for(int i = start; i <= end; i++)
+		{
+			Point cord = null;
+			
+			if(horizontal)
+				cord = new Point(i, colro);
+			else
+				cord = new Point(colro, i);
+			
+			{
+				var tile = tileCollection.get(cord);
+				
+				var letterScore = testing ? ((BoardTileTest) tile).getSymbol().getValue() :
+					((BoardTilePane) tile).getBoardTile().getSymbol().getValue();
+				
+				var bonusLetter = testing ? ((BoardTileTest) tile).getBonusLetter() : 
+					((BoardTilePane) tile).getBonusLetter();
+				
+				var bonusMulti = testing ? ((BoardTileTest) tile).getBonusValue() :
+					((BoardTilePane) tile).getBonusValue();
+				
+				if(bonusLetter == 'L')
 					score += letterScore * bonusMulti;
 				else
 					score += letterScore;
@@ -942,7 +1120,10 @@ public class BoardController implements Initializable {
 				if (bonusLetter == 'W')
 				{
 					hasWordMulti = true;
-					wordMultiTiles.add(tile);
+					if(testing)
+						wordMultiTiles.add((BoardTileTest)tile);
+					else
+						wordMultiTiles.add((BoardTilePane)tile);
 				}
 			}
 		}
@@ -951,18 +1132,21 @@ public class BoardController implements Initializable {
 		{
 			for(var tile : wordMultiTiles)
 			{
-				score += score * tile.getBonusValue();
+				var multi = testing ? ((BoardTileTest) tile).getBonusValue() 
+						: ((BoardTilePane) tile).getBonusValue();
+				
+				score = score * multi;
 			}
 		}
 		
 		return score;
 	}
-	
+		
 	private Pair<String,Pair<Integer,Integer>> collectLettersUntilSeperator(char[] letters, int index, char seperator)
 	{
 		var str = new StringBuilder();
 		
-		var endStr = 0;
+		var endStr = 14;
 		
 		var startStr = 0;
 		

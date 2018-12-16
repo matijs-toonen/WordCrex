@@ -44,4 +44,8 @@ public class TurnBoardLetter {
 	public Symbol getSymbol() {
 		return _letter.getSymbol();
 	}
+	
+	public int getLetterId() {
+		return _letter.getLetterId();
+	}
 }

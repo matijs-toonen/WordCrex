@@ -6,7 +6,10 @@ import java.util.function.Consumer;
 import Controller.MainController;
 import Model.Game;
 import Model.GameStatus;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Cursor;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -17,8 +20,9 @@ public class GameItem extends AnchorPane {
 	
 	private Game _currentGame;
 	private Label lblUser = new Label();
-	private Label lblTime = new Label();
+	private Label lblStatus = new Label();
 	private ImageView imgStatus = new ImageView();
+	private Button rightArrow = new Button();
 	
 	public GameItem(Game game) {
 		super();
@@ -26,7 +30,9 @@ public class GameItem extends AnchorPane {
 		setUserLabel();
 		setSubLabel();
 		setImage();
-		this.getChildren().addAll(lblTime, imgStatus, lblUser);
+		setRightArrow();
+		
+		this.getChildren().addAll(lblStatus, imgStatus, lblUser, rightArrow);
 	}
 	
 	private void setImage() {
@@ -64,11 +70,11 @@ public class GameItem extends AnchorPane {
 		
 		if(zetUser1 <= zetUser2){
 			is = this.getClass().getResourceAsStream("/Resources/request.png");
-			lblTime.setText(opponent + " wacht op jou...");
+			lblStatus.setText(opponent + " wacht op jou...");
 		}
 		else {
 			is = this.getClass().getResourceAsStream("/Resources/playing.png");
-			lblTime.setText("We wachten op " + opponent);
+			lblStatus.setText("We wachten op " + opponent);
 		}
     
 		return new Image(is);
@@ -84,12 +90,12 @@ public class GameItem extends AnchorPane {
 		//Determine won/lost
 		if(username.equals(winner)) {
 			is = this.getClass().getResourceAsStream("/Resources/finished.png");
-			lblTime.setText("Je hebt gewonnen!");
+			lblStatus.setText("Je hebt gewonnen!");
 		}
 		else
 		{
 			is = this.getClass().getResourceAsStream("/Resources/resigned.png");
-			lblTime.setText("Je hebt verloren..");
+			lblStatus.setText("Je hebt verloren..");
 		}
 		
 		return new Image(is);
@@ -104,18 +110,31 @@ public class GameItem extends AnchorPane {
 	
 	private void setSubLabel() {
 		lblUser.getStyleClass().add("text");
-		lblTime.setStyle("-fx-padding: 20 0 40 50; -fx-font-size: 13px; -fx-text-fill: #ABABB1");
+		lblStatus.setStyle("-fx-padding: 20 0 40 50; -fx-font-size: 13px; -fx-text-fill: #ABABB1");
+	}
+	
+	private void setRightArrow() {
+		InputStream is = this.getClass().getResourceAsStream("/Resources/rightArrow.png");
+		Image image = new Image(is);
+		
+		if(_currentGame.getSatus() != null) {
+			rightArrow.setLayoutX(300);
+			rightArrow.setLayoutY(5);
+			rightArrow.setGraphic(new ImageView(image));
+			rightArrow.setCursor(Cursor.HAND);
+			rightArrow.getStyleClass().add("rightArrow");
+		}
 	}
 	
 	public Game getGame() {
 		return _currentGame;
 	}
 
-	public void setUserOnClickEvent(Consumer<MouseEvent> action) {
+	public void setUserOnClickEvent(Consumer<ActionEvent> action) {
 		
-		lblUser.setOnMouseClicked(new EventHandler<MouseEvent>() {
+		rightArrow.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
-			public void handle(MouseEvent event) {
+			public void handle(ActionEvent event) {
 				action.accept(event);
 			}
 		});

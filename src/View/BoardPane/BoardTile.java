@@ -18,22 +18,24 @@ import javafx.scene.paint.Color;
 
 public class BoardTile extends Pane {
 	private Symbol _symbol;
+	private int _letterId;
 	private Label lblValue = new Label();
 	private Label lblSymbol = new Label();
-
-	public BoardTile(Symbol symbol) {
+	
+	public BoardTile(Symbol symbol, int letterId) {
 		super();
+		_letterId = letterId;
 		init(symbol);
 	}
 	
 	private void init(Symbol symbol) {
 		_symbol = symbol;
-		lblValue.setLayoutX(20);
-		lblValue.setTextFill(Color.GREEN);
+		lblValue.setLayoutX(25);
+		lblValue.getStyleClass().add("tileValue");
 
 		lblSymbol.setLayoutX(12);
 		lblSymbol.setLayoutY(8);
-		lblSymbol.setTextFill(Color.BLUE);
+		lblSymbol.getStyleClass().add("tileSymbol");
 		
 		if(_symbol == null) {
 			lblSymbol.setText("#");
@@ -48,6 +50,10 @@ public class BoardTile extends Pane {
 
 		getChildren().removeAll(lblValue, lblSymbol);
 		getChildren().addAll(lblValue, lblSymbol);
+	}
+	
+	public int getLetterId() {
+		return _letterId;
 	}
 	
 	public Symbol getSymbol() {
