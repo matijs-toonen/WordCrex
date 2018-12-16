@@ -20,6 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import Model.BoardPlayer;
 import Model.Game;
 import Model.HandLetter;
 import Model.Letter;
@@ -242,23 +243,26 @@ public class BoardController implements Initializable {
 	
 	public void playTurn()
 	{
-		if(!hasNotPlacedFirstMid())
+		if(!isMiddleOpen())
 		{	
 			if(!_board.allChainedToMiddle())
-				System.err.println("Not all tiles connected to the middle");
+				showErrorMessage("Niet alle tiles zitten aan elkaar");
 			else
 			{
 				var wordsData = getUniqueWordData();
 				
+				if(wordsData.size() > 1)
+				{
+					showErrorMessage("Je mag maar 1 woord leggen");
+					return;
+				}
+				
+				var wordData = wordsData.get(0);
+				
 				var statementTurnPlayer = "";
 				var statementBoardPlayer = new ArrayList<String>();
 				var playerNum = checkPlayerIfPlayer1() ? 1 : 2;
-				var score = 0;
-				
-				for(var wordData : wordsData)
-				{
-					score += wordData.getScore();
-				}
+				var score = wordData.getScore();
 				
 				var gameId = _currentGame.getGameId();
 				var turnId = _currentTurn.getTurnId();
@@ -268,25 +272,11 @@ public class BoardController implements Initializable {
 						+ "(game_id, turn_id, username_player%1$s, bonus, score, turnaction_type) \n"
 						+ "VALUES(%2$s, %3$s, '%4$s', %5$s, %6$s, '%7$s')"
 						,playerNum, gameId, turnId, username, 0, score, "play");
+								
+
+				var lettersData = wordData.getLetters();
 				
-				var uniqueLettersData = new HashMap<Integer, Pair<Character, Point>>();
-				
-				for(var wordData : wordsData)
-				{
-					var lettersData = wordData.getLetters();
-					
-					lettersData.entrySet().forEach(letterData -> {
-						
-						var letterId = letterData.getKey();
-						var letterCharCord = letterData.getValue();
-						
-						if(!uniqueLettersData.containsKey(letterId))
-							uniqueLettersData.put(letterId, letterCharCord);
-						
-					});
-				}
-				
-				uniqueLettersData.entrySet().forEach(letterData -> {
+				lettersData.entrySet().forEach(letterData -> {
 					
 					var letterId = letterData.getKey();
 					var tileX = (int) letterData.getValue().getValue().getX()+1;
@@ -297,6 +287,8 @@ public class BoardController implements Initializable {
 							+ "VALUES (%2$s, '%3$s', %4$s, %5$s, %6$s, %7$s);"
 							, playerNum,gameId, username, turnId, letterId, tileX, tileY));
 				});
+				
+
 								
 				String[] statementBoardPlayerArr = new String[statementBoardPlayer.size()];
 				statementBoardPlayerArr = statementBoardPlayer.toArray(statementBoardPlayerArr);
@@ -322,7 +314,7 @@ public class BoardController implements Initializable {
 			}
 		}
 		else
-			System.err.println("Middle field not used");
+			showErrorMessage("Middelste tile moet gevuld zijn");
 	}
 	
 	private LinkedList<WordData> getUniqueWordData()
@@ -351,12 +343,9 @@ public class BoardController implements Initializable {
 		return uniqueWordsData;
 	}
 	
-	private boolean hasNotPlacedFirstMid()
+	private boolean isMiddleOpen()
 	{		
-		if(_currentTurn.getTurnId() == 1)
-			return _board.canPlace(_board.getMiddle());
-		else
-			return false;
+		return _board.canPlace(_board.getMiddle());
 	}
 	
 	public void clickSkipTurn() {
@@ -656,9 +645,143 @@ public class BoardController implements Initializable {
 			waitForVisualizeNewHandLetters();
 		}
 		else {
-			var handLetters = generateHandLetters();
-			visualizeHand(handLetters);
+			var scores = getScores();
+			if(insertScore(scores.getKey(), scores.getValue()))
+			{
+				var handLetters = generateHandLetters();
+				visualizeHand(handLetters);
+			}
 		}
+	}
+	
+	private boolean insertScore(int ownScore, int oppScore)
+	{
+		var ownInsert = false;
+		var oppInsert = false;
+		
+		var bonus = 5;
+		
+		var gameId = _currentGame.getGameId();
+		var turnId = _currentTurn.getTurnId();
+		
+		var ownPlayerNum = checkPlayerIfPlayer1() ? 1 : 2;
+		
+		var oppPlayerNum = ownPlayerNum == 1 ? 2 : 1;
+		
+		try
+		{			
+			if(ownScore == oppScore)
+			{				
+				var statement = String.format("UPDATE turnplayer%s"
+						+ "SET bonus = %s"
+						+ "WHERE game_id = %s"
+						+ "AND turn_id = %s"
+						+ "AND score = %s",oppPlayerNum, bonus, gameId, turnId, oppScore);
+								
+				if(_db.Update(statement))
+					oppScore += bonus;
+			}
+
+			if(ownScore > oppScore)
+			{
+				var selectStatement = String.format("SELECT letter_id, game_id, turn_id, tile_x, tile_y "
+						+ "FROM boardplayer%s "
+						+ "WHERE game_id = %s "
+						+ "AND turn_id = %s", ownPlayerNum, gameId, turnId);
+				
+				ArrayList<BoardPlayer> playerBoard = (ArrayList<BoardPlayer>) 
+						_db.SelectAll(selectStatement, BoardPlayer.class);
+				
+				ArrayList<String> insertStatements = new ArrayList<String>();
+				
+				for(var boardPlayer : playerBoard)
+				{
+					var insertStatement = String.format("INSERT INTO turnboardletter "
+							+ "(letter_id, game_id, turn_id, tile_x, tile_y)"
+							+ "VALUES"
+							+ "(%s, %s, %s, %s, %s)"
+							, boardPlayer.getLetterId(), boardPlayer.getGameId(), boardPlayer.getTurnId(),
+							boardPlayer.getLetterX(), boardPlayer.getLetterY());
+					
+					insertStatements.add(insertStatement);
+				}
+				
+				String[] statementBoardPlayerArr = new String[insertStatements.size()];
+				statementBoardPlayerArr = insertStatements.toArray(statementBoardPlayerArr);
+				
+
+				
+				oppInsert = true;
+				ownInsert = _db.InsertBatch(statementBoardPlayerArr);
+				
+			}
+			else
+			{
+				var selectStatement = String.format("SELECT letter_id, game_id, turn_id, tile_x, tile_y "
+						+ "FROM boardplayer%s "
+						+ "WHERE game_id = %s "
+						+ "AND turn_id = %s", oppPlayerNum, gameId, turnId);
+				
+				ArrayList<BoardPlayer> playerBoard = (ArrayList<BoardPlayer>) 
+						_db.SelectAll(selectStatement, BoardPlayer.class);
+				
+				ArrayList<String> insertStatements = new ArrayList<String>();
+				
+				for(var boardPlayer : playerBoard)
+				{
+					var insertStatement = String.format("INSERT INTO turnboardletter "
+							+ "(letter_id, game_id, turn_id, tile_x, tile_y)"
+							+ "VALUES"
+							+ "(%s, %s, %s, %s, %s)"
+							, boardPlayer.getLetterId(), boardPlayer.getGameId(), boardPlayer.getTurnId(),
+							boardPlayer.getLetterX(), boardPlayer.getLetterY());
+					
+					insertStatements.add(insertStatement);
+				}
+				
+				String[] statementBoardPlayerArr = new String[insertStatements.size()];
+				statementBoardPlayerArr = insertStatements.toArray(statementBoardPlayerArr);
+				
+				oppInsert = _db.InsertBatch(statementBoardPlayerArr);
+				ownInsert = true;
+			}
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return ownInsert == oppInsert;
+	}
+		
+	private Pair<Integer, Integer> getScores()
+	{
+		Pair<Integer, Integer> ownOppScore = null;
+		try
+		{
+			var gameId = _currentGame.getGameId();
+			var turnId = _currentTurn.getTurnId();
+			
+			var ownPlayerNum = checkPlayerIfPlayer1() ? 1 : 2;
+			
+			var opponentPlayerNum = ownPlayerNum == 1 ? 2 : 1;
+			
+			var ownScore = _db.SelectCount(String.format("SELECT score FROM turnplayer%1$s "
+					+ "WHERE game_id = %2$s "
+					+ "AND turn_id = %3$s", ownPlayerNum, gameId, turnId));
+			
+			var opponentScore = _db.SelectCount(String.format("SELECT score FROM turnplayer%1$s "
+					+ "WHERE game_id = %2$s "
+					+ "AND turn_id = %3$s",opponentPlayerNum, gameId, turnId)); 
+			
+			ownOppScore = new Pair<>(ownScore, opponentScore);
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return ownOppScore;
 	}
 	
 	private ArrayList<HandLetter> getHandLetters() {
@@ -672,7 +795,6 @@ public class BoardController implements Initializable {
 		return handLetters.get(0).getLetters().size();
 	}
 	
-	// TODO HERE
 	private void waitForVisualizeNewHandLetters(){
 		disableBoard();
 		
@@ -951,12 +1073,11 @@ public class BoardController implements Initializable {
 	private ArrayList<WordData> getWordData(Point cords)
 	{
 		var completeWordData = new ArrayList<WordData>();
-		
 
 		var wordsWithScore = getPlacedWordsWithScore(cords);
-		
+				
 		for(var word : wordsWithScore)
-		{								
+		{
 			completeWordData.add(new WordData(word.getKey(), word.getValue(), 
 					getPlacedWordWithLetterCords(cords, word.getKey())));
 		}
