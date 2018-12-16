@@ -90,7 +90,7 @@ public class BoardController implements Initializable {
 	private AnchorPane rightBarAnchor;
 	
 	@FXML
-	private ImageView reset, accept;
+	private ImageView shuffle, accept;
 	
 	@FXML
 	private AnchorPane screenPane;	
@@ -401,7 +401,7 @@ public class BoardController implements Initializable {
 	public void reset() {
 		resetFieldHand();
 		placeHand(false);
-		reset.setVisible(false);
+		shuffle.setVisible(true);
 	}
 	
 	public void renewHand() {
@@ -1044,7 +1044,7 @@ public class BoardController implements Initializable {
 				sourceTile.setLayoutY(0);
 				boardTile.setBoardTile(sourceTile);
 				
-				reset.setVisible(true);
+				shuffle.setVisible(false);
 				_fieldHand.put(cords, sourceTile);
 				_boardTiles.put(cords, boardTile);
 				
