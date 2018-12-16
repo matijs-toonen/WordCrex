@@ -121,8 +121,8 @@ WHERE
         
 -- Account regristeren
 
-set @username = 'testmannetje';
-set @upassword = 'test';
+set @username = 'tom';
+set @upassword = '12345';
 
 INSERT INTO account (username, password)
 SELECT * FROM (SELECT @username, @upassword) AS tmp
@@ -148,13 +148,13 @@ where word = @wordGuess;
 set @gameid = 528;
 
 INSERT INTO turn (game_id, turn_id)
-VALUES( @gameid, (select max(turn_id) + 1 from turn where game_id = @gameid));
+VALUES( 504, (select max(turn_id) + 1 from turn where game_id = 504));
 
 INSERT INTO turnplayer1 (game_id, turn_id, username_player1, turnaction_type)
-VALUES( @gameid, (select max(turn_id) + 1 from turn where game_id = @gameid), 'sjors', 'resign');
+VALUES( 504, (select max(turn_id) + 1 from turn where game_id = 504), 'tom', 'play');
 
 INSERT INTO turnplayer2 (game_id, turn_id, username_player2, turnaction_type)
-VALUES( @gameid, (select max(turn_id) + 1 from turn where game_id = @gameid), 'matijs', 'play');
+VALUES( 504, (select max(turn_id) + 1 from turn where game_id = 504), 'sjors', 'play');
 
 -- turn acties verwerken
 -- Als er gewoon gespeeld word
@@ -180,21 +180,23 @@ update turnplayer2
 set turnaction_type = 'pass'
 where username_player2 = 'rik' and game_id = @gameid and turn_ID = (select max(turn_id) from turn where game_id = @gameid);
 -- check of er een pass aanwezig is in de huidige turn
-set @gameid = 500;
+set @gameid = 504;
+set @turnid = 1;
+set @username = 'sjors';
 
-UPDATE turnplayer1 
+UPDATE turnplayer2 
 SET 
     turnaction_type = 'resign'
 WHERE
     game_id = @gameid 
 		AND turn_id = @turnid
-        AND username_player1 = @username;
+        AND username_player2 = @username;
 
 UPDATE game 
 SET 
-    game_state = 'resigned'
+    game.game_state = 'resigned'
 WHERE
-    game_id = (SELECT 
+    game.game_id = (SELECT 
             g.game_id
         FROM
             game AS g
@@ -207,7 +209,25 @@ WHERE
                 OR p2.turnaction_type = 'resign'
                 AND g.game_id = 528); 
 
+UPDATE game 
+SET 
+    game.game_state = 'resigned'
+WHERE
+    game.game_id = (SELECT 
+            g.game_id
+        FROM
+            (select * from game) AS g
+                JOIN
+            turnplayer1 AS p1 ON p1.game_id = g.game_id
+                JOIN
+            turnplayer2 AS p2 ON p2.game_id = g.game_id
+        WHERE
+            p1.turnaction_type = 'resign'
+                OR p2.turnaction_type = 'resign'
+                AND g.game_id = 528); 
+
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+set @gameid = 528;
 
 INSERT INTO turnplayer1 (game_id, turn_id, username_player1, turnaction_type)
 VALUES( @gameid, 2, 'sjors', 'resign');

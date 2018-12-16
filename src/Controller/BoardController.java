@@ -95,7 +95,8 @@ public class BoardController implements Initializable {
 	private ImageView reset, accept;
 	
 	@FXML
-	private AnchorPane screenPane;	
+	private AnchorPane screenPane;
+	
 	
 	public BoardController(Game game, Turn turn) {
 		_currentGame = game;
@@ -338,6 +339,7 @@ public class BoardController implements Initializable {
 	
 	public void resignGame()
 	{		
+
 		try 
 		{
 			var updateStatement = TurnPlayer.getTurnPlayerUpdateQuery(checkPlayer(), "resign", _currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername());
@@ -348,20 +350,68 @@ public class BoardController implements Initializable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		AnchorPane pane = null;
+
 		try 
-		{		 
-			GameController con = new GameController(_rootPane);			
-			var panes = new FXMLLoader(getClass().getResource("/View/Games.fxml"));
+		{
+			if(checkPlayer())
+			{
+				_db.Update("UPDATE turnplayer1 " + 
+						"SET " + 
+						"turnaction_type = 'resign' " + 
+						"WHERE " + 
+						"game_id = " + _currentGame.getGameId() + " " + 
+						"AND turn_id = " + _currentTurn.getTurnId() + " " + 
+						"AND username_player1 = " + MainController.getUser().getUsername() + "");
+			}
+			else 
+			{
+				_db.Update("UPDATE turnplayer2 " + 
+						"SET " + 
+						"turnaction_type = 'resign' " + 
+						"WHERE " + 
+						"game_id = " + _currentGame.getGameId() + " " + 
+						"AND turn_id = " + _currentTurn.getTurnId() + " " + 
+						"AND username_player2 = " + MainController.getUser().getUsername() + "");
+			}
 			
+			_db.Update("UPDATE game " + 
+					"SET " + 
+					"game.game_state = 'resigned' " + 
+					"WHERE " + 
+					"game.game_id = (SELECT " + 
+					"g.game_id " + 
+					"FROM " + 
+					"game AS g " + 
+					"JOIN " + 
+					"turnplayer1 AS p1 ON p1.game_id = g.game_id " + 
+					"JOIN " + 
+					"turnplayer2 AS p2 ON p2.game_id = g.game_id " + 
+					"WHERE " + 
+					"p1.turnaction_type = 'resign' " + 
+					"OR p2.turnaction_type = 'resign' " + 
+					"AND g.game_id = " + _currentGame.getGameId() + "); ");
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
+		
+				
+		AnchorPane pane = null;
+		try {
+			GameController con = new GameController(_rootPane);
+			
+			var panes = new FXMLLoader(getClass().getResource("/View/Games.fxml"));
 			panes.setController(con);
 			pane = panes.load();
 			
 		}
 		catch(Exception ex) {
 			Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
-		}		
+		}
+		//borderPane.setCenter(root);
 		_rootPane.getChildren().setAll(pane);
 	}
 	
