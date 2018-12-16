@@ -413,7 +413,7 @@ public class BoardController implements Initializable {
 		try 
 		{
 			var resignTurnStatement = TurnPlayer.getResignQuery(checkPlayerIfPlayer1(), "resign", _currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername());
-			var resignGameStatement = Game.getResignQuery(_currentGame.getGameId());
+			var resignGameStatement = Game.getResignQuery(_currentGame.getGameId(), getOpponent());
 			
 			if(_db.Insert(resignTurnStatement))
 				_db.Update(resignGameStatement);

@@ -215,10 +215,10 @@ public class Game {
  				, usernameFrom, usernameTo);
  	}
  	
- 	public static final String getResignQuery(int gameId) {
+ 	public static final String getResignQuery(int gameId, String opponent) {
  		return ("UPDATE game " + 
  				"SET " + 
- 				"game_state = 'resigned' " + 
+ 				"game_state = 'resigned', username_winner = '" + opponent + "' " + 
  				"WHERE " + 
  				"game_id = " + gameId);
  	}
