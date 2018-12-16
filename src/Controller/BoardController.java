@@ -117,7 +117,7 @@ public class BoardController implements Initializable {
 
 	private void getLetters() {
 		_db = new DatabaseController<Symbol>();
-		var statement = "SELECT * FROM letter NATURAL JOIN symbol WHERE game_id = " + _currentGame.getGameId();
+		var statement = Letter.getUnusedLetters(_currentGame.getGameId());
 		
 		try {
 			_letters = (ArrayList<Letter>)_db.SelectAll(statement, Letter.class);
@@ -657,12 +657,25 @@ public class BoardController implements Initializable {
 			public void run() {
 				var handLetters = getExistingHandLetters();
 				int tries = 0;
+//				while(true) {
+//					Thread.sleep(1000);
+//					handLetters = getExistingHandLetters();
+//					
+//					var amount = getAmountLetters(handLetters);
+//					if(amount == 0 || amount != 7 || tries < 4) {
+//						
+//					}
+//					break;
+//				}
 				while(getAmountLetters(handLetters) == 0 || getAmountLetters(handLetters) != 7 || tries < 4) {
 	    			try {
 						Thread.sleep(1000);
 						handLetters = getExistingHandLetters();
 						
-						tries++;
+						if(getAmountLetters(handLetters) > 0) {
+							tries++;	
+						}
+						
 						if (getAmountLetters(handLetters) == 0)
 							tries = 0;
 					
@@ -707,6 +720,8 @@ public class BoardController implements Initializable {
 		for(int i = 0; i < 7; i++) {
 			handLetters.add(createHandLetter());
 		}
+		
+		getLetters();
 		
 		return handLetters;
 	}
@@ -763,18 +778,24 @@ public class BoardController implements Initializable {
 	}
 		
 	private HandLetter createHandLetter() {
+		var letter = createLetter();
+		if(letter == null)
+			return null;
+		
 		return new HandLetter(_currentGame, _currentTurn, createLetter());
 	}
 	
 	private Letter createLetter() {
-		var number = _random.nextInt(_letters.size());
+		var amountOfLetters = _letters.size();
+		if(amountOfLetters == 0) 
+			return null;
+		
+		var number = _random.nextInt(amountOfLetters);
 		var rndLetter = _letters.get(number);
 		
-		var statement = "INSERT INTO handletter VALUES (" + _currentGame.getGameId() + ", " + _currentTurn.getTurnId() + ", " + rndLetter.getLetterId() + ")"; 
-		
+		var statement = HandLetter.insertLetter(_currentGame.getGameId(), _currentTurn.getTurnId(), rndLetter.getLetterId());
 		try {
 			if(_db.Insert(statement)) {
-				_letters.remove(number);
 				return rndLetter;
 			}
 		} catch (SQLException e) {

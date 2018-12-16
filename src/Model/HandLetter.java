@@ -48,4 +48,8 @@ public class HandLetter {
 	public static Optional<HandLetter> getHandByGameAndTurn(ArrayList<HandLetter> handLetters, int gameId, int turnId){
 		return handLetters.stream().filter(handLetter -> handLetter.getGameId() == gameId && handLetter.getTurnId() == turnId).findFirst();
 	}
+	
+	public final static String insertLetter(int gameId, int turnId, int letterId) {
+		return ("INSERT INTO handletter VALUES (" + gameId + ", " + turnId + ", " + letterId + ")");
+	}
 }
