@@ -284,19 +284,25 @@ public class BoardController implements Initializable {
 				String[] statementBoardPlayerArr = new String[statementBoardPlayer.size()];
 				statementBoardPlayerArr = statementBoardPlayer.toArray(statementBoardPlayerArr);
 				
-				try 
+				for(var statement : statementBoardPlayerArr)
 				{
-					if(_db.Insert(statementTurnPlayer)) 
-					{
-						if(_db.InsertBatch(statementBoardPlayerArr)) 
-						{
-							renewHand();
-						}
-					}
+					System.out.println(statement);
 				}
-				catch(SQLException e) {
-					e.printStackTrace();
-				}
+	
+				// TODO uncomment
+//				try 
+//				{
+//					if(_db.Insert(statementTurnPlayer)) 
+//					{
+//						if(_db.InsertBatch(statementBoardPlayerArr)) 
+//						{
+//							renewHand();
+//						}
+//					}
+//				}
+//				catch(SQLException e) {
+//					e.printStackTrace();
+//				}
 			}
 		}
 		else
@@ -623,6 +629,7 @@ public class BoardController implements Initializable {
 		placeHand(false);		
 	}
 	
+	// TODO HERE
 	private void getGeneratedLetters(boolean checkGenerated){
 		if(checkGenerated) {
 			waitForVisualizeNewHandLetters();
@@ -644,6 +651,7 @@ public class BoardController implements Initializable {
 		return handLetters.get(0).getLetters().size();
 	}
 	
+	// TODO HERE
 	private void waitForVisualizeNewHandLetters(){	
 		var thread = new Thread() {
 			public void run() {
