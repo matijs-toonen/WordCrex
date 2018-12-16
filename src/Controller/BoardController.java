@@ -101,7 +101,7 @@ public class BoardController implements Initializable {
 		_boardTiles = new HashMap<Point, BoardTilePane>();
         _currentHand = new ArrayList<BoardTile>();
         _fieldHand = new HashMap<Point, BoardTile>();
-        getLetters();
+        getLettersAndValidate();
 	}
 	
 
@@ -114,7 +114,7 @@ public class BoardController implements Initializable {
 		this(game, new Turn(1));
 	}
 
-	private void getLetters() {
+	private void getLettersAndValidate() {
 		_db = new DatabaseController<Symbol>();
 		var statement = Letter.getUnusedLetters(_currentGame.getGameId());
 		
@@ -123,6 +123,42 @@ public class BoardController implements Initializable {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		
+		//kijken of de pot valid is 
+		checkValidPotSize();
+	}
+	
+	private void checkValidPotSize()
+	{
+		if(_letters.size() == 0)
+		{
+			try 
+			{
+				_db.Update("update game " + 
+							"set game_state = 'finished' " + 
+							"where game_id = " + _currentGame.getGameId() + "");
+				
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			AnchorPane pane = null;
+			try 
+			{		 
+				GameController con = new GameController(_rootPane);			
+				var panes = new FXMLLoader(getClass().getResource("/View/Games.fxml"));
+				
+				panes.setController(con);
+				pane = panes.load();
+				
+			}
+			catch(Exception ex) {
+				Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+			}		
+			_rootPane.getChildren().setAll(pane);
+			
 		}
 	}
 	
@@ -750,7 +786,10 @@ public class BoardController implements Initializable {
 			handLetters.add(createHandLetter());
 		}
 		
-		getLetters();
+		getLettersAndValidate();
+		//checkValidPotSize();
+		
+		
 		
 		return handLetters;
 	}
