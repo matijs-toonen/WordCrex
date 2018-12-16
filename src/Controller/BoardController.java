@@ -657,6 +657,7 @@ public class BoardController implements Initializable {
 			if(insertScore(scores.getKey(), scores.getValue()))
 			{
 				var handLetters = generateHandLetters();
+				updatePaneWithNewLetters();
 				visualizeHand(handLetters);
 			}
 		}
