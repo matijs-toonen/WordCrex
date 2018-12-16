@@ -77,9 +77,8 @@ public class Board {
         for (Point node : nodes)
         {
             if (visited.contains(node))
-            {
                 continue;
-            }
+            
             if (node.equals(_middle))
             {
                 visited.add(node);
@@ -91,9 +90,8 @@ public class Board {
         for (Point node : nodes)
         {
             if (visited.contains(node) || node.equals(_middle))
-            {
                 continue;
-            }
+            
             visited.addLast(node);
             findPath(visited, start);
         }
