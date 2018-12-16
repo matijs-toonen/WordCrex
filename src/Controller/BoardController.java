@@ -374,6 +374,9 @@ public class BoardController implements Initializable {
 			}
 		}
 		
+		if(uniqueWordsData.size() == 1)
+			return uniqueWordsData;
+		
 		for(int i = 0; i < uniqueWordsData.size(); i++)
 		{
 			for(int j = 0; j < uniqueWordsData.size(); j++)
