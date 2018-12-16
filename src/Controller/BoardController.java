@@ -707,7 +707,7 @@ public class BoardController implements Initializable {
 				for(var boardPlayer : playerBoard)
 				{
 					var letterId = boardPlayer.getLetterId();
-					if(usedLetters.contains(letterId)) 
+					if(usedLetters.stream().filter(letter -> letter.getLetterId() == letterId).findFirst().isPresent()) 
 						continue;
 
 					var insertStatement = String.format("INSERT INTO turnboardletter "
@@ -744,7 +744,7 @@ public class BoardController implements Initializable {
 				for(var boardPlayer : playerBoard)
 				{
 					var letterId = boardPlayer.getLetterId();
-					if(usedLetters.contains(letterId)) 
+					if(usedLetters.stream().filter(letter -> letter.getLetterId() == letterId).findFirst().isPresent())
 						continue;
 					
 					var insertStatement = String.format("INSERT INTO turnboardletter "
