@@ -77,13 +77,13 @@ public class BoardController implements Initializable {
 	private boolean _historyVisible;
 	
 	@FXML
-	private Label lblScore1, lblScore2, lblPlayer1, lblPlayer2;
+	private Label lblScore1, lblScore2, lblPlayer1, lblPlayer2, errorPaneLabel;
 	
 	@FXML
 	private Button btnTest, btnShuffle;
 	
 	@FXML
-	private Pane panePlayField, paneHand, boardPane, waitingPane;
+	private Pane panePlayField, paneHand, boardPane, waitingPane, errorMessagePane;
 	
 	@FXML
 	private AnchorPane rightBarAnchor;
@@ -160,6 +160,23 @@ public class BoardController implements Initializable {
 		boardPane.setDisable(false);
 		waitingPane.setVisible(false);
 		boardPane.setStyle("-fx-opacity: 1");
+	}
+	
+	/**
+	 * Hide error message
+	 */
+	public void hideErrorMessage() {
+		boardPane.setStyle("-fx-opacity: 1.0");
+		errorMessagePane.setVisible(false);
+	}
+	
+	/**
+	 * Hide error message
+	 */
+	private void showErrorMessage(String text) {
+		boardPane.setStyle("-fx-opacity: 0.3");
+		errorPaneLabel.setText(text);
+		errorMessagePane.setVisible(true);
 	}
 	
 	private void scoreRefreshThread() {
