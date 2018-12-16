@@ -130,8 +130,10 @@ public class BoardController implements Initializable {
 		{
 			try 
 			{
+				var score = (Score)_db.SelectFirst("SELECT * FROM score where game_id = " + _currentGame.getGameId(), Score.class);
+				String winner = score.getOwnScore() > score.getOpponentScore() ? score.getUser1() : score.getUser2(); 
 				_db.Update("update game " + 
-							"set game_state = 'finished' " + 
+							"set game_state = 'finished', username_winner = '" + winner + "' " +   
 							"where game_id = " + _currentGame.getGameId() + "");
 				
 			} catch (SQLException e) {
