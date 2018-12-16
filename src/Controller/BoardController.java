@@ -1,5 +1,6 @@
 package Controller;
 
+import java.awt.List;
 import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -27,6 +29,7 @@ import Model.Tile;
 import Model.Turn;
 import Model.TurnBoardLetter;
 import Model.Word;
+import Model.WordData;
 import Model.Board.Board;
 import Model.Board.PositionStatus;
 import Tests.BoardTileTest;
@@ -70,7 +73,6 @@ public class BoardController implements Initializable {
 
 	private boolean _chatVisible;
 	private boolean _historyVisible;
-	private boolean _firstPlacedWord = false;
 	
 	@FXML
 	private Label lblScore1, lblScore2, lblPlayer1, lblPlayer2;
@@ -154,38 +156,78 @@ public class BoardController implements Initializable {
 	
 	public void playTurn()
 	{
-		System.out.println(_currentGame.getGameId() + " " + _currentTurn.getTurnId() + " " + MainController.getUser().getUsername() + " " + _fieldHand);
-		
-		// TODO cancel next turn
-		if(hasNotPlacedFirstMid())
-			System.out.println("Cancel next turn");
+		if(!hasNotPlacedFirstMid())
+		{	
+			if(!_board.allChainedToMiddle())
+				System.err.println("Not all tiles connected to the middle");
+			else
+			{
+				var wordsData = getUniqueWordData();
+				
+				var statementTurnPlayer = "";
+				var statementBoardPlayer = new StringBuilder();
+				var playerNum = checkPlayerIfPlayer1() ? 1 : 2;
+				var score = 0;
+				
+				for(var wordData : wordsData)
+				{
+					score += wordData.getScore();
+				}
+								
+				statementTurnPlayer = String.format("INSERT INTO turnplayer%1$s "
+						+ "(game_id, turn_id, username_player%1$s, bonus, score, turnaction_type)"
+						+ "VALUES(%2$s, %3$s, %4$s, %5$s, %6$s, %7$s)"
+						,playerNum, _currentGame.getGameId(), _currentTurn.getTurnId(), 
+						MainController.getUser().getUsername(), 0, score, "play");
+				
+				System.out.println(statementTurnPlayer);
+				
+				statementBoardPlayer.append(String.format("INSERT INTO boardplayer%1$s "
+						+ "(game_id, username, turn_id, letter_id, tile_x, tile_y)"
+						, playerNum));
+			}
+		}
 		else
+			System.err.println("Middle field not used");
+	}
+	
+	private LinkedList<WordData> getUniqueWordData()
+	{
+		var uniqueWordsData = new LinkedList<WordData>();
+		
+				
+		for(Point point : _fieldHand.keySet())
 		{
+			var wordsData = getWordData(point);
 			
+			for(var wordData : wordsData)
+			{
+				uniqueWordsData.add(wordData);
+			}
 		}
 		
-		if(checkPlayerIfPlayer1())
+		for(int i = 0; i < uniqueWordsData.size(); i++)
 		{
-			
+			for(int j = 0; j < uniqueWordsData.size(); j++)
+			{
+				if(uniqueWordsData.get(i).hasSameLetterIds(uniqueWordsData.get(j).getLetterIds()))
+					uniqueWordsData.remove(j);
+			}
 		}
-		else
-		{
-			
-		}
+		
+		return uniqueWordsData;
 	}
 	
 	private boolean hasNotPlacedFirstMid()
-	{
-		var middleCord = new Point(7,7);
-		
+	{		
 		if(_currentTurn.getTurnId() == 1)
-			return _board.canPlace(middleCord);
+			return _board.canPlace(_board.getMiddle());
 		else
 			return false;
 	}
 	
 	public void reset() {
-		resetHand();
+		resetFieldHand();
 		reset.setVisible(false);
 	}
 	
@@ -452,7 +494,7 @@ public class BoardController implements Initializable {
 		return handLetters;
 	}
 	
-	private void resetHand() {
+	private void resetFieldHand() {
 		_fieldHand.entrySet().forEach(handLetter -> {
 			var cords = handLetter.getKey();
 			
@@ -581,40 +623,30 @@ public class BoardController implements Initializable {
 				if(!_board.canPlace(cords))
 					return;
 				
-				if(_board.placedConnected(cords) || _currentTurn.getTurnId() == 1)
-				{
-					if(sourceTile.getParent() instanceof BoardTilePane) {
-						var oldBoardTile = (BoardTilePane) sourceTile.getParent();
-						var oldCords = oldBoardTile.getCords();
-						_board.updateStatus(oldCords, PositionStatus.Open);
-						oldBoardTile.removeBoardTile();
-						_fieldHand.remove(oldCords);
-						_boardTiles.put(boardTile.getCords(), oldBoardTile);
-					}
-					
-					sourceTile.setLayoutX(0);
-					sourceTile.setLayoutY(0);
-					boardTile.setBoardTile(sourceTile);
-					
-					reset.setVisible(true);
-					_fieldHand.put(cords, sourceTile);
-					_boardTiles.put(cords, boardTile);
-					
-					event.acceptTransferModes(TransferMode.ANY);
-					event.setDropCompleted(true);
-					_board.updateStatus(cords, PositionStatus.Taken);
-					
-					playTileSound();
-
-					showPlacedWords(cords); // Only for testing purposes can remove after
-					
-					event.consume();
+				// Remove letter from fieldhand
+				if(sourceTile.getParent() instanceof BoardTilePane) {
+					var oldBoardTile = (BoardTilePane) sourceTile.getParent();
+					var oldCords = oldBoardTile.getCords();						
+					_board.updateStatus(oldCords, PositionStatus.Open);
+					oldBoardTile.removeBoardTile();
+					_fieldHand.remove(oldCords);
+					_boardTiles.put(boardTile.getCords(), oldBoardTile);
 				}
-				else
-				{
-					event.setDropCompleted(false);
-					return;
-				}
+				
+				sourceTile.setLayoutX(0);
+				sourceTile.setLayoutY(0);
+				boardTile.setBoardTile(sourceTile);
+				
+				reset.setVisible(true);
+				_fieldHand.put(cords, sourceTile);
+				_boardTiles.put(cords, boardTile);
+				
+				event.acceptTransferModes(TransferMode.ANY);
+				event.setDropCompleted(true);
+				_board.updateStatus(cords, PositionStatus.Taken);
+				
+				playTileSound();					
+				event.consume();
 			}
 		});
 	}
@@ -662,35 +694,22 @@ public class BoardController implements Initializable {
 			}
 		});
 	}
-		
-	private void showPlacedWords(Point cords)
+	
+	private ArrayList<WordData> getWordData(Point cords)
 	{
-		try
-		{
-			var wordsWithScore = getPlacedWordsWithScore(cords);
-			
-			for(var word : wordsWithScore)
-			{
-				System.out.println("Word: " + word.getKey() + " Score: " + word.getValue());
-				
-				var wordsWithLetterCords = getPlacedWordWithLetterCords(cords, word.getKey());
-				
+		var completeWordData = new ArrayList<WordData>();
+		
 
-				for(Entry<Integer, Pair<Character, Point>> entry : 
-					wordsWithLetterCords.entrySet())
-				{
-					var letterId = entry.getKey();
-					var letter = entry.getValue().getKey();
-					var letterCord = entry.getValue().getValue();
-					
-					System.out.println(letterId + " " + letter + ": " + letterCord);
-				}
-			}
+		var wordsWithScore = getPlacedWordsWithScore(cords);
+		
+		for(var word : wordsWithScore)
+		{								
+			completeWordData.add(new WordData(word.getKey(), word.getValue(), 
+					getPlacedWordWithLetterCords(cords, word.getKey())));
 		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
+
+		
+		return completeWordData;
 
 	}
 	
