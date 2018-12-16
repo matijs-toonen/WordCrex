@@ -159,7 +159,7 @@ public class BoardController implements Initializable {
 	private void enableBoard() {
 		boardPane.setDisable(false);
 		waitingPane.setVisible(false);
-		boardPane.setStyle("-fx-opacity: 1");
+		boardPane.setStyle("-fx-opacity: 1.0");
 	}
 	
 	/**
@@ -670,10 +670,17 @@ public class BoardController implements Initializable {
 	
 	// TODO HERE
 	private void waitForVisualizeNewHandLetters(){	
+		
+		disableBoard();
+		
+		
 		var thread = new Thread() {
 			public void run() {
 				var handLetters = getExistingHandLetters();
 				int tries = 0;
+				
+				
+				
 //				while(true) {
 //					Thread.sleep(1000);
 //					handLetters = getExistingHandLetters();
@@ -684,8 +691,10 @@ public class BoardController implements Initializable {
 //					}
 //					break;
 //				}
+
 				while(getAmountLetters(handLetters) == 0 || getAmountLetters(handLetters) != 7 || tries < 4) {
-	    			try {
+					
+					try {
 						Thread.sleep(1000);
 						handLetters = getExistingHandLetters();
 						
@@ -697,12 +706,15 @@ public class BoardController implements Initializable {
 							tries = 0;
 					
 					} catch (Exception e) {
-						System.out.println(e.getMessage());
+						e.printStackTrace();
 					}
 				}
+				
 				final var finalHandLetters = handLetters;
+				
 				Platform.runLater(() -> {
 	            	visualizeHand(finalHandLetters);
+	            	enableBoard();
 		        });
 			}
 		};
