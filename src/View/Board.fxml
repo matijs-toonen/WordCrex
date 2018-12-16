@@ -5,16 +5,19 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1000.0" prefWidth="1635.0" style="-fx-background-color: #F0F0F7;" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1000.0" prefWidth="1635.0" style="-fx-background-color: #F0F0F7;" stylesheets="@../Application/application.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Pane prefHeight="900.0" prefWidth="920.0" style="-fx-background-color: transparent;">
+      <Pane fx:id="boardPane" prefHeight="900.0" prefWidth="920.0" style="-fx-background-color: transparent;">
          <children>
             <Pane fx:id="panePlayField" layoutX="70.0" layoutY="84.0" prefHeight="680.0" prefWidth="680.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1);" />
             <Pane fx:id="paneHand" layoutX="782.0" layoutY="84.0" prefHeight="330.0" prefWidth="59.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1);" />
@@ -115,5 +118,52 @@
            </children>
             </Pane>
             <AnchorPane fx:id="rightBarAnchor" layoutX="965.0" prefHeight="900.0" prefWidth="390.0" />
+      <Pane fx:id="blockedOverplay" prefHeight="2000.0" prefWidth="2000.0" visible="false"/>
+      <AnchorPane fx:id="errorMessagePane" layoutX="265.0" layoutY="325.0" style="-fx-background-color: #202020; -fx-background-radius: 15;" visible="false">
+         <children>
+            <VBox alignment="TOP_CENTER" prefWidth="300.0">
+               <children>
+                  <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../Resources/error.png" />
+                     </image>
+                     <VBox.margin>
+                        <Insets top="30.0" />
+                     </VBox.margin>
+                  </ImageView>
+      		            <Label fx:id="errorPaneLabel" textFill="WHITE">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                     <padding>
+                        <Insets bottom="20.0" left="10.0" right="10.0" top="20.0" />
+                     </padding>
+                  </Label>
+                  		<Button mnemonicParsing="false" onMouseClicked="#hideErrorMessage" style="-fx-background-color: gray;" text="OK" textFill="WHITE">
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                     <VBox.margin>
+                        <Insets bottom="20.0" />
+                     </VBox.margin>
+                  </Button>
+               </children>
+            </VBox>
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="waitingPane" layoutX="305.0" layoutY="325.0" prefHeight="200.0" prefWidth="210.0" style="-fx-background-color: #202020; -fx-background-radius: 15;" visible="false">
+         <children>
+            <Text fill="WHITE" layoutX="43.0" layoutY="45.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="text" text="Wachten op zet">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Text>
+            <ImageView fitHeight="128.0" fitWidth="128.0" layoutX="41.0" layoutY="58.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../Resources/loading.gif" />
+               </image>
+            </ImageView>
+         </children>
+      </AnchorPane>
          </children>
 </AnchorPane>

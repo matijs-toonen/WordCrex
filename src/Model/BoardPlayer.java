@@ -40,6 +40,31 @@ public class BoardPlayer {
 		}
 	}
 	
+	public int getGameId()
+	{
+		return _game.getGameId();
+	}
+
+	public int getTurnId()
+	{
+		return _turn.getTurnId();
+	}
+	
+	public int getLetterId()
+	{
+		return _letter.getLetterId();
+	}
+	
+	public int getLetterX()
+	{
+		return _tile.getX();
+	}
+	
+	public int getLetterY()
+	{
+		return _tile.getY();
+	}
+	
 	public static final String hasPlacedTurn(String table, String username, int turnId, int gameId) {
 		return ("SELECT COUNT(*) FROM " + table + "  WHERE username = '" + username + "' AND turn_id = " + turnId + " AND game_id = " + gameId);
 	}

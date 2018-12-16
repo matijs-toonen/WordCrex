@@ -20,6 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import Model.BoardPlayer;
 import Model.Game;
 import Model.HandLetter;
 import Model.Letter;
@@ -83,7 +84,7 @@ public class BoardController implements Initializable {
 	private Button btnTest, btnShuffle;
 	
 	@FXML
-	private Pane panePlayField, paneHand, boardPane, waitingPane, errorMessagePane;
+	private Pane panePlayField, paneHand, boardPane, waitingPane, errorMessagePane, blockedOverplay;
 	
 	@FXML
 	private AnchorPane rightBarAnchor;
@@ -140,15 +141,16 @@ public class BoardController implements Initializable {
 		scoreRefreshThread();
 
 		createField(false);
-		createHand(false);
+		createHand();
 		dragOnHand();
 	}
+	
 	
 	/**
 	 * disable the board and show waiting animation
 	 */
 	private void disableBoard() {
-		boardPane.setDisable(true);
+		blockedOverplay.setVisible(true);
 		waitingPane.setVisible(true);
 		boardPane.setStyle("-fx-opacity: 0.3");
 	}
@@ -157,16 +159,19 @@ public class BoardController implements Initializable {
 	 * disable the board and show waiting animation
 	 */
 	private void enableBoard() {
-		boardPane.setDisable(false);
+		blockedOverplay.setVisible(false);
 		waitingPane.setVisible(false);
 		boardPane.setStyle("-fx-opacity: 1.0");
 	}
+	
 	
 	/**
 	 * Hide error message
 	 */
 	public void hideErrorMessage() {
+		blockedOverplay.setVisible(false);
 		boardPane.setStyle("-fx-opacity: 1.0");
+		
 		errorMessagePane.setVisible(false);
 	}
 	
@@ -174,7 +179,9 @@ public class BoardController implements Initializable {
 	 * Hide error message
 	 */
 	private void showErrorMessage(String text) {
+		blockedOverplay.setVisible(true);
 		boardPane.setStyle("-fx-opacity: 0.3");
+		
 		errorPaneLabel.setText(text);
 		errorMessagePane.setVisible(true);
 	}
@@ -207,7 +214,6 @@ public class BoardController implements Initializable {
 		try {
 			_currentScore = (Score) _db.SelectFirst(scoreQuery, Score.class);
 		} catch (SQLException e) {
-			System.out.println(e.getMessage());
 		}
 		
 		Platform.runLater(() -> {
@@ -242,23 +248,32 @@ public class BoardController implements Initializable {
 	
 	public void playTurn()
 	{
-		if(!hasNotPlacedFirstMid())
+		if(!isMiddleOpen())
 		{	
 			if(!_board.allChainedToMiddle())
-				System.err.println("Not all tiles connected to the middle");
+				showErrorMessage("Niet alle tiles zitten aan elkaar");
 			else
 			{
 				var wordsData = getUniqueWordData();
 				
+				if(wordsData.size() > 1)
+				{
+					showErrorMessage("Je mag maar 1 woord leggen");
+					return;
+				}
+				
+				if(wordsData.size() == 0)
+				{
+					showErrorMessage("Je moet 1 woord leggen");
+					return;
+				}
+				
+				var wordData = wordsData.get(0);
+				
 				var statementTurnPlayer = "";
 				var statementBoardPlayer = new ArrayList<String>();
 				var playerNum = checkPlayerIfPlayer1() ? 1 : 2;
-				var score = 0;
-				
-				for(var wordData : wordsData)
-				{
-					score += wordData.getScore();
-				}
+				var score = wordData.getScore();
 				
 				var gameId = _currentGame.getGameId();
 				var turnId = _currentTurn.getTurnId();
@@ -268,25 +283,11 @@ public class BoardController implements Initializable {
 						+ "(game_id, turn_id, username_player%1$s, bonus, score, turnaction_type) \n"
 						+ "VALUES(%2$s, %3$s, '%4$s', %5$s, %6$s, '%7$s')"
 						,playerNum, gameId, turnId, username, 0, score, "play");
+								
+
+				var lettersData = wordData.getLetters();
 				
-				var uniqueLettersData = new HashMap<Integer, Pair<Character, Point>>();
-				
-				for(var wordData : wordsData)
-				{
-					var lettersData = wordData.getLetters();
-					
-					lettersData.entrySet().forEach(letterData -> {
-						
-						var letterId = letterData.getKey();
-						var letterCharCord = letterData.getValue();
-						
-						if(!uniqueLettersData.containsKey(letterId))
-							uniqueLettersData.put(letterId, letterCharCord);
-						
-					});
-				}
-				
-				uniqueLettersData.entrySet().forEach(letterData -> {
+				lettersData.entrySet().forEach(letterData -> {
 					
 					var letterId = letterData.getKey();
 					var tileX = (int) letterData.getValue().getValue().getX()+1;
@@ -297,33 +298,30 @@ public class BoardController implements Initializable {
 							+ "VALUES (%2$s, '%3$s', %4$s, %5$s, %6$s, %7$s);"
 							, playerNum,gameId, username, turnId, letterId, tileX, tileY));
 				});
+				
+
 								
 				String[] statementBoardPlayerArr = new String[statementBoardPlayer.size()];
 				statementBoardPlayerArr = statementBoardPlayer.toArray(statementBoardPlayerArr);
 				
-				for(var statement : statementBoardPlayerArr)
+				try 
 				{
-					System.out.println(statement);
+					if(_db.Insert(statementTurnPlayer)) 
+					{
+						System.out.println(statementBoardPlayerArr);
+						if(_db.InsertBatch(statementBoardPlayerArr)) 
+						{
+							renewHand();
+						}
+					}
 				}
-	
-				// TODO uncomment
-//				try 
-//				{
-//					if(_db.Insert(statementTurnPlayer)) 
-//					{
-//						if(_db.InsertBatch(statementBoardPlayerArr)) 
-//						{
-//							renewHand();
-//						}
-//					}
-//				}
-//				catch(SQLException e) {
-//					e.printStackTrace();
-//				}
+				catch(SQLException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		else
-			System.err.println("Middle field not used");
+			showErrorMessage("Middelste tile moet gevuld zijn");
 	}
 	
 	private LinkedList<WordData> getUniqueWordData()
@@ -352,16 +350,12 @@ public class BoardController implements Initializable {
 		return uniqueWordsData;
 	}
 	
-	private boolean hasNotPlacedFirstMid()
+	private boolean isMiddleOpen()
 	{		
-		if(_currentTurn.getTurnId() == 1)
-			return _board.canPlace(_board.getMiddle());
-		else
-			return false;
+		return _board.canPlace(_board.getMiddle());
 	}
 	
 	public void clickSkipTurn() {
-		System.out.println("User clicked skip turn");
 		String insertQuery = Game.getPassQuery(_currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername(), checkPlayer());
 		
 		var _db = new DatabaseController<Game>();
@@ -406,20 +400,19 @@ public class BoardController implements Initializable {
 	
 	public void reset() {
 		resetFieldHand();
+		placeHand(false);
 		reset.setVisible(false);
 	}
 	
 	public void renewHand() {
-		createHand(true);
+		createHand();
 	}
-	private boolean needsToWaitForHandLetters() {
-		var table = checkPlayer() ? "turnplayer2" : "turnplayer1";
+	
+	private boolean needsToWaitForHandLetters(String table) {
+		
 		var query = TurnPlayer.hasPlacedTurn(table, _currentTurn.getTurnId(), _currentGame.getGameId());
-		System.out.println(query);
 		try {
-			var shoud = _db.SelectCount(query) == 0;
-			System.out.println(shoud + " table " + table + " turn " + _currentTurn.getTurnId());
-			return shoud;
+			return _db.SelectCount(query) == 0;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -520,11 +513,7 @@ public class BoardController implements Initializable {
 						var cords = new Point(i, j);
 						if(existingTurns.containsKey(cords)) {
 							var turn = existingTurns.get(cords);
-							boardTile = new BoardTile(turn.getSymbol(), turn.getLetterId());
-							boardTile.setMinWidth(39);
-							boardTile.setMinHeight(39);
-							boardTile.setStyle("-fx-background-color: pink; -fx-background-radius: 6");
-							_board.updateStatus(cords, PositionStatus.Taken);
+							boardTile = createBoardTile(cords, turn);
 						}
 						var tilePane = new BoardTilePane(tile);
 						tilePane.setDropEvents(createDropEvents());
@@ -583,6 +572,15 @@ public class BoardController implements Initializable {
 		}
 	}
 	
+	private BoardTile createBoardTile(Point cords, TurnBoardLetter turn) {
+		var boardTile = new BoardTile(turn.getSymbol(), turn.getLetterId());
+		boardTile.setMinWidth(39);
+		boardTile.setMinHeight(39);
+		boardTile.setStyle("-fx-background-color: #43425D; -fx-background-radius: 6");
+		_board.updateStatus(cords, PositionStatus.Taken);
+		return boardTile;
+	}
+	
 	private HashMap<Point, TurnBoardLetter> getTurns() {
 		_db = new DatabaseController<TurnBoardLetter>();
 		var turns = new HashMap<Point, TurnBoardLetter>();
@@ -590,7 +588,9 @@ public class BoardController implements Initializable {
 		String tileQuery = Game.getExistingTiles(_currentGame.getGameId(), _currentTurn.getTurnId());
 		try {
 			((ArrayList<TurnBoardLetter>)_db.SelectAll(tileQuery, TurnBoardLetter.class)).forEach(turn -> {
-				turns.put(turn.getTileCords(), turn);	
+				var cords = turn.getTileCords();
+				var point = new Point((int) cords.getX() - 1, (int) cords.getY() - 1);
+				turns.put(point, turn);	
 			});
 		}
 		catch(SQLException e) {
@@ -606,20 +606,22 @@ public class BoardController implements Initializable {
 	}
 	
 	
-	private void createHand(boolean checkGenerated) {
+	private void createHand() {
 		_currentHand.clear();
 		_db = new DatabaseController<HandLetter>();
-		var handLetters = new ArrayList<HandLetter>();
 		
-		if(checkGenerated) {
-			var check = needsToWaitForHandLetters();
-			_currentTurn.incrementId();
-			getGeneratedLetters(check);
+		var tableOpponent = checkPlayer() ? "turnplayer2" : "turnplayer1";
+		var tableMe = checkPlayer() ? "turnplayer1" : "turnplayer2";
+		var hasPlacedOpponent = needsToWaitForHandLetters(tableOpponent);
+		var needsToPlaceOwn = needsToWaitForHandLetters(tableMe);
+
+		if(needsToPlaceOwn) {
+			var handLetters = getHandLetters();
+			visualizeHand(handLetters);
 			return;
 		}
 		
-		handLetters = getHandLetters();
-		visualizeHand(handLetters);
+		getGeneratedLetters(hasPlacedOpponent);	
 	}
 	
 	private void visualizeHand(ArrayList<HandLetter> handLetters) {
@@ -646,15 +648,161 @@ public class BoardController implements Initializable {
 		placeHand(false);		
 	}
 	
-	// TODO HERE
 	private void getGeneratedLetters(boolean checkGenerated){
 		if(checkGenerated) {
+			_currentTurn.incrementId();
 			waitForVisualizeNewHandLetters();
 		}
 		else {
-			var handLetters = generateHandLetters();
-			visualizeHand(handLetters);
+			var scores = getScores();
+			if(insertScore(scores.getKey(), scores.getValue()))
+			{
+				_currentTurn.incrementId();
+				var handLetters = generateHandLetters();
+				updatePaneWithNewLetters();
+				visualizeHand(handLetters);
+			}
 		}
+	}
+	
+	private boolean insertScore(int ownScore, int oppScore)
+	{
+		var ownInsert = false;
+		var oppInsert = false;
+		
+		var bonus = 5;
+		
+		var gameId = _currentGame.getGameId();
+		var turnId = _currentTurn.getTurnId();
+		
+		var ownPlayerNum = checkPlayerIfPlayer1() ? 1 : 2;
+		
+		var oppPlayerNum = ownPlayerNum == 1 ? 2 : 1;
+		
+		try
+		{			
+			if(ownScore == oppScore)
+			{				
+				var statement = String.format("UPDATE turnplayer%s "
+						+ "SET bonus = %s "
+						+ "WHERE game_id = %s "
+						+ "AND turn_id = %s "
+						+ "AND score = %s ",oppPlayerNum, bonus, gameId, turnId, oppScore);
+
+				if(_db.Update(statement))
+					oppScore += bonus;
+			}
+			
+			var usedLetters = (ArrayList<TurnBoardLetter>)_db.SelectAll("SELECT letter_id FROM turnboardletter where game_id = " + gameId, TurnBoardLetter.class);
+
+			if(ownScore > oppScore)
+			{
+				var selectStatement = String.format("SELECT letter_id, game_id, turn_id, tile_x, tile_y "
+						+ "FROM boardplayer%s "
+						+ "WHERE game_id = %s "
+						+ "AND turn_id = %s", ownPlayerNum, gameId, turnId);
+				
+				ArrayList<BoardPlayer> playerBoard = (ArrayList<BoardPlayer>) 
+						_db.SelectAll(selectStatement, BoardPlayer.class);
+				
+				ArrayList<String> insertStatements = new ArrayList<String>();
+				
+				for(var boardPlayer : playerBoard)
+				{
+					var letterId = boardPlayer.getLetterId();
+					if(usedLetters.stream().filter(letter -> letter.getLetterId() == letterId).findFirst().isPresent()) 
+						continue;
+
+					var insertStatement = String.format("INSERT INTO turnboardletter "
+							+ "(letter_id, game_id, turn_id, tile_x, tile_y)"
+							+ "VALUES"
+							+ "(%s, %s, %s, %s, %s)"
+							, boardPlayer.getLetterId(), boardPlayer.getGameId(), boardPlayer.getTurnId(),
+							boardPlayer.getLetterX(), boardPlayer.getLetterY());
+					
+					insertStatements.add(insertStatement);
+				}
+				
+				String[] statementBoardPlayerArr = new String[insertStatements.size()];
+				statementBoardPlayerArr = insertStatements.toArray(statementBoardPlayerArr);
+				
+
+				
+				oppInsert = true;
+				ownInsert = _db.InsertBatch(statementBoardPlayerArr);
+				
+			}
+			else
+			{
+				var selectStatement = String.format("SELECT letter_id, game_id, turn_id, tile_x, tile_y "
+						+ "FROM boardplayer%s "
+						+ "WHERE game_id = %s "
+						+ "AND turn_id = %s", oppPlayerNum, gameId, turnId);
+				
+				ArrayList<BoardPlayer> playerBoard = (ArrayList<BoardPlayer>) 
+						_db.SelectAll(selectStatement, BoardPlayer.class);
+				
+				ArrayList<String> insertStatements = new ArrayList<String>();
+				
+				for(var boardPlayer : playerBoard)
+				{
+					var letterId = boardPlayer.getLetterId();
+					if(usedLetters.stream().filter(letter -> letter.getLetterId() == letterId).findFirst().isPresent())
+						continue;
+					
+					var insertStatement = String.format("INSERT INTO turnboardletter "
+							+ "(letter_id, game_id, turn_id, tile_x, tile_y)"
+							+ "VALUES"
+							+ "(%s, %s, %s, %s, %s)"
+							, boardPlayer.getLetterId(), boardPlayer.getGameId(), boardPlayer.getTurnId(),
+							boardPlayer.getLetterX(), boardPlayer.getLetterY());
+					
+					insertStatements.add(insertStatement);
+				}
+				
+				String[] statementBoardPlayerArr = new String[insertStatements.size()];
+				statementBoardPlayerArr = insertStatements.toArray(statementBoardPlayerArr);
+				
+				oppInsert = _db.InsertBatch(statementBoardPlayerArr);
+				ownInsert = true;
+			}
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return ownInsert == oppInsert;
+	}
+		
+	private Pair<Integer, Integer> getScores()
+	{
+		Pair<Integer, Integer> ownOppScore = null;
+		try
+		{
+			var gameId = _currentGame.getGameId();
+			var turnId = _currentTurn.getTurnId();
+			
+			var ownPlayerNum = checkPlayerIfPlayer1() ? 1 : 2;
+			
+			var opponentPlayerNum = ownPlayerNum == 1 ? 2 : 1;
+			
+			var ownScore = _db.SelectCount(String.format("SELECT score FROM turnplayer%1$s "
+					+ "WHERE game_id = %2$s "
+					+ "AND turn_id = %3$s", ownPlayerNum, gameId, turnId));
+			
+			var opponentScore = _db.SelectCount(String.format("SELECT score FROM turnplayer%1$s "
+					+ "WHERE game_id = %2$s "
+					+ "AND turn_id = %3$s",opponentPlayerNum, gameId, turnId));
+			
+			ownOppScore = new Pair<>(ownScore, opponentScore);
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return ownOppScore;
 	}
 	
 	private ArrayList<HandLetter> getHandLetters() {
@@ -668,36 +816,18 @@ public class BoardController implements Initializable {
 		return handLetters.get(0).getLetters().size();
 	}
 	
-	// TODO HERE
-	private void waitForVisualizeNewHandLetters(){	
-		
+	private void waitForVisualizeNewHandLetters(){
 		disableBoard();
-		
 		
 		var thread = new Thread() {
 			public void run() {
 				var handLetters = getExistingHandLetters();
 				int tries = 0;
-				
-				
-				
-//				while(true) {
-//					Thread.sleep(1000);
-//					handLetters = getExistingHandLetters();
-//					
-//					var amount = getAmountLetters(handLetters);
-//					if(amount == 0 || amount != 7 || tries < 4) {
-//						
-//					}
-//					break;
-//				}
-
 				while(getAmountLetters(handLetters) == 0 || getAmountLetters(handLetters) != 7 || tries < 4) {
-					
 					try {
 						Thread.sleep(1000);
 						handLetters = getExistingHandLetters();
-						
+
 						if(getAmountLetters(handLetters) > 0) {
 							tries++;	
 						}
@@ -713,6 +843,7 @@ public class BoardController implements Initializable {
 				final var finalHandLetters = handLetters;
 				
 				Platform.runLater(() -> {
+					updatePaneWithNewLetters();
 	            	visualizeHand(finalHandLetters);
 	            	enableBoard();
 		        });
@@ -721,6 +852,42 @@ public class BoardController implements Initializable {
 		
 		thread.setDaemon(true);
 		thread.start();
+	}
+	
+	private void updatePaneWithNewLetters() {
+		var exisitingTurns = getTurns();
+		resetBoard();
+		
+		exisitingTurns.entrySet().forEach(turn -> {
+			var cords = turn.getKey();
+			var boardTilePane = _boardTiles.get(cords);
+			var boardTile = createBoardTile(cords, turn.getValue());
+			boardTilePane.setBoardTile(boardTile);
+		});
+	}
+	
+	private void resetFieldHand() {
+		_fieldHand.entrySet().forEach(handLetter -> {
+			var cords = handLetter.getKey();
+			
+			var tilePane = _boardTiles.get(cords);
+			tilePane.removeBoardTile();
+			_board.updateStatus(cords, PositionStatus.Open);
+		});	
+
+		_fieldHand.clear();
+	}
+	
+	private void resetBoard() {
+		_fieldHand.entrySet().forEach(tile -> {
+			var cords = tile.getKey();
+			var boardTilePane = _boardTiles.get(tile.getKey());
+			
+			boardTilePane.removeBoardTile();
+			_board.updateStatus(cords, PositionStatus.Open);
+		});
+		
+		_fieldHand.clear();
 	}
 	
 	private ArrayList<HandLetter> getExistingHandLetters() {
@@ -753,19 +920,6 @@ public class BoardController implements Initializable {
 		getLetters();
 		
 		return handLetters;
-	}
-	
-	private void resetFieldHand() {
-		_fieldHand.entrySet().forEach(handLetter -> {
-			var cords = handLetter.getKey();
-			
-			var tilePane = _boardTiles.get(cords);
-			tilePane.removeBoardTile();
-			_board.updateStatus(cords, PositionStatus.Open);
-		});	
-
-		placeHand(false);
-		_fieldHand.clear();
 	}
 	
 	private void addTurn() {		
@@ -829,7 +983,6 @@ public class BoardController implements Initializable {
 				return rndLetter;
 			}
 		} catch (SQLException e) {
-			System.out.println(e.getMessage());
 		}
 		return null;
 	}
@@ -952,12 +1105,11 @@ public class BoardController implements Initializable {
 	private ArrayList<WordData> getWordData(Point cords)
 	{
 		var completeWordData = new ArrayList<WordData>();
-		
 
 		var wordsWithScore = getPlacedWordsWithScore(cords);
-		
+				
 		for(var word : wordsWithScore)
-		{								
+		{
 			completeWordData.add(new WordData(word.getKey(), word.getValue(), 
 					getPlacedWordWithLetterCords(cords, word.getKey())));
 		}
