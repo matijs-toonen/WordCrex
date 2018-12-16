@@ -191,7 +191,7 @@ public class BoardController implements Initializable {
 		Thread chatThread = new Thread(){
 		    public void run(){
 		    	
-		    	while(true) {
+		    	while(true &&  MainController.getUser() != null) {
 		    		refreshScore();
 	    			
 	    			try {
