@@ -31,8 +31,8 @@ public class GameItem extends AnchorPane {
 		setSubLabel();
 		setImage();
 		setRightArrow();
-		
-		this.getChildren().addAll(lblStatus, imgStatus, lblUser, rightArrow);
+
+		this.getChildren().addAll(lblStatus, imgStatus, lblUser);
 	}
 	
 	private void setImage() {
@@ -40,6 +40,7 @@ public class GameItem extends AnchorPane {
 		Image image = null;
 		if(_currentGame.getSatus() == GameStatus.Playing) {
 			image = getActiveImage();
+			this.getChildren().add(rightArrow);
 		}
 		else {
 			image = getPlayedImage();
