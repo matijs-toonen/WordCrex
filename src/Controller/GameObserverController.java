@@ -17,6 +17,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -84,10 +85,10 @@ public class GameObserverController implements Initializable{
 	}
 	
 	private void loadBoard(Game game, Turn turn) {
-		AnchorPane pane = null;
+		ScrollPane pane = null;
 		try {
-			var con = new BoardController(game, turn, _rootPane);
-			var panes = new FXMLLoader(getClass().getResource("/View/Board.fxml"));
+			var con = new ObserverBoardController(game, turn, _rootPane);
+			var panes = new FXMLLoader(getClass().getResource("/View/Observe.fxml"));
 			panes.setController(con);
 			pane = panes.load();
 		}
@@ -98,11 +99,25 @@ public class GameObserverController implements Initializable{
 		_rootPane.getChildren().setAll(pane);
 	}
 
+	
+	private int getTurn(String query) {
+		try {
+			return _db.SelectCount(query);
+		} catch (SQLException e) {
+			
+		}
+		return 1;
+	}
+	
 	//Custom function for handeling the onmouseclickEvent
 	public Consumer<MouseEvent> onLabelClick() {
 		return (event -> {
 	    	var userLabel = (Label) event.getSource();
-	        System.out.println("mouse click detected! " + userLabel.getText());
+	    	var parent = (GameItemObserver) userLabel.getParent();
+	    	var game = parent.getGame();
+	    	var turnQuery = Game.getTurnFromActiveGame(game.getGameId());
+	    	var turn = new Turn(getTurn(turnQuery));
+	    	loadBoard(game, turn);
 		});
     }
 }
