@@ -175,6 +175,9 @@ public class BoardController implements Initializable {
 		createField(false);
 		createHand();
 		dragOnHand();
+		
+		
+		// add tooltip to buttons
 	}
 	
     private String getOpponent() {
