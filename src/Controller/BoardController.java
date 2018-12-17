@@ -77,7 +77,7 @@ public class BoardController implements Initializable {
 	private boolean _historyVisible;
 	
 	@FXML
-	private Label lblScore1, lblScore2, lblPlayer1, lblPlayer2, errorPaneLabel;
+	private Label lblScore1, lblScore2, lblPlayer1, lblPlayer2, lblTiles, errorPaneLabel;
 	
 	@FXML
 	private Button btnTest, btnShuffle;
@@ -172,6 +172,7 @@ public class BoardController implements Initializable {
 		lblScore1.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 25 0 0 25");
 		lblScore2.setText("9");
 		lblScore2.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 0 25 25 0");
+		lblTiles.setStyle("-fx-font-size: 20;");
 		
 		scoreRefreshThread();
 
@@ -263,6 +264,13 @@ public class BoardController implements Initializable {
 		Platform.runLater(() -> {
 			lblScore1.setText(Integer.toString(_currentScore.getOwnScore()));
 			lblScore2.setText(Integer.toString(_currentScore.getOpponentScore()));
+			
+			try {
+				lblTiles.setText(Integer.toString(_db.SelectCount("select COUNT(*) from pot where game_id = " + _currentGame.getGameId())));
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	    });
 		
 	}
