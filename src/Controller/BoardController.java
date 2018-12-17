@@ -440,6 +440,7 @@ public class BoardController implements Initializable {
 	
 	public void renewHand() {
 		createHand();
+		shuffle.setVisible(true);
 	}
 	
 	private boolean needsToWaitForHandLetters(String table) {
