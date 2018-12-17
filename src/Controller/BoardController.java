@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
@@ -131,7 +130,7 @@ public class BoardController implements Initializable {
 			try 
 			{
 				var score = (Score)_db.SelectFirst("SELECT * FROM score where game_id = " + _currentGame.getGameId(), Score.class);
-				String winner = score.getOwnScore() > score.getOpponentScore() ? score.getUser1() : score.getUser2(); 
+				String winner = score.getOwnScore() > score.getOpponentScore() ? MainController.getUser().getUsername() : score.getOpponent();
 				_db.Update("update game " + 
 							"set game_state = 'finished', username_winner = '" + winner + "' " +   
 							"where game_id = " + _currentGame.getGameId() + "");
@@ -141,21 +140,21 @@ public class BoardController implements Initializable {
 				e.printStackTrace();
 			}
 			
-			AnchorPane pane = null;
-			try 
-			{		 
-				GameController con = new GameController(_rootPane);			
-				var panes = new FXMLLoader(getClass().getResource("/View/Games.fxml"));
-				
-				panes.setController(con);
-				pane = panes.load();
-				
-			}
-			catch(Exception ex) {
-				Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
-			}
-			_rootPane.getChildren().setAll(pane);
-			
+			Platform.runLater(() -> {
+				AnchorPane pane = null;
+				try 
+				{
+					GameController con = new GameController(_rootPane);			
+					var panes = new FXMLLoader(getClass().getResource("/View/Games.fxml"));
+					
+					panes.setController(con);
+					pane = panes.load();
+				}
+				catch(Exception ex) {
+					Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+				}
+				_rootPane.getChildren().setAll(pane);	
+			});
 		}
 	}
 	

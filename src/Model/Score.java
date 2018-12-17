@@ -58,6 +58,10 @@ public class Score {
 		return _username2;
 	}
 	
+	public String getOpponent() {
+		return MainController.getUser().getUsername().equals(_username1) ? _username2 : _username1;
+	}
+	
 	public int getOwnScore() {
 		String myUsername = MainController.getUser().getUsername();
 		
