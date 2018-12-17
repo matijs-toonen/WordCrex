@@ -141,21 +141,25 @@ public class BoardController implements Initializable {
 			}
 			
 			Platform.runLater(() -> {
-				AnchorPane pane = null;
-				try 
-				{
-					GameController con = new GameController(_rootPane);			
-					var panes = new FXMLLoader(getClass().getResource("/View/Games.fxml"));
-					
-					panes.setController(con);
-					pane = panes.load();
-				}
-				catch(Exception ex) {
-					Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
-				}
-				_rootPane.getChildren().setAll(pane);	
+				showGameScreen();
 			});
 		}
+	}
+	
+	private void showGameScreen() {
+		AnchorPane pane = null;
+		try 
+		{
+			GameController con = new GameController(_rootPane);			
+			var panes = new FXMLLoader(getClass().getResource("/View/Games.fxml"));
+			
+			panes.setController(con);
+			pane = panes.load();
+		}
+		catch(Exception ex) {
+			Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		_rootPane.getChildren().setAll(pane);
 	}
 	
 	@Override
@@ -422,20 +426,7 @@ public class BoardController implements Initializable {
 		} catch (SQLException e) {
 		}
 		
-		AnchorPane pane = null;
-		try 
-		{		 
-			GameController con = new GameController(_rootPane);			
-			var panes = new FXMLLoader(getClass().getResource("/View/Games.fxml"));
-			
-			panes.setController(con);
-			pane = panes.load();
-			
-		}
-		catch(Exception ex) {
-			Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
-		}		
-		_rootPane.getChildren().setAll(pane);
+		showGameScreen();
 	}
 	
 	public void reset() {
@@ -860,6 +851,14 @@ public class BoardController implements Initializable {
 				int tries = 0;
 				while(getAmountLetters(handLetters) == 0 || getAmountLetters(handLetters) != 7 || tries < 4) {
 					try {
+						var hasResigned = _db.SelectCount("SELECT COUNT(*) FROM game WHERE game_state = 'resigned' AND game_id = " + _currentGame.getGameId()) == 1;
+						
+						if(hasResigned) {
+							Platform.runLater(() -> {
+								showGameScreen();
+							});
+							return;
+						}
 						Thread.sleep(1000);
 						handLetters = getExistingHandLetters();
 
