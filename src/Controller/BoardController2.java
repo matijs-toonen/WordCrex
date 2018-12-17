@@ -58,7 +58,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
 
-public class BoardController implements Initializable {
+public class BoardController2 implements Initializable {
 	
 	private DatabaseController _db;
 	private Random _random = new Random();
@@ -95,7 +95,7 @@ public class BoardController implements Initializable {
 	@FXML
 	private AnchorPane screenPane;	
 	
-	public BoardController(Game game, Turn turn, AnchorPane rootPane) {
+	public BoardController2(Game game, Turn turn, AnchorPane rootPane) {
 		_currentGame = game;
 		_currentTurn = turn;
 		_rootPane = rootPane;
@@ -106,11 +106,11 @@ public class BoardController implements Initializable {
         getLettersAndValidate();
 	}
 
-	public BoardController(Game game, AnchorPane rootPane) {
+	public BoardController2(Game game, AnchorPane rootPane) {
 		this(game, new Turn(1), rootPane);
 	}
 	
-	public BoardController(Game game, Turn turn, boolean isObserver, AnchorPane rootPane) {
+	public BoardController2(Game game, Turn turn, boolean isObserver, AnchorPane rootPane) {
 		this(game, turn, rootPane);
 		_isObserver = isObserver;
 	}
