@@ -57,62 +57,76 @@
            </GridPane>
                   <Pane fx:id="backPanel" layoutX="782.0" layoutY="437.0" prefHeight="283.0" prefWidth="59.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1);" styleClass="backPanel">
                      <children>
-                        <ImageView fitHeight="39.0" fitWidth="39.0" layoutX="11.0" layoutY="56.0" onMouseClicked="#reset" pickOnBounds="true" preserveRatio="true">
+                        <Button prefHeight="39.0" prefWidth="39.0" layoutX="11.0" layoutY="56.0" onMouseClicked="#reset">
+                           <ImageView>
                            <image>
                               <Image url="@../Resources/reset.png" />
                            </image>
+                           </ImageView>
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
-                        </ImageView>
-                        <ImageView fx:id="shuffle" fitHeight="39.0" fitWidth="39.0" layoutX="11.0" layoutY="56.0" onMouseClicked="#shuffle" pickOnBounds="true" preserveRatio="true" styleClass="optionButton">
+                        </Button>
+                        <Button fx:id="shuffle" prefHeight="39.0" prefWidth="39.0" layoutX="11.0" layoutY="56.0" onMouseClicked="#shuffle">
+                           <ImageView>
                            <image>
                               <Image url="@../Resources/shuffle.png" />
                            </image>
+                           </ImageView>
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
-                        </ImageView>
-                        <ImageView fitHeight="39.0" fitWidth="39.0" layoutX="11.0" layoutY="12.0" onMouseClicked="#playTurn" pickOnBounds="true" preserveRatio="true" styleClass="optionButton">
+                        </Button>
+                        <Button prefHeight="39.0" prefWidth="39.0" layoutX="11.0" layoutY="12.0" onMouseClicked="#playTurn">
+                           <ImageView fitHeight="39.0" fitWidth="39.0">
                            <image>
                               <Image url="@../Resources/play.png" />
                            </image>
+                           </ImageView>
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
-                        </ImageView>
-                        <ImageView fitHeight="39.0" fitWidth="39.0" layoutX="11.0" layoutY="100.0" onMouseClicked="#clickSkipTurn" pickOnBounds="true" preserveRatio="true" styleClass="optionButton">
+                        </Button>
+                        <Button prefHeight="39.0" prefWidth="39.0" layoutX="11.0" layoutY="100.0" onMouseClicked="#clickSkipTurn">
+                           <ImageView>
                            <image>
                               <Image url="@../Resources/skip.png" />
                            </image>
+                           </ImageView>
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
-                        </ImageView>
-                        <ImageView fitHeight="39.0" fitWidth="39.0" layoutX="11.0" layoutY="144.0" onMouseClicked="#openChat" pickOnBounds="true" preserveRatio="true" styleClass="optionButton">
+                        </Button>
+                        <Button prefHeight="39.0" prefWidth="39.0" layoutX="11.0" layoutY="144.0" onMouseClicked="#openChat">
+                           <ImageView>
                            <image>
                               <Image url="@../Resources/chat.png" />
                            </image>
+                           </ImageView>
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
-                        </ImageView>
-                        <ImageView fitHeight="39.0" fitWidth="39.0" layoutX="11.0" layoutY="188.0" onMouseClicked="#openHistory" pickOnBounds="true" preserveRatio="true" styleClass="optionButton">
+                        </Button>
+                        <Button prefHeight="39.0" prefWidth="39.0" layoutX="11.0" layoutY="188.0" onMouseClicked="#openHistory">
+                           <ImageView>
                            <image>
                               <Image url="@../Resources/history.png" />
                            </image>
+                           </ImageView>
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
-                        </ImageView>
-                        <ImageView fitHeight="39.0" fitWidth="39.0" layoutX="11.0" layoutY="232.0" onMouseClicked="#resignGame" pickOnBounds="true" preserveRatio="true" styleClass="optionButton">
+                        </Button>
+                        <Button prefHeight="39.0" prefWidth="39.0" layoutX="11.0" layoutY="232.0" onMouseClicked="#resignGame">
+                           <ImageView>
                            <image>
                               <Image url="@../Resources/resign.png" />
                            </image>
+                           </ImageView>
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
-                        </ImageView>
+                        </Button>
                      </children>
                   </Pane>
            </children>

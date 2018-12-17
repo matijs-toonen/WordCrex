@@ -44,6 +44,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
@@ -92,7 +93,9 @@ public class BoardController implements Initializable {
 	private ImageView shuffle, accept;
 	
 	@FXML
-	private AnchorPane screenPane;	
+	private AnchorPane screenPane;
+	
+	private Tooltip playTooltip, resetTooltip, shuffleTooltip, skipTooltip, chatTooltip, turnTooltip, resignTooltip;
 	
 	public BoardController(Game game, Turn turn, AnchorPane rootPane) {
 		_currentGame = game;
