@@ -316,16 +316,19 @@ public class BoardController implements Initializable {
 				
 				if(wordsData.size() == 0)
 				{
-					showErrorMessage("Je moet 1 woord leggen");
+					showErrorMessage("Je moet 1 woord leggen\nof je woord is geen valide woord");
 					return;
 				}
-				
-				var wordData = wordsData.get(0);
 				
 				var statementTurnPlayer = "";
 				var statementBoardPlayer = new ArrayList<String>();
 				var playerNum = checkPlayerIfPlayer1() ? 1 : 2;
-				var score = wordData.getScore();
+				var score = 0;
+				
+				for(var wordData : wordsData)
+				{
+					score += wordData.getScore();
+				}
 				
 				var gameId = _currentGame.getGameId();
 				var turnId = _currentTurn.getTurnId();
@@ -335,11 +338,25 @@ public class BoardController implements Initializable {
 						+ "(game_id, turn_id, username_player%1$s, bonus, score, turnaction_type) \n"
 						+ "VALUES(%2$s, %3$s, '%4$s', %5$s, %6$s, '%7$s')"
 						,playerNum, gameId, turnId, username, 0, score, "play");
-								
-
-				var lettersData = wordData.getLetters();
 				
-				lettersData.entrySet().forEach(letterData -> {
+				var uniqueLettersData = new HashMap<Integer, Pair<Character, Point>>();
+				
+				for(var wordData : wordsData)
+				{
+					var lettersData = wordData.getLetters();
+					
+					lettersData.entrySet().forEach(letterData -> {
+						
+						var letterId = letterData.getKey();
+						var letterCharCord = letterData.getValue();
+						
+						if(!uniqueLettersData.containsKey(letterId))
+							uniqueLettersData.put(letterId, letterCharCord);
+						
+					});
+				}
+				
+				uniqueLettersData.entrySet().forEach(letterData -> {
 					
 					var letterId = letterData.getKey();
 					var tileX = (int) letterData.getValue().getValue().getX()+1;
@@ -388,7 +405,7 @@ public class BoardController implements Initializable {
 				uniqueWordsData.add(wordData);
 			}
 		}
-		
+				
 		if(uniqueWordsData.size() == 1)
 			return uniqueWordsData;
 		
@@ -396,6 +413,9 @@ public class BoardController implements Initializable {
 		{
 			for(int j = 0; j < uniqueWordsData.size(); j++)
 			{
+				if(uniqueWordsData.get(i).equals(uniqueWordsData.get(j)))
+					continue;
+				
 				if(uniqueWordsData.get(i).hasSameLetterIds(uniqueWordsData.get(j).getLetterIds()))
 					uniqueWordsData.remove(j);
 			}
@@ -1160,7 +1180,6 @@ public class BoardController implements Initializable {
 			completeWordData.add(new WordData(word.getKey(), word.getValue(), 
 					getPlacedWordWithLetterCords(cords, word.getKey())));
 		}
-
 		
 		return completeWordData;
 

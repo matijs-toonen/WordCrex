@@ -67,6 +67,10 @@ public class SetHistory {
 		}
 	}
 	
+	public int getTurnID() {
+		return _turn_id;
+	}
+	
 	public String getPlayer1() {
 		return _player1;
 	}
