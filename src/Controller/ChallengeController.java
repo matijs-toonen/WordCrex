@@ -203,7 +203,7 @@ public class ChallengeController implements Initializable  {
 		return (resultSet -> {
 			try {
 				resultSet.first();
-				var gameId = resultSet.getInt("game_id");
+				var gameId = resultSet.getInt("GENERATED_KEY");
 				insertLetters(gameId);
 				return gameId;
 			} catch (SQLException e) {
