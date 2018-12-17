@@ -48,6 +48,9 @@ public class SuggestController implements Initializable{
 	
 	@FXML 
 	private TextField searchBox;
+	
+	@FXML
+	private Label WordError;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -78,10 +81,12 @@ public class SuggestController implements Initializable{
 		textfieldAddWord.setText("");
 		
 		try {
+			WordError.setVisible(false);
 			String statement = Word.insertQuery(wordValue, MainController.getUser().getUsername());
 			System.out.println(statement);
 			_db.Insert(statement);
 		} catch (SQLException e) {
+			WordError.setVisible(true);
 			System.err.println(e);
 		}
 		

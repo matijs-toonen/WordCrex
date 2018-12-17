@@ -102,7 +102,6 @@ public class BoardController implements Initializable {
 		_boardTiles = new HashMap<Point, BoardTilePane>();
         _currentHand = new ArrayList<BoardTile>();
         _fieldHand = new HashMap<Point, BoardTile>();
-        getLettersAndValidate();
 	}
 
 	public BoardController(Game game, AnchorPane rootPane) {
@@ -141,21 +140,25 @@ public class BoardController implements Initializable {
 			}
 			
 			Platform.runLater(() -> {
-				AnchorPane pane = null;
-				try 
-				{
-					GameController con = new GameController(_rootPane);			
-					var panes = new FXMLLoader(getClass().getResource("/View/Games.fxml"));
-					
-					panes.setController(con);
-					pane = panes.load();
-				}
-				catch(Exception ex) {
-					Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
-				}
-				_rootPane.getChildren().setAll(pane);	
+				showGameScreen();
 			});
 		}
+	}
+	
+	private void showGameScreen() {
+		AnchorPane pane = null;
+		try 
+		{
+			GameController con = new GameController(_rootPane);			
+			var panes = new FXMLLoader(getClass().getResource("/View/Games.fxml"));
+			
+			panes.setController(con);
+			pane = panes.load();
+		}
+		catch(Exception ex) {
+			Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		_rootPane.getChildren().setAll(pane);
 	}
 	
 	@Override
@@ -175,6 +178,9 @@ public class BoardController implements Initializable {
 		createField(false);
 		createHand();
 		dragOnHand();
+		
+		
+		// add tooltip to buttons
 	}
 	
     private String getOpponent() {
@@ -302,16 +308,19 @@ public class BoardController implements Initializable {
 				
 				if(wordsData.size() == 0)
 				{
-					showErrorMessage("Je moet 1 woord leggen");
+					showErrorMessage("Je moet 1 woord leggen\nof je woord is geen valide woord");
 					return;
 				}
-				
-				var wordData = wordsData.get(0);
 				
 				var statementTurnPlayer = "";
 				var statementBoardPlayer = new ArrayList<String>();
 				var playerNum = checkPlayerIfPlayer1() ? 1 : 2;
-				var score = wordData.getScore();
+				var score = 0;
+				
+				for(var wordData : wordsData)
+				{
+					score += wordData.getScore();
+				}
 				
 				var gameId = _currentGame.getGameId();
 				var turnId = _currentTurn.getTurnId();
@@ -321,11 +330,25 @@ public class BoardController implements Initializable {
 						+ "(game_id, turn_id, username_player%1$s, bonus, score, turnaction_type) \n"
 						+ "VALUES(%2$s, %3$s, '%4$s', %5$s, %6$s, '%7$s')"
 						,playerNum, gameId, turnId, username, 0, score, "play");
-								
-
-				var lettersData = wordData.getLetters();
 				
-				lettersData.entrySet().forEach(letterData -> {
+				var uniqueLettersData = new HashMap<Integer, Pair<Character, Point>>();
+				
+				for(var wordData : wordsData)
+				{
+					var lettersData = wordData.getLetters();
+					
+					lettersData.entrySet().forEach(letterData -> {
+						
+						var letterId = letterData.getKey();
+						var letterCharCord = letterData.getValue();
+						
+						if(!uniqueLettersData.containsKey(letterId))
+							uniqueLettersData.put(letterId, letterCharCord);
+						
+					});
+				}
+				
+				uniqueLettersData.entrySet().forEach(letterData -> {
 					
 					var letterId = letterData.getKey();
 					var tileX = (int) letterData.getValue().getValue().getX()+1;
@@ -374,7 +397,7 @@ public class BoardController implements Initializable {
 				uniqueWordsData.add(wordData);
 			}
 		}
-		
+				
 		if(uniqueWordsData.size() == 1)
 			return uniqueWordsData;
 		
@@ -382,6 +405,9 @@ public class BoardController implements Initializable {
 		{
 			for(int j = 0; j < uniqueWordsData.size(); j++)
 			{
+				if(uniqueWordsData.get(i).equals(uniqueWordsData.get(j)))
+					continue;
+				
 				if(uniqueWordsData.get(i).hasSameLetterIds(uniqueWordsData.get(j).getLetterIds()))
 					uniqueWordsData.remove(j);
 			}
@@ -422,20 +448,7 @@ public class BoardController implements Initializable {
 		} catch (SQLException e) {
 		}
 		
-		AnchorPane pane = null;
-		try 
-		{		 
-			GameController con = new GameController(_rootPane);			
-			var panes = new FXMLLoader(getClass().getResource("/View/Games.fxml"));
-			
-			panes.setController(con);
-			pane = panes.load();
-			
-		}
-		catch(Exception ex) {
-			Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
-		}		
-		_rootPane.getChildren().setAll(pane);
+		showGameScreen();
 	}
 	
 	public void reset() {
@@ -446,6 +459,7 @@ public class BoardController implements Initializable {
 	
 	public void renewHand() {
 		createHand();
+		shuffle.setVisible(true);
 	}
 	
 	private boolean needsToWaitForHandLetters(String table) {
@@ -860,6 +874,14 @@ public class BoardController implements Initializable {
 				int tries = 0;
 				while(getAmountLetters(handLetters) == 0 || getAmountLetters(handLetters) != 7 || tries < 4) {
 					try {
+						var hasResigned = _db.SelectCount("SELECT COUNT(*) FROM game WHERE game_state = 'resigned' AND game_id = " + _currentGame.getGameId()) == 1;
+						
+						if(hasResigned) {
+							Platform.runLater(() -> {
+								showGameScreen();
+							});
+							return;
+						}
 						Thread.sleep(1000);
 						handLetters = getExistingHandLetters();
 
@@ -1150,7 +1172,6 @@ public class BoardController implements Initializable {
 			completeWordData.add(new WordData(word.getKey(), word.getValue(), 
 					getPlacedWordWithLetterCords(cords, word.getKey())));
 		}
-
 		
 		return completeWordData;
 
