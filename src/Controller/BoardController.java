@@ -306,6 +306,11 @@ public class BoardController implements Initializable {
 					return;
 				}
 				
+				for(var data : wordsData)
+				{
+					System.out.println(data.getWord() + " playTurn");
+				}
+				
 				var statementTurnPlayer = "";
 				var statementBoardPlayer = new ArrayList<String>();
 				var playerNum = checkPlayerIfPlayer1() ? 1 : 2;
@@ -344,9 +349,12 @@ public class BoardController implements Initializable {
 				
 				uniqueLettersData.entrySet().forEach(letterData -> {
 					
+					var letter = letterData.getValue().getKey();
 					var letterId = letterData.getKey();
 					var tileX = (int) letterData.getValue().getValue().getX()+1;
 					var tileY = (int) letterData.getValue().getValue().getY()+1;
+					
+//					System.out.println(letter + ": " + letterId + " point:" + letterData.getValue().getValue());
 					
 					statementBoardPlayer.add(String.format("INSERT INTO boardplayer%1$s \n"
 							+ "(game_id, username, turn_id, letter_id, tile_x, tile_y) \n"
@@ -392,6 +400,11 @@ public class BoardController implements Initializable {
 			}
 		}
 		
+		for(var data : uniqueWordsData)
+		{
+			System.out.println(data.getWord() + " getUniqueWordData");
+		}
+		
 		if(uniqueWordsData.size() == 1)
 			return uniqueWordsData;
 		
@@ -399,6 +412,9 @@ public class BoardController implements Initializable {
 		{
 			for(int j = 0; j < uniqueWordsData.size(); j++)
 			{
+				if(uniqueWordsData.get(i).equals(uniqueWordsData.get(j)))
+					continue;
+				
 				if(uniqueWordsData.get(i).hasSameLetterIds(uniqueWordsData.get(j).getLetterIds()))
 					uniqueWordsData.remove(j);
 			}
@@ -1164,6 +1180,8 @@ public class BoardController implements Initializable {
 				
 		for(var word : wordsWithScore)
 		{
+			
+			System.out.println(word + " getWordData");
 			completeWordData.add(new WordData(word.getKey(), word.getValue(), 
 					getPlacedWordWithLetterCords(cords, word.getKey())));
 		}
