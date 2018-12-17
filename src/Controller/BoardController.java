@@ -689,14 +689,13 @@ public class BoardController implements Initializable {
 		}
 		else {
 			var scores = getScores();
-			if(insertScore(scores.getKey(), scores.getValue()))
-			{
-				getLettersAndValidate();
-				_currentTurn.incrementId();
-				var handLetters = generateHandLetters();
-				updatePaneWithNewLetters();
-				visualizeHand(handLetters);
-			}
+			insertScore(scores.getKey(), scores.getValue());
+			
+			getLettersAndValidate();
+			_currentTurn.incrementId();
+			var handLetters = generateHandLetters();
+			updatePaneWithNewLetters();
+			visualizeHand(handLetters);
 		}
 	}
 	
