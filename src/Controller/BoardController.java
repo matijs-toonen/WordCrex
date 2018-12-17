@@ -1118,8 +1118,7 @@ public class BoardController implements Initializable {
 				event.acceptTransferModes(TransferMode.ANY);
 				event.setDropCompleted(true);
 				_board.updateStatus(cords, PositionStatus.Taken);
-				
-				playTileSound();					
+									
 				event.consume();
 			}
 		});
@@ -1473,10 +1472,4 @@ public class BoardController implements Initializable {
 		return new Pair<>(word,wordStartEnd);
 	}
 	
-	private void playTileSound() {
-		String bip = "src/Resources/tileMove.mp3";
-		Media hit = new Media(new File(bip).toURI().toString());
-		MediaPlayer mediaPlayer = new MediaPlayer(hit);
-		mediaPlayer.play();
-	}
 }
