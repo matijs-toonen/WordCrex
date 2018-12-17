@@ -124,12 +124,15 @@ public class BoardController implements Initializable {
 	
 	private void checkValidPotSize()
 	{
-		if(_letters.size() == 0)
+		if(_letters.size() < 7)
 		{		
 			try 
 			{
 				var existingStatement = Letter.getUnusedLettersBasedOnHandLetter(_currentGame.getGameId(), _currentTurn.getTurnId());
-				_letters = (ArrayList<Letter>) _db.SelectAll(existingStatement, Letter.class);
+				var letters = (ArrayList<Letter>) _db.SelectAll(existingStatement, Letter.class);
+				letters.forEach(letter -> {
+					_letters.add(letter);
+				});
 				if(_letters.size() > 0) 
 					return;
 				
@@ -858,7 +861,7 @@ public class BoardController implements Initializable {
 			public void run() {
 				var handLetters = getExistingHandLetters();
 				int tries = 0;
-				while(getAmountLetters(handLetters) == 0 || getAmountLetters(handLetters) != 7 || tries < 4) {
+				while(getAmountLetters(handLetters) == 0 || getAmountLetters(handLetters) != 7 && tries < 4) {
 					try {
 						var hasResigned = _db.SelectCount("SELECT COUNT(*) FROM game WHERE game_state = 'resigned' AND game_id = " + _currentGame.getGameId()) == 1;
 						
@@ -869,8 +872,11 @@ public class BoardController implements Initializable {
 							return;
 						}
 						Thread.sleep(1000);
+						System.out.println(_currentTurn.getTurnId());
 						handLetters = getExistingHandLetters();
 
+
+						System.out.println(handLetters.size());
 						if(getAmountLetters(handLetters) > 0) {
 							tries++;	
 						}
@@ -886,6 +892,7 @@ public class BoardController implements Initializable {
 				final var finalHandLetters = handLetters;
 				
 				Platform.runLater(() -> {
+					System.out.println("refrosh");
 					updatePaneWithNewLetters();
 	            	visualizeHand(finalHandLetters);
 	            	enableBoard();
