@@ -302,13 +302,8 @@ public class BoardController implements Initializable {
 				
 				if(wordsData.size() == 0)
 				{
-					showErrorMessage("Je moet 1 woord leggen");
+					showErrorMessage("Je moet 1 woord leggen\nof je woord is geen valide woord");
 					return;
-				}
-				
-				for(var data : wordsData)
-				{
-					System.out.println(data.getWord() + " playTurn");
 				}
 				
 				var statementTurnPlayer = "";
@@ -349,12 +344,9 @@ public class BoardController implements Initializable {
 				
 				uniqueLettersData.entrySet().forEach(letterData -> {
 					
-					var letter = letterData.getValue().getKey();
 					var letterId = letterData.getKey();
 					var tileX = (int) letterData.getValue().getValue().getX()+1;
 					var tileY = (int) letterData.getValue().getValue().getY()+1;
-					
-//					System.out.println(letter + ": " + letterId + " point:" + letterData.getValue().getValue());
 					
 					statementBoardPlayer.add(String.format("INSERT INTO boardplayer%1$s \n"
 							+ "(game_id, username, turn_id, letter_id, tile_x, tile_y) \n"
@@ -399,12 +391,7 @@ public class BoardController implements Initializable {
 				uniqueWordsData.add(wordData);
 			}
 		}
-		
-		for(var data : uniqueWordsData)
-		{
-			System.out.println(data.getWord() + " getUniqueWordData");
-		}
-		
+				
 		if(uniqueWordsData.size() == 1)
 			return uniqueWordsData;
 		
@@ -1180,12 +1167,9 @@ public class BoardController implements Initializable {
 				
 		for(var word : wordsWithScore)
 		{
-			
-			System.out.println(word + " getWordData");
 			completeWordData.add(new WordData(word.getKey(), word.getValue(), 
 					getPlacedWordWithLetterCords(cords, word.getKey())));
 		}
-
 		
 		return completeWordData;
 
