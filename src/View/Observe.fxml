@@ -10,11 +10,11 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1000.0" prefWidth="1635.0" style="-fx-background-color: #F0F0F7;" stylesheets="@../Application/application.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="881.0" prefWidth="1315.0" style="-fx-background-color: #F0F0F7;" stylesheets="@../Application/application.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
         <content>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="1000.0" prefWidth="1635.0">
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="900.0" prefWidth="1635.0">
                <children>
-                  <Pane fx:id="boardPane" prefHeight="1000.0" prefWidth="1635.0" style="-fx-background-color: transparent;" />
+                  <Pane fx:id="boardPane" prefHeight="900.0" prefWidth="1635.0" style="-fx-background-color: transparent;" />
                   <Pane fx:id="panePlayField" layoutX="70.0" layoutY="84.0" prefHeight="680.0" prefWidth="680.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1);" />
                   <Pane fx:id="paneHand" layoutX="782.0" layoutY="84.0" prefHeight="330.0" prefWidth="59.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1);" />
                   <GridPane layoutX="70.0" layoutY="28.0" prefHeight="30.0" prefWidth="1485.0">
@@ -44,7 +44,7 @@
                               <Insets left="15.0" />
                            </padding>
                         </Label>
-                        <Label maxHeight="Infinity" style="-fx-background-color: #F4E4D3;" text=" - " GridPane.columnIndex="2" GridPane.halignment="CENTER">
+                        <Label maxHeight="Infinity" text=" - " GridPane.columnIndex="2" GridPane.halignment="CENTER">
                            <font>
                               <Font name="System Bold" size="18.0" />
                            </font>
