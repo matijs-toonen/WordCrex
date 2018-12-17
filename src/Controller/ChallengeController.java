@@ -1,10 +1,12 @@
 package Controller;
 
 import java.net.URL;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -156,7 +158,7 @@ public class ChallengeController implements Initializable  {
 				
 				if (awnser.equals("accepted")) {
 					_dbGame.Update(turnQuery);
-					insertLetters(gameId);
+//					insertLetters(gameId);
 					loadBoard(game);
 	    		}
 				
@@ -184,7 +186,8 @@ public class ChallengeController implements Initializable  {
 	    	
 	    	var statement = Game.getRequestGameQuery(MainController.getUser().getUsername(), opponent);
     		try {
-				_dbGame.Update(statement);
+    			_db = new DatabaseController<Integer>();
+				var item = _db.InsertWithReturnKeys(statement, getInt());
 			} catch (SQLException e) {
 				System.out.println(e.getMessage());
 			}
@@ -196,11 +199,23 @@ public class ChallengeController implements Initializable  {
 		});
     }
 	
+	private Function<ResultSet, Integer> getInt(){
+		return (resultSet -> {
+			try {
+				resultSet.first();
+				var gameId = resultSet.getInt("game_id");
+				insertLetters(gameId);
+				return gameId;
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return 0;
+		});
+	}
+	
 	private void insertLetters(int gameId) {
 		if(hasAllLettersWithGameId(gameId))
-			return;
-		
-		if(!deleteExistingLettersWithGameId(gameId))
 			return;
 		
 		_db = new DatabaseController<Symbol>();
