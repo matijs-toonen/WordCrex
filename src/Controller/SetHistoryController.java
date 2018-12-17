@@ -112,6 +112,8 @@ public class SetHistoryController implements Initializable {
 		playersSetBox.getChildren().add(playerBox1);
 		playersSetBox.getChildren().add(playerBox2);
 		
+		playersSetBox.setStyle("-fx-padding: 0 0 25 0;");
+		
 		return playersSetBox;
 	}
 	
