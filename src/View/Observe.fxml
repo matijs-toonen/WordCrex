@@ -56,8 +56,7 @@
                         </Label>
                      </children>
                  </GridPane>
-                  <Pane fx:id="blockedOverplay" prefHeight="2000.0" prefWidth="2000.0" visible="false" />
-                  <Pane fx:id="panePlayField1" layoutX="875.0" layoutY="84.0" prefHeight="680.0" prefWidth="680.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1);" />
+                  <Pane fx:id="panePlayField2" layoutX="875.0" layoutY="84.0" prefHeight="680.0" prefWidth="680.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1);" />
                </children>
             </AnchorPane>
         </content>

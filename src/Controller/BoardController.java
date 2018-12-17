@@ -75,7 +75,6 @@ public class BoardController implements Initializable {
 
 	private boolean _chatVisible;
 	private boolean _historyVisible;
-	private boolean _isObserver;
 	
 	@FXML
 	private Label lblScore1, lblScore2, lblPlayer1, lblPlayer2, errorPaneLabel;
@@ -108,11 +107,6 @@ public class BoardController implements Initializable {
 
 	public BoardController(Game game, AnchorPane rootPane) {
 		this(game, new Turn(1), rootPane);
-	}
-	
-	public BoardController(Game game, Turn turn, boolean isObserver, AnchorPane rootPane) {
-		this(game, turn, rootPane);
-		_isObserver = isObserver;
 	}
 
 	private void getLettersAndValidate() {
@@ -174,14 +168,6 @@ public class BoardController implements Initializable {
 	}
 	
 	private void setLabels() {
-		if(_isObserver) {
-			var player1 = _currentGame.getUser1();
-			var player2 = _currentGame.getUser2();
-			lblPlayer1.setText(player1);
-			lblPlayer2.setText(player2);
-			return;
-		}
-		
 		lblPlayer1.setText(MainController.getUser().getUsername());
 		lblPlayer1.setStyle("-fx-font-size: 28");
         var opponent = getOpponent();

@@ -58,7 +58,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
 
-public class BoardController2 implements Initializable {
+public class ObserverBoardController implements Initializable {
 	
 	private DatabaseController _db;
 	private Random _random = new Random();
@@ -84,7 +84,7 @@ public class BoardController2 implements Initializable {
 	private Button btnTest, btnShuffle;
 	
 	@FXML
-	private Pane panePlayField, paneHand, boardPane, waitingPane, errorMessagePane, blockedOverplay;
+	private Pane panePlayField, paneHand, boardPane, panePlayField2;
 	
 	@FXML
 	private AnchorPane rightBarAnchor;
@@ -95,24 +95,19 @@ public class BoardController2 implements Initializable {
 	@FXML
 	private AnchorPane screenPane;	
 	
-	public BoardController2(Game game, Turn turn, AnchorPane rootPane) {
+	public ObserverBoardController(Game game, Turn turn, AnchorPane rootPane) {
 		_currentGame = game;
 		_currentTurn = turn;
 		_rootPane = rootPane;
-		_board = new Board();
-		_boardTiles = new HashMap<Point, BoardTilePane>();
-        _currentHand = new ArrayList<BoardTile>();
-        _fieldHand = new HashMap<Point, BoardTile>();
-        getLettersAndValidate();
+//		_board = new Board();
+//		_boardTiles = new HashMap<Point, BoardTilePane>();
+//        _currentHand = new ArrayList<BoardTile>();
+//        _fieldHand = new HashMap<Point, BoardTile>();
+//        getLettersAndValidate();
 	}
 
-	public BoardController2(Game game, AnchorPane rootPane) {
+	public ObserverBoardController(Game game, AnchorPane rootPane) {
 		this(game, new Turn(1), rootPane);
-	}
-	
-	public BoardController2(Game game, Turn turn, boolean isObserver, AnchorPane rootPane) {
-		this(game, turn, rootPane);
-		_isObserver = isObserver;
 	}
 
 	private void getLettersAndValidate() {
