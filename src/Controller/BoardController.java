@@ -102,7 +102,6 @@ public class BoardController implements Initializable {
 		_boardTiles = new HashMap<Point, BoardTilePane>();
         _currentHand = new ArrayList<BoardTile>();
         _fieldHand = new HashMap<Point, BoardTile>();
-        getLettersAndValidate();
 	}
 
 	public BoardController(Game game, AnchorPane rootPane) {
