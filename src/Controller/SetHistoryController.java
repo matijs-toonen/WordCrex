@@ -12,6 +12,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -93,6 +94,7 @@ public class SetHistoryController implements Initializable {
 	private VBox listItem(SetHistory setHistory) {
 		VBox playersSetBox = new VBox();
 		
+		GridPane PlayersTurnBox = SetBox(setHistory.getTurnID());
 		GridPane playerBox1 = playerBox(setHistory.getPlayer1(), setHistory.getWoord1(), setHistory.getScore1());
 		GridPane playerBox2 = playerBox(setHistory.getPlayer2(), setHistory.getWoord2(), setHistory.getScore2());
 		
@@ -106,10 +108,38 @@ public class SetHistoryController implements Initializable {
 			playerBox2.setStyle("-fx-background-color: #DAF7E8;");
 		}
 		
+		playersSetBox.getChildren().add(PlayersTurnBox);
 		playersSetBox.getChildren().add(playerBox1);
 		playersSetBox.getChildren().add(playerBox2);
 		
 		return playersSetBox;
+	}
+	
+	private GridPane SetBox(int turn) {
+		GridPane TurnItem = new GridPane();
+		
+		Label TurnNumber = new Label();
+		TurnNumber.setText(Integer.toString(turn));
+		TurnNumber.setStyle("-fx-font-weight: bold ;-fx-text-fill: #4D4F5C; -fx-font-family: 'Source Sans Pro'; -fx-font-size: 14px; -fx-background-color: rgba(255,255,255,1); -fx-padding: 5 10; -fx-border-width: 5px ; -fx-background-radius: 25");
+		
+		TurnItem.add(TurnNumber, 1, 0);
+		TurnItem.setStyle("-fx-padding: 5, 5, 5, 5 ;");
+		
+		TurnItem.setHalignment(TurnNumber, HPos.CENTER);
+		
+		ColumnConstraints cc1 = new ColumnConstraints();
+		ColumnConstraints cc2 = new ColumnConstraints();
+		 
+		cc1.setPercentWidth(45);
+		cc1.setHgrow(Priority.ALWAYS);
+		cc2.setPercentWidth(10);
+		cc2.setHgrow(Priority.ALWAYS);
+		 
+		TurnItem.getColumnConstraints().add(cc1);
+		TurnItem.getColumnConstraints().add(cc2);
+		TurnItem.getColumnConstraints().add(cc1);
+		
+		return TurnItem;
 	}
 	
 	private GridPane playerBox(String player, String word, int score) {
