@@ -52,4 +52,22 @@ public class Letter {
 	public static final String getUnusedLetters(int gameId) {
 		return ("SELECT * FROM pot NATURAL JOIN letter NATURAL JOIN symbol WHERE game_id = " + gameId);
 	}
+	
+	public static final String getUnusedLettersBasedOnHandLetter(int gameId, int turnId) {
+		return ("SELECT \r\n" + 
+				"    *\r\n" + 
+				"FROM\r\n" + 
+				"    handletter\r\n" + 
+				"        NATURAL JOIN\r\n" + 
+				"    letter\r\n" + 
+				"WHERE\r\n" + 
+				"    game_id = 526 AND turn_id = 38\r\n" + 
+				"        AND letter_id NOT IN (SELECT \r\n" + 
+				"            letter_id\r\n" + 
+				"        FROM\r\n" + 
+				"            turnboardletter\r\n" + 
+				"        WHERE\r\n" + 
+				"            game_id = "+ gameId + " AND turn_id = " + turnId + ");\r\n" + 
+				"");
+	}
 }

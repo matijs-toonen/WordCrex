@@ -125,9 +125,14 @@ public class BoardController implements Initializable {
 	private void checkValidPotSize()
 	{
 		if(_letters.size() == 0)
-		{
+		{		
 			try 
 			{
+				var existingStatement = Letter.getUnusedLettersBasedOnHandLetter(_currentGame.getGameId(), _currentTurn.getTurnId());
+				_letters = (ArrayList<Letter>) _db.SelectAll(existingStatement, Letter.class);
+				if(_letters.size() > 0) 
+					return;
+				
 				var score = (Score)_db.SelectFirst("SELECT * FROM score where game_id = " + _currentGame.getGameId(), Score.class);
 				String winner = score.getOwnScore() > score.getOpponentScore() ? MainController.getUser().getUsername() : score.getOpponent();
 				_db.Update("update game " + 
@@ -686,6 +691,7 @@ public class BoardController implements Initializable {
 			var scores = getScores();
 			if(insertScore(scores.getKey(), scores.getValue()))
 			{
+				getLettersAndValidate();
 				_currentTurn.incrementId();
 				var handLetters = generateHandLetters();
 				updatePaneWithNewLetters();
@@ -836,6 +842,7 @@ public class BoardController implements Initializable {
 	
 	private ArrayList<HandLetter> getHandLetters() {
 		var handLetters = getExistingHandLetters();
+		getLettersAndValidate();
 		return handLetters.size() == 0 ? generateHandLetters() : handLetters; 
 	}
 	
@@ -949,8 +956,6 @@ public class BoardController implements Initializable {
 		if(!hasExisitingTurn()) {
 			addTurn();
 		}
-		
-		getLettersAndValidate();
 		
 		for(int i = 0; i < 7; i++) {
 			var letter = createHandLetter();
