@@ -952,7 +952,9 @@ public class BoardController implements Initializable {
 		getLettersAndValidate();
 		
 		for(int i = 0; i < 7; i++) {
-			handLetters.add(createHandLetter());
+			var letter = createHandLetter();
+			if(letter != null)
+				handLetters.add(letter);
 		}
 		
 		return handLetters;
