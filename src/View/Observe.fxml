@@ -10,9 +10,9 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="881.0" prefWidth="1315.0" style="-fx-background-color: #F0F0F7;" stylesheets="@../Application/application.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" pannable="true" prefHeight="881.0" prefWidth="1315.0" style="-fx-background-color: #F0F0F7;" stylesheets="@../Application/application.css" vbarPolicy="NEVER" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
         <content>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="900.0" prefWidth="1635.0">
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="865.0" prefWidth="1635.0">
                <children>
                   <Pane fx:id="boardPane" prefHeight="900.0" prefWidth="1635.0" style="-fx-background-color: transparent;" />
                   <Pane fx:id="panePlayField" layoutX="70.0" layoutY="84.0" prefHeight="680.0" prefWidth="680.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1);" />
