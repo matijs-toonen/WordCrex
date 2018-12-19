@@ -1421,8 +1421,10 @@ public class BoardController implements Initializable {
 					score += letterScore * bonusMulti;
 				else
 					score += letterScore;
+				
+				System.out.println(bonusLetter);
 					
-				if (bonusLetter == 'W')
+				if (bonusLetter == 'W' || bonusLetter == '*')
 				{
 					hasWordMulti = true;
 					if(testing)
@@ -1435,12 +1437,24 @@ public class BoardController implements Initializable {
 		
 		if(hasWordMulti)
 		{
-			for(var tile : wordMultiTiles)
+			for(var multiTile : wordMultiTiles)
 			{
-				var multi = testing ? ((BoardTileTest) tile).getBonusValue() 
-						: ((BoardTilePane) tile).getBonusValue();
+				var tile = testing ? ((BoardTileTest) multiTile) 
+						: ((BoardTilePane) multiTile);
 				
-				score = score * multi;
+				if(tile instanceof BoardTilePane)
+				{
+					var bonusLetter = ((BoardTilePane) tile).getBonusLetter();
+					
+					score = bonusLetter == '*' ? score * 3 : score * ((BoardTilePane) tile).getBonusValue();
+				}
+				else if (tile instanceof BoardTileTest)
+				{
+					var bonusLetter = ((BoardTileTest) tile).getBonusLetter();
+					
+					score = bonusLetter == '*' ? score * 3 : score * ((BoardTileTest) tile).getBonusValue();
+				}
+
 			}
 		}
 		
