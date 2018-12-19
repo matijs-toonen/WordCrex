@@ -1107,6 +1107,18 @@ public class BoardController implements Initializable {
 					_boardTiles.put(boardTile.getCords(), oldBoardTile);
 				}
 				
+				// TODO voor davido
+				var wordsWithScore = getPlacedWordsWithScore(cords);
+				var dropScore = 0;
+				
+				for(var word : wordsWithScore)
+				{
+					System.out.println(word.getKey());
+					dropScore += word.getValue();
+				}
+				
+				System.out.println(dropScore);
+				
 				sourceTile.setLayoutX(0);
 				sourceTile.setLayoutY(0);
 				boardTile.setBoardTile(sourceTile);
