@@ -15,10 +15,15 @@ public class DatabaseController <T> {
 	/*
 	 * PROPS
 	 */
-	private static String _url = "jdbc:mysql://databases.aii.avans.nl/";
-    private static String _schema = "2018_vsoprj2_wordcrex_abcd";
-    private static String _user = "42in02vtsod";
-    private static String _password = "duurzaamheid";
+//	private static String _url = "jdbc:mysql://databases.aii.avans.nl/";
+//    private static String _schema = "2018_vsoprj2_wordcrex_abcd";
+//    private static String _user = "42in02vtsod";
+//    private static String _password = "duurzaamheid";
+    
+    private static String _url = "jdbc:mysql://digitalbyali.nl/";
+    private static String _schema = "u17091p12601_wordcrex";
+    private static String _user = "u17091p12601_groepd";
+    private static String _password = "P@s5w0rd!";
 	
 	
 	public DatabaseController(String url, String schema, String user, String password) {
