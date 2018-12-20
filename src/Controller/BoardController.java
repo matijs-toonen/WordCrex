@@ -1091,6 +1091,7 @@ public class BoardController implements Initializable {
 			if(event.getGestureTarget() instanceof BoardTilePane) {
 				var sourceTile = (BoardTile) event.getGestureSource();
 				var boardTile = (BoardTilePane) event.getGestureTarget();
+				Integer score = 0;
 				
 				var cords = boardTile.getCords();
 								
@@ -1107,29 +1108,31 @@ public class BoardController implements Initializable {
 					_boardTiles.put(boardTile.getCords(), oldBoardTile);
 				}
 				
-				// TODO voor davido
-				var wordsWithScore = getPlacedWordsWithScore(cords);
-				var dropScore = 0;
-				
-				for(var word : wordsWithScore)
-				{
-					System.out.println(word.getKey());
-					dropScore += word.getValue();
-				}
-				
-				System.out.println(dropScore);
-				
 				sourceTile.setLayoutX(0);
 				sourceTile.setLayoutY(0);
 				boardTile.setBoardTile(sourceTile);
 				
-				shuffle.setVisible(false);
 				_fieldHand.put(cords, sourceTile);
 				_boardTiles.put(cords, boardTile);
 				
 				event.acceptTransferModes(TransferMode.ANY);
 				event.setDropCompleted(true);
 				_board.updateStatus(cords, PositionStatus.Taken);
+				
+				var wordsData = getWordData(cords);
+				for(var word : wordsData) {
+					System.out.println(word.getWord());
+					System.out.println(word.getScore());
+					
+					score = word.getScore();
+				}
+				
+				clearScores();	
+				
+				if(score != 0) {
+					boardTile.setBoardTile(sourceTile, score);
+					_boardTiles.put(cords, boardTile);
+				}
 									
 				event.consume();
 			}
