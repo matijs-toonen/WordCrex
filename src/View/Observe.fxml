@@ -19,8 +19,8 @@
                   <Pane fx:id="panePlayField" layoutX="70.0" layoutY="84.0" prefHeight="680.0" prefWidth="680.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1);" />
                   <Pane fx:id="paneHand" layoutX="782.0" layoutY="84.0" prefHeight="330.0" prefWidth="59.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1);">
                <children>
-                  <Button mnemonicParsing="false" onAction="#nextTurn" text="Next Turn" />
-                  <Button layoutY="24.0" mnemonicParsing="false" onAction="#previousTurn" text="Prev Turn" />
+                  <Button fx:id="btnNextTurn" mnemonicParsing="false" onAction="#nextTurn" text="Next Turn" />
+                  <Button fx:id="btnPrevTurn" layoutY="24.0" mnemonicParsing="false" onAction="#previousTurn" text="Prev Turn" />
                </children></Pane>
                   <GridPane layoutX="70.0" layoutY="28.0" prefHeight="30.0" prefWidth="1485.0">
                     <columnConstraints>

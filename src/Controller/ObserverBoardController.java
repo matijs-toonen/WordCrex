@@ -47,9 +47,13 @@ public class ObserverBoardController implements Initializable {
     private HashMap<Point, BoardTile> _fieldHand;
     private AnchorPane _rootPane;
     private Score _currentScore;
+    private int _maxTurnId;
 	
 	@FXML
 	private Label lblScore1, lblScore2, lblPlayer1, lblPlayer2, errorPaneLabel;
+	
+	@FXML
+	private Button btnNextTurn, btnPrevTurn;
 	
 	@FXML
 	private Pane panePlayField, paneHand, boardPane, panePlayField2;
@@ -102,19 +106,80 @@ public class ObserverBoardController implements Initializable {
 		lblScore2.setText("9");
 		lblScore2.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 0 25 25 0");
 		
-		createField(panePlayField, true);
-		createField(panePlayField2, false);
+		btnPrevTurn.setDisable(_currentTurn.getTurnId() <= 1);
+		
+		checkMaxTurn();
+		
+		drawField();
+		updateScore();
+	}
+	
+	private void checkMaxTurn() {
+		var thread = new Thread(() -> {
+			while(true) {
+				try {
+					var maxTurnQuery = "SELECT MAX(turn_id) from turn where game_id = " + _currentGame.getGameId();
+					_maxTurnId = _db.SelectCount(maxTurnQuery);
+					Platform.runLater(() -> {
+						btnNextTurn.setDisable(_currentTurn.getTurnId() >= _maxTurnId);
+					});
+					Thread.sleep(1000);
+				}
+				 catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}	
+				catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+			
+		});
+		thread.setDaemon(true);
+		thread.start();
 	}
 	
 	public void nextTurn(ActionEvent event) {
-		System.out.println("hier");
 		_currentTurn.incrementId();
-		createField(panePlayField, true);
-		createField(panePlayField2, false);
+		btnPrevTurn.setDisable(false);
+		btnNextTurn.setDisable(_currentTurn.getTurnId() >= _maxTurnId);
+		drawField();
+		updateScore();
 	}
 	
 	public void previousTurn(ActionEvent event) {
+		var disable = _currentTurn.getTurnId() <= 1; 
+		if(disable) {
+			btnPrevTurn.setDisable(disable);
+			return;
+		}
 		
+		_currentTurn.decrementId();
+		btnNextTurn.setDisable(_currentTurn.getTurnId() >= _maxTurnId);
+		drawField();
+		updateScore();
+	}
+	
+	private void updateScore() {
+		var scorePlayer1 = "SELECT SUM(score) FROM turnplayer1 WHERE turn_id <= " + _currentTurn.getTurnId() + " AND game_id = " + _currentGame.getGameId();
+		var scorePlayer2 = "SELECT SUM(score) FROM turnplayer2 WHERE turn_id <= " + _currentTurn.getTurnId() + " AND game_id = " + _currentGame.getGameId();
+		
+		try {
+			var score1 = String.valueOf(_db.SelectCount(scorePlayer1));
+			var score2 = String.valueOf(_db.SelectCount(scorePlayer2));
+
+			lblScore1.setText(score1);
+			lblScore2.setText(score2);	
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void drawField() {
+		createField(panePlayField, true);
+		createField(panePlayField2, false);
 	}
 	
 	private void createField(Pane board, boolean isPlayer1) 
@@ -150,7 +215,7 @@ public class ObserverBoardController implements Initializable {
 						var turn = existingTurns.get(cords);
 						boardTile = createBoardTile(cords, turn);
 					}
-					if(playedTurn.containsKey(cords)) {
+					else if(playedTurn.containsKey(cords)) {
 						var turn = playedTurn.get(cords);
 						boardTile = createBoardTile(cords, turn);
 					}
