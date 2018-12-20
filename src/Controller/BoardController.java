@@ -128,6 +128,7 @@ public class BoardController implements Initializable {
 		{
 			try 
 			{
+				// This query sets the game to a finished state
 				var score = (Score)_db.SelectFirst("SELECT * FROM score where game_id = " + _currentGame.getGameId(), Score.class);
 				String winner = score.getOwnScore() > score.getOpponentScore() ? MainController.getUser().getUsername() : score.getOpponent();
 				_db.Update("update game " + 
