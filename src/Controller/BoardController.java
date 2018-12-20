@@ -1035,6 +1035,7 @@ public class BoardController implements Initializable {
 		return new HandLetter(_currentGame, _currentTurn, letter);
 	}
 	
+	//
 	private Letter createLetter() {
 		var amountOfLetters = _letters.size();
 		if(amountOfLetters == 0) 
