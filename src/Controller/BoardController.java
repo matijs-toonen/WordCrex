@@ -1024,6 +1024,7 @@ public class BoardController implements Initializable {
 			if(event.getGestureTarget() instanceof BoardTilePane) {
 				var sourceTile = (BoardTile) event.getGestureSource();
 				var boardTile = (BoardTilePane) event.getGestureTarget();
+				Integer score = 0;
 				
 				var cords = boardTile.getCords();
 								
@@ -1052,13 +1053,37 @@ public class BoardController implements Initializable {
 				event.setDropCompleted(true);
 				_board.updateStatus(cords, PositionStatus.Taken);
 				
-				playTileSound();					
+				var wordsData = getWordData(cords);
+				for(var word : wordsData) {
+					System.out.println(word.getWord());
+					System.out.println(word.getScore());
+					
+					score = word.getScore();
+				}
+				
+				clearScores();	
+				
+				if(score != 0) {
+					boardTile.setBoardTile(sourceTile, score);
+					_boardTiles.put(cords, boardTile);
+				}
+				
+				//playTileSound();					
 				event.consume();
 			}
 		});
 	}
 	
-	private void dragOnHand() {
+	private void clearScores() {
+		_fieldHand.entrySet().forEach(handLetter -> {
+			var scoreCords = handLetter.getKey();
+			
+			var tilePane = _boardTiles.get(scoreCords);
+			tilePane.clearScores();
+		});
+	}
+	
+	private void dragOnHand() {		
 		paneHand.setOnDragOver(new EventHandler<DragEvent>() {
 
 			@Override
@@ -1407,10 +1432,10 @@ public class BoardController implements Initializable {
 		return new Pair<>(word,wordStartEnd);
 	}
 	
-	private void playTileSound() {
+	/*private void playTileSound() {
 		String bip = "src/Resources/tileMove.mp3";
 		Media hit = new Media(new File(bip).toURI().toString());
 		MediaPlayer mediaPlayer = new MediaPlayer(hit);
 		mediaPlayer.play();
-	}
+	}*/
 }
