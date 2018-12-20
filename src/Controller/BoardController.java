@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
@@ -1160,40 +1161,112 @@ public class BoardController implements Initializable {
 				event.setDropCompleted(true);
 				_board.updateStatus(cords, PositionStatus.Taken);
 								
-				refreshVisualScores(cords, boardTile, sourceTile);	
+				refreshVisualWordScore(cords, boardTile, sourceTile);	
 					
 				event.consume();
 			}
 		});
 	}
 		
-	private void refreshVisualScores(Point dropPoint, BoardTilePane target, BoardTile source) {
+	private void refreshVisualWordScore(Point dropPoint, BoardTilePane target, BoardTile source) {
 		
 		var wordsData = getWordData(dropPoint);
 		
-		wordsData.forEach(data -> {
+		if(wordsData.size() == 0)
+		{
+			System.out.println("Not a word");
 			
-			var letterCords = data.getLetters();
+			var column = (int)dropPoint.getX();
+			var row = (int)dropPoint.getY();
 			
-			letterCords.entrySet().forEach(letter -> {
-				
-				var cord = letter.getValue().getValue();
+			var horStartEnd = collectLettersUntilSeperator(
+					createCharArrFromCords(row, true), column, ' ').getValue();
+			
+			var verStartEnd = collectLettersUntilSeperator(
+					createCharArrFromCords(column, false), row, ' ').getValue();
+			
+			var cordsToClear = new HashSet<Point>();
+			
+			var cordsToClearhor = collectCordsStartEnd(horStartEnd, row, true);
+			var cordsToClearVer = collectCordsStartEnd(verStartEnd, column, false);
+			
+			for(var cord : cordsToClearhor)
+			{
+				cordsToClear.add(cord);
+			}
+			
+			for(var cord : cordsToClearVer)
+			{
+				cordsToClear.add(cord);
+			}
+			
+			cordsToClear.forEach(cord -> {
 				var tilePane = _boardTiles.get(cord);
 				tilePane.clearScores();
 			});
-		});
-		
-		var score = 0;
-		
-		for(var data : wordsData)
+			
+		}
+		else
 		{
-			score += data.getScore();
+			wordsData.forEach(data -> {
+				
+				var letterCords = data.getLetters();
+				
+				letterCords.entrySet().forEach(letter -> {
+					
+					var cord = letter.getValue().getValue();
+					var tilePane = _boardTiles.get(cord);
+					tilePane.clearScores();
+				});
+			});
+			
+			var score = 0;
+			
+			for(var data : wordsData)
+			{
+				score += data.getScore();
+			}
+			
+			if(score != 0) {
+				target.setBoardTile(source, score);
+				_boardTiles.put(dropPoint, target);
+			}
+		}
+	}
+	
+	private ArrayList<Point> collectCordsStartEnd(Pair<Integer, Integer> startEnd, int colro, boolean horizontal)
+	{
+		var cords = new ArrayList<Point>();
+		
+		var start = startEnd.getKey();
+		var end = startEnd.getValue();
+		
+		if(horizontal)
+		{
+			// Horizontal
+			for(int i = start; i <= end; i++)
+			{
+				if(_boardTiles.containsKey(new Point(i, colro)))
+				{
+					var tile = _boardTiles.get(new Point(i, colro));
+					cords.add(tile.getCords());
+				}
+			}
+		}
+		else
+		{
+			// Vertical
+			for(int i = start; i <= end; i++)
+			{
+				if(_boardTiles.containsKey(new Point(colro, i)))
+				{
+					var tile = _boardTiles.get(new Point(colro, i));
+					cords.add(tile.getCords());
+				}
+			}	
 		}
 		
-		if(score != 0) {
-			target.setBoardTile(source, score);
-			_boardTiles.put(dropPoint, target);
-		}
+		return cords;
 	}
 	
 	private void dragOnHand() {
