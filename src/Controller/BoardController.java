@@ -922,30 +922,6 @@ public class BoardController implements Initializable {
 						e.printStackTrace();
 					}
 				}
-//				while(tries < 4 || getAmountLetters(handLetters) == 0 || getAmountLetters(handLetters) != 7) {
-//					try {
-//						var hasResigned = _db.SelectCount("SELECT COUNT(*) FROM game WHERE game_state = 'resigned' AND game_id = " + _currentGame.getGameId()) == 1;
-//						
-//						if(hasResigned) {
-//							Platform.runLater(() -> {
-//								showGameScreen();
-//							});
-//							return;
-//						}
-//						Thread.sleep(1000);
-//						handLetters = getExistingHandLetters();
-//
-//						if(getAmountLetters(handLetters) > 0) {
-//							tries++;	
-//						}
-//						
-//						if (getAmountLetters(handLetters) == 0)
-//							tries = 0;
-//					
-//					} catch (Exception e) {
-//						e.printStackTrace();
-//					}
-//				}
 				
 				final var finalHandLetters = handLetters;
 				
