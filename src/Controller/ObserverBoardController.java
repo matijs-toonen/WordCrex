@@ -23,6 +23,7 @@ import Model.Board.PositionStatus;
 import View.BoardPane.BoardTile;
 import View.BoardPane.BoardTilePane;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -51,16 +52,7 @@ public class ObserverBoardController implements Initializable {
 	private Label lblScore1, lblScore2, lblPlayer1, lblPlayer2, errorPaneLabel;
 	
 	@FXML
-	private Button btnTest, btnShuffle;
-	
-	@FXML
 	private Pane panePlayField, paneHand, boardPane, panePlayField2;
-	
-	@FXML
-	private AnchorPane rightBarAnchor;
-	
-	@FXML
-	private ImageView shuffle, accept;
 	
 	@FXML
 	private AnchorPane screenPane;	
@@ -110,49 +102,21 @@ public class ObserverBoardController implements Initializable {
 		lblScore2.setText("9");
 		lblScore2.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 0 25 25 0");
 		
-		scoreRefreshThread();
-
 		createField(panePlayField, true);
 		createField(panePlayField2, false);
 	}
 	
-	private void scoreRefreshThread() {
-		
-		Thread chatThread = new Thread(){
-		    public void run(){
-		    	
-		    	while(MainController.getUser() != null) {
-		    		refreshScore();
-	    			
-	    			try {
-						Thread.sleep(2000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-	    		}
-		    }
-		};
-		
-		chatThread.setDaemon(true);
-		chatThread.start();
+	public void nextTurn(ActionEvent event) {
+		System.out.println("hier");
+		_currentTurn.incrementId();
+		createField(panePlayField, true);
+		createField(panePlayField2, false);
 	}
 	
-	private void refreshScore() {
-		var _dbScore = new DatabaseController<Score>();
-		String scoreQuery = Score.getScoreFromGameQuery(_currentGame.getGameId());
-		
-		try {
-			_currentScore = (Score) _db.SelectFirst(scoreQuery, Score.class);
-		} catch (SQLException e) {
-		}
-		
-		Platform.runLater(() -> {
-			lblScore1.setText(Integer.toString(_currentScore.getOwnScore()));
-			lblScore2.setText(Integer.toString(_currentScore.getOpponentScore()));
-	    });
+	public void previousTurn(ActionEvent event) {
 		
 	}
-		
+	
 	private void createField(Pane board, boolean isPlayer1) 
 	{
 		var existingTurns = getTurns();

@@ -105,7 +105,6 @@ public class GameObserverController implements Initializable{
 	    	var userLabel = (Label) event.getSource();
 	    	var parent = (GameItemObserver) userLabel.getParent();
 	    	var game = parent.getGame();
-	    	var turnQuery = Game.getTurnFromActiveGame(game.getGameId());
 	    	var turn = new Turn(1);
 	    	loadBoard(game, turn);
 		});
