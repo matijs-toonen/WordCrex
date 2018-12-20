@@ -904,7 +904,7 @@ public class BoardController implements Initializable {
 					
 					try 
 					{
-						var hasResigned = _db.SelectCount("SELECT COUNT(*) FROM game WHERE game_state = 'resigned' AND game_id = " + _currentGame.getGameId()) == 1;
+						var hasResigned = _db.SelectCount("SELECT COUNT(*) FROM game WHERE (game_state = 'resigned' OR game_state = 'finished') AND game_id = " + _currentGame.getGameId()) == 1;
 						
 						if(hasResigned) {
 							Platform.runLater(() -> {
