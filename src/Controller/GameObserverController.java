@@ -98,16 +98,6 @@ public class GameObserverController implements Initializable{
 		//borderPane.setCenter(root);
 		_rootPane.getChildren().setAll(pane);
 	}
-
-	
-	private int getTurn(String query) {
-		try {
-			return _db.SelectCount(query);
-		} catch (SQLException e) {
-			
-		}
-		return 1;
-	}
 	
 	//Custom function for handeling the onmouseclickEvent
 	public Consumer<MouseEvent> onLabelClick() {
@@ -116,7 +106,7 @@ public class GameObserverController implements Initializable{
 	    	var parent = (GameItemObserver) userLabel.getParent();
 	    	var game = parent.getGame();
 	    	var turnQuery = Game.getTurnFromActiveGame(game.getGameId());
-	    	var turn = new Turn(getTurn(turnQuery));
+	    	var turn = new Turn(1);
 	    	loadBoard(game, turn);
 		});
     }

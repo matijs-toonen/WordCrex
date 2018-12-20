@@ -11,16 +11,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import Model.BoardPlayer;
 import Model.Game;
 import Model.Letter;
 import Model.Score;
-import Model.Symbol;
 import Model.Tile;
 import Model.Turn;
 import Model.TurnBoardLetter;
 import Model.Board.Board;
 import Model.Board.PositionStatus;
-import Tests.BoardTileTest;
 import View.BoardPane.BoardTile;
 import View.BoardPane.BoardTilePane;
 import javafx.application.Platform;
@@ -42,7 +41,6 @@ public class ObserverBoardController implements Initializable {
 	private Turn _currentTurn;
 	private Game _currentGame;
 	private HashMap<Point, BoardTilePane> _boardTiles;
-	private HashMap<Point, BoardTileTest> _boardTilesTest;
 	private Board _board;
     private ArrayList<BoardTile> _currentHand;
     private HashMap<Point, BoardTile> _fieldHand;
@@ -114,7 +112,8 @@ public class ObserverBoardController implements Initializable {
 		
 		scoreRefreshThread();
 
-		createField(false);
+		createField(panePlayField, true);
+		createField(panePlayField2, false);
 	}
 	
 	private void scoreRefreshThread() {
@@ -154,9 +153,10 @@ public class ObserverBoardController implements Initializable {
 		
 	}
 		
-	private void createField(boolean test) 
+	private void createField(Pane board, boolean isPlayer1) 
 	{
 		var existingTurns = getTurns();
+		var playedTurn = getPlayedTurn(isPlayer1);
 		
 		_db = new DatabaseController<Tile>();
 		try 
@@ -180,54 +180,28 @@ public class ObserverBoardController implements Initializable {
 					if(tile == null)
 						throw new Exception("Tile == null");
 						
-
-					if(!test)
-					{
-						BoardTile boardTile = null;
-						var cords = new Point(i, j);
-						if(existingTurns.containsKey(cords)) {
-							var turn = existingTurns.get(cords);
-							boardTile = createBoardTile(cords, turn);
-						}
-						var tilePane = new BoardTilePane(tile);
-						tilePane.setLayoutX(x);
-						tilePane.setLayoutY(y);
-						tilePane.setMinWidth(39);
-						tilePane.setMinHeight(39);
-						
-						tilePane.setBoardTile(boardTile);
-						switch(String.valueOf(tile.getType().getValue()) + String.valueOf(tile.getType().getLetter()).trim()) {
-						case "6L":
-							tilePane.getStyleClass().add("tile6L");
-							break;
-						case "4L":
-							tilePane.getStyleClass().add("tile4L");
-							break;
-						case "4W":
-							tilePane.getStyleClass().add("tile4W");
-							break;
-						case "3W":
-							tilePane.getStyleClass().add("tile3W");
-							break;
-						case "2L":
-							tilePane.getStyleClass().add("tile2L");
-							break;
-						case "0*":
-							tilePane.getStyleClass().add("tileCenter");
-							break;
-						case "0":
-							tilePane.getStyleClass().add("tile0");
-							break;
-						}
-						
-						_boardTiles.put(new Point(i, j), tilePane);
-						panePlayField.getChildren().add(tilePane);						
+					BoardTile boardTile = null;
+					var cords = new Point(i, j);
+					if(existingTurns.containsKey(cords)) {
+						var turn = existingTurns.get(cords);
+						boardTile = createBoardTile(cords, turn);
 					}
-					else
-					{
-						var boardTileTest = new BoardTileTest(tile);
-						_boardTilesTest.put(new Point(i, j), boardTileTest);
+					if(playedTurn.containsKey(cords)) {
+						var turn = playedTurn.get(cords);
+						boardTile = createBoardTile(cords, turn);
 					}
+					var tilePane = new BoardTilePane(tile);
+					tilePane.setLayoutX(x);
+					tilePane.setLayoutY(y);
+					tilePane.setMinWidth(39);
+					tilePane.setMinHeight(39);
+					
+					tilePane.setBoardTile(boardTile);
+					var value = String.valueOf(tile.getType().getValue()) + String.valueOf(tile.getType().getLetter()).trim(); 
+					tilePane.getStyleClass().add(getStyle(value));
+					
+					_boardTiles.put(new Point(i, j), tilePane);
+					board.getChildren().add(tilePane);
 					
 					y += 44.5;
 				}
@@ -245,6 +219,27 @@ public class ObserverBoardController implements Initializable {
 		}
 	}
 	
+	private String getStyle(String value) {
+		switch(value) {
+		case "6L":
+			return "tile6L";
+		case "4L":
+			return "tile4L";
+		case "4W":
+			return "tile4W";
+		case "3W":
+			return "tile3W";
+		case "2L":
+			return "tile2L";
+		case "0*":
+			return "tileCenter";
+		case "0":
+			return "tile0";
+		default:
+			return "";
+		}
+	}
+	
 	private BoardTile createBoardTile(Point cords, TurnBoardLetter turn) {
 		var boardTile = new BoardTile(turn.getSymbol(), turn.getLetterId());
 		boardTile.setMinWidth(39);
@@ -254,6 +249,15 @@ public class ObserverBoardController implements Initializable {
 		return boardTile;
 	}
 	
+	private BoardTile createBoardTile(Point cords, BoardPlayer turn) {
+		var boardTile = new BoardTile(turn.getSymbol(), turn.getLetterId());
+		boardTile.setMinWidth(39);
+		boardTile.setMinHeight(39);
+		boardTile.setStyle("-fx-background-color: #3B86FF; -fx-background-radius: 6");
+		_board.updateStatus(cords, PositionStatus.Taken);
+		return boardTile;
+	}
+
 	private HashMap<Point, TurnBoardLetter> getTurns() {
 		_db = new DatabaseController<TurnBoardLetter>();
 		var turns = new HashMap<Point, TurnBoardLetter>();
@@ -262,6 +266,25 @@ public class ObserverBoardController implements Initializable {
 		try {
 			((ArrayList<TurnBoardLetter>)_db.SelectAll(tileQuery, TurnBoardLetter.class)).forEach(turn -> {
 				var cords = turn.getTileCords();
+				var point = new Point((int) cords.getX() - 1, (int) cords.getY() - 1);
+				turns.put(point, turn);	
+			});
+		}
+		catch(SQLException e) {
+			
+		}
+		return turns;
+	}
+	
+	private HashMap<Point, BoardPlayer> getPlayedTurn(boolean isPlayer1){
+		_db = new DatabaseController<BoardPlayer>();
+		var turns = new HashMap<Point, BoardPlayer>();
+		var table = isPlayer1 ? "boardplayer1" : "boardplayer2";
+		
+		var playedTilesQuery = Game.getPlayedTiles(_currentGame.getGameId(), _currentTurn.getTurnId(), table);
+		try {
+			((ArrayList<BoardPlayer>)_db.SelectAll(playedTilesQuery, BoardPlayer.class)).forEach(turn -> {
+				var cords = turn.getCords();
 				var point = new Point((int) cords.getX() - 1, (int) cords.getY() - 1);
 				turns.put(point, turn);	
 			});
@@ -288,12 +311,5 @@ public class ObserverBoardController implements Initializable {
 		});	
 
 		_fieldHand.clear();
-	}
-	
-	private void playTileSound() {
-		String bip = "src/Resources/tileMove.mp3";
-		Media hit = new Media(new File(bip).toURI().toString());
-		MediaPlayer mediaPlayer = new MediaPlayer(hit);
-		mediaPlayer.play();
 	}
 }
