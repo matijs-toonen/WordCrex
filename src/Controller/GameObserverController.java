@@ -87,7 +87,7 @@ public class GameObserverController implements Initializable{
 	private void loadBoard(Game game, Turn turn) {
 		ScrollPane pane = null;
 		try {
-			var con = new ObserverBoardController(game, turn, _rootPane);
+			var con = new ObserverBoardController(game, turn);
 			var panes = new FXMLLoader(getClass().getResource("/View/Observe.fxml"));
 			panes.setController(con);
 			pane = panes.load();

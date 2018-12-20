@@ -15,13 +15,17 @@
         <content>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="865.0" prefWidth="1635.0">
                <children>
-                  <Pane fx:id="boardPane" prefHeight="900.0" prefWidth="1635.0" style="-fx-background-color: transparent;" />
-                  <Pane fx:id="panePlayField" layoutX="70.0" layoutY="84.0" prefHeight="680.0" prefWidth="680.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1);" />
-                  <Pane fx:id="paneHand" layoutX="782.0" layoutY="84.0" prefHeight="330.0" prefWidth="59.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1);">
+                  <Pane fx:id="boardPane" prefHeight="900.0" prefWidth="1635.0" style="-fx-background-color: transparent;">
                <children>
-                  <Button fx:id="btnNextTurn" mnemonicParsing="false" onAction="#nextTurn" text="Next Turn" />
-                  <Button fx:id="btnPrevTurn" layoutY="24.0" mnemonicParsing="false" onAction="#previousTurn" text="Prev Turn" />
+                  <Pane fx:id="paneHand1" layoutX="788.0" layoutY="450.0" prefHeight="73.0" prefWidth="59.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1);">
+                     <children>
+                        <Button fx:id="btnNextTurn" mnemonicParsing="false" onAction="#nextTurn" text="Next Turn" />
+                        <Button fx:id="btnPrevTurn" layoutY="24.0" mnemonicParsing="false" onAction="#previousTurn" text="Prev Turn" />
+                     </children>
+                  </Pane>
                </children></Pane>
+                  <Pane fx:id="panePlayField" layoutX="70.0" layoutY="84.0" prefHeight="680.0" prefWidth="680.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1);" />
+                  <Pane fx:id="paneHand" layoutX="782.0" layoutY="84.0" prefHeight="330.0" prefWidth="59.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1);" />
                   <GridPane layoutX="70.0" layoutY="28.0" prefHeight="30.0" prefWidth="1485.0">
                     <columnConstraints>
                       <ColumnConstraints hgrow="ALWAYS" />

@@ -1,18 +1,20 @@
 package Controller;
 
 import java.awt.Point;
-import java.io.File;
 import java.net.URL;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ResourceBundle;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import Model.BoardPlayer;
 import Model.Game;
+import Model.HandLetter;
 import Model.Letter;
 import Model.Score;
 import Model.Tile;
@@ -29,24 +31,17 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 
 public class ObserverBoardController implements Initializable {
 	
 	private DatabaseController _db;
-	private ArrayList<Letter> _letters = new ArrayList<Letter>();
 	private Turn _currentTurn;
 	private Game _currentGame;
 	private HashMap<Point, BoardTilePane> _boardTiles;
 	private Board _board;
     private ArrayList<BoardTile> _currentHand;
-    private HashMap<Point, BoardTile> _fieldHand;
-    private AnchorPane _rootPane;
-    private Score _currentScore;
     private int _maxTurnId;
 	
 	@FXML
@@ -61,34 +56,16 @@ public class ObserverBoardController implements Initializable {
 	@FXML
 	private AnchorPane screenPane;	
 	
-	public ObserverBoardController(Game game, Turn turn, AnchorPane rootPane) {
+	public ObserverBoardController(Game game, Turn turn) {
 		_currentGame = game;
 		_currentTurn = turn;
-		_rootPane = rootPane;
 		_board = new Board();
 		_boardTiles = new HashMap<Point, BoardTilePane>();
         _currentHand = new ArrayList<BoardTile>();
-        _fieldHand = new HashMap<Point, BoardTile>();
 	}
 
-	public ObserverBoardController(Game game, AnchorPane rootPane) {
-		this(game, new Turn(1), rootPane);
-	}
-	
-	private void showGameScreen() {
-		AnchorPane pane = null;
-		try 
-		{
-			GameController con = new GameController(_rootPane);			
-			var panes = new FXMLLoader(getClass().getResource("/View/Games.fxml"));
-			
-			panes.setController(con);
-			pane = panes.load();
-		}
-		catch(Exception ex) {
-			Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
-		}
-		_rootPane.getChildren().setAll(pane);
+	public ObserverBoardController(Game game) {
+		this(game, new Turn(1));
 	}
 	
 	@Override
@@ -112,6 +89,7 @@ public class ObserverBoardController implements Initializable {
 		
 		drawField();
 		updateScore();
+		drawHand();
 	}
 	
 	private void checkMaxTurn() {
@@ -126,11 +104,9 @@ public class ObserverBoardController implements Initializable {
 					Thread.sleep(1000);
 				}
 				 catch (SQLException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}	
 				catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
@@ -146,19 +122,17 @@ public class ObserverBoardController implements Initializable {
 		btnNextTurn.setDisable(_currentTurn.getTurnId() >= _maxTurnId);
 		drawField();
 		updateScore();
+		drawHand();
 	}
 	
 	public void previousTurn(ActionEvent event) {
-		var disable = _currentTurn.getTurnId() <= 1; 
-		if(disable) {
-			btnPrevTurn.setDisable(disable);
-			return;
-		}
-		
 		_currentTurn.decrementId();
+		
+		btnPrevTurn.setDisable(_currentTurn.getTurnId() <= 1);
 		btnNextTurn.setDisable(_currentTurn.getTurnId() >= _maxTurnId);
 		drawField();
 		updateScore();
+		drawHand();
 	}
 	
 	private void updateScore() {
@@ -172,9 +146,35 @@ public class ObserverBoardController implements Initializable {
 			lblScore1.setText(score1);
 			lblScore2.setText(score2);	
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	private void drawHand() {
+		var handLetters = getExistingHandLetters();
+		visualizeHand(handLetters);
+	}
+	
+	private void visualizeHand(ArrayList<HandLetter> handLetters) {
+		paneHand.getChildren().clear();
+		_currentHand.clear();
+		int x = 13;
+		int y = 13;
+
+		for(var handLetter : handLetters) {
+			for(var letter : handLetter.getLetters()) {
+				var boardTile = new BoardTile(letter.getSymbol(), letter.getLetterId());
+				boardTile.setLayoutX(x);
+				boardTile.setLayoutY(y);
+				boardTile.setStyle("-fx-background-color: #3B86FF; -fx-background-radius: 6");
+				y += 44.5;
+				boardTile.setMinWidth(39);
+				boardTile.setMinHeight(39);
+				
+				_currentHand.add(boardTile);
+				paneHand.getChildren().add(boardTile);
+			}
+		};
 	}
 	
 	private void drawField() {
@@ -324,21 +324,52 @@ public class ObserverBoardController implements Initializable {
 		return turns;
 	}
 	
+	private ArrayList<HandLetter> getExistingHandLetters() {
+		_db = new DatabaseController<HandLetter>();
+		
+		var statement = Game.getExisitingHandLetters(_currentGame.getGameId(), _currentTurn.getTurnId());
+		ArrayList<HandLetter> handLetters = new ArrayList<HandLetter>();
+		
+		try {
+			handLetters = (ArrayList<HandLetter>) _db.SelectWithCustomLogic(getHandLetter(), statement);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return handLetters;
+	}
+	
+	private Function<ResultSet, ArrayList<HandLetter>> getHandLetter(){
+		return (resultSet -> {
+			var handLetters = new ArrayList<HandLetter>();
+			try {
+				while(resultSet.next()) {	
+					var columns = DatabaseController.getColumns(resultSet.getMetaData());
+					
+					var turn = new Turn(resultSet.getInt("turn_id"));
+					var letter = new Letter(resultSet, columns);
+					
+					var existingHandLetter = HandLetter.getHandByGameAndTurn(handLetters, letter.getGame().getGameId(), turn.getTurnId());
+					
+					if(existingHandLetter.isPresent()) 
+						existingHandLetter.get().addLetters(letter);
+					else {
+						var handLetter = new HandLetter(resultSet, columns);
+						handLetters.add(handLetter);
+					}
+				}	
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return handLetters;
+		});
+	}
+	
 	private Tile getTileFromCollection(ArrayList<Tile> collection, int x, int y)
 	{
 		var allTiles = collection.stream().filter(t -> t.isAtPoint(new Point(x,y))).collect(Collectors.toList());
 		return  allTiles.size() == 1 ? allTiles.get(0) : null;
-	}
-	
-	private void resetFieldHand() {
-		_fieldHand.entrySet().forEach(handLetter -> {
-			var cords = handLetter.getKey();
-			
-			var tilePane = _boardTiles.get(cords);
-			tilePane.removeBoardTile();
-			_board.updateStatus(cords, PositionStatus.Open);
-		});	
-
-		_fieldHand.clear();
 	}
 }
