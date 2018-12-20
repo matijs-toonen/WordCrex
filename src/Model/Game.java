@@ -150,7 +150,7 @@ public class Game {
  	
  	public static final String getTurnFromActiveGame(int gameId) {
  		return ("SELECT IF(MAX(turn_id) IS NULL, 1, MAX(turn_id)) " + 
- 				"FROM handletter " + 
+ 				"FROM turn " + 
  				"WHERE game_id = " + gameId);
  	}
  	

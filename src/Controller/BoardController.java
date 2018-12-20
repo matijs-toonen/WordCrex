@@ -119,7 +119,7 @@ public class BoardController implements Initializable {
 			e.printStackTrace();
 		}
 		
-		checkValidPotSize();
+		//checkValidPotSize();
 	}
 	
 	private void checkValidPotSize()
@@ -431,6 +431,7 @@ public class BoardController implements Initializable {
 	}
 	
 	public void clickSkipTurn() {
+		System.out.println("currentturn = " + _currentTurn.getTurnId());
 		String insertQuery = Game.getPassQuery(_currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername(), checkPlayerIfPlayer1());
 		
 		var _db = new DatabaseController<Game>();
