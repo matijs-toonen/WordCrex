@@ -1139,6 +1139,15 @@ public class BoardController implements Initializable {
 		});
 	}
 	
+	private void clearScores() {
+		_fieldHand.entrySet().forEach(handLetter -> {
+			var scoreCords = handLetter.getKey();
+			
+			var tilePane = _boardTiles.get(scoreCords);
+			tilePane.clearScores();
+		});
+	}
+	
 	private void dragOnHand() {
 		paneHand.setOnDragOver(new EventHandler<DragEvent>() {
 
