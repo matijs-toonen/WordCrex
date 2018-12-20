@@ -15,6 +15,7 @@ public class DatabaseController <T> {
 	/*
 	 * PROPS
 	 */
+
 //	private static String _url = "jdbc:mysql://databases.aii.avans.nl/";
 //    private static String _schema = "2018_vsoprj2_wordcrex_abcd";
 //    private static String _user = "42in02vtsod";
