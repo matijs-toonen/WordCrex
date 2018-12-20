@@ -21,6 +21,8 @@ public class Game {
 	private Answer _answerPlayer2;
 	private String _opponent;
 	private String _winner;
+	private Integer _score1;
+	private Integer _score2;
 	
 	
 	/*
@@ -42,6 +44,8 @@ public class Game {
 			_winner = columns.contains("username_winner") ? rs.getString("username_winner") : null;
 			_zetPlayer1 = columns.contains("player1_zet") ? rs.getInt("player1_zet") : null;
 			_zetPlayer2 = columns.contains("player2_zet") ? rs.getInt("player2_zet") : null;
+			_score1 = columns.contains("score1") ? rs.getInt("score1") : null;
+			_score2 = columns.contains("score2") ? rs.getInt("score2") : null;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -101,6 +105,13 @@ public class Game {
 		return _winner;
 	}
 	
+	public String getFinalScore() {
+		if (_score1 == null) {
+			return "";
+		}
+		return " | " + Integer.toString(_score1) + " - " + Integer.toString(_score2);
+	}
+	
 	
 	/*
 	 * Filters
@@ -124,11 +135,18 @@ public class Game {
 	 * Queries
 	 */
 	public static final String getWinnerQuery(String username) {
-		return ("SELECT game_id,username_winner, " +
-				"(SELECT IF(username_player1 = '"+username+"', username_player2, username_player1)) AS opponent " +
-				"FROM game " +
-				"WHERE (username_player1 = '"+username+"' OR username_player2 = '"+username+"') " +
-				"AND (username_winner is not null)");
+		
+		return String.format("SELECT g.game_id,\n" + 
+				"       username_winner,\n" + 
+				"       (SELECT IF(g.username_player1 = '%s', g.username_player2, g.username_player1)) AS opponent,\n" + 
+				"       s.score1 + s.bonus1 as score1,\n" + 
+				"       s.score2 + s.bonus2 as score2\n" + 
+				"\n" + 
+				"FROM game as g\n" + 
+				"            inner join score as s\n" + 
+				"                       on g.game_id = s.game_id\n" + 
+				"WHERE (g.username_player1 = '%s' OR g.username_player2 = '%s')\n" + 
+				"  AND (g.username_winner is not null)", username, username, username);
 	}
 	
  	public static final String getActiveQuery(String username) {
@@ -150,7 +168,7 @@ public class Game {
  	
  	public static final String getTurnFromActiveGame(int gameId) {
  		return ("SELECT IF(MAX(turn_id) IS NULL, 1, MAX(turn_id)) " + 
- 				"FROM handletter " + 
+ 				"FROM turn " + 
  				"WHERE game_id = " + gameId);
  	}
  	

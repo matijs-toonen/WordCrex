@@ -94,7 +94,7 @@ public class SetHistoryController implements Initializable {
 	private VBox listItem(SetHistory setHistory) {
 		VBox playersSetBox = new VBox();
 		
-		GridPane PlayersTurnBox = SetBox(setHistory.getTurnID());
+		GridPane PlayersTurnBox = SetBox(setHistory.getTurnID(), setHistory.getInhoud());
 		GridPane playerBox1 = playerBox(setHistory.getPlayer1(), setHistory.getWoord1(), setHistory.getScore1());
 		GridPane playerBox2 = playerBox(setHistory.getPlayer2(), setHistory.getWoord2(), setHistory.getScore2());
 		
@@ -117,11 +117,11 @@ public class SetHistoryController implements Initializable {
 		return playersSetBox;
 	}
 	
-	private GridPane SetBox(int turn) {
+	private GridPane SetBox(int turn, String inhoud) {
 		GridPane TurnItem = new GridPane();
 		
 		Label TurnNumber = new Label();
-		TurnNumber.setText(Integer.toString(turn));
+		TurnNumber.setText("Turn: " + Integer.toString(turn) + " | " + inhoud);
 		TurnNumber.setStyle("-fx-font-weight: bold ;-fx-text-fill: #4D4F5C; -fx-font-family: 'Source Sans Pro'; -fx-font-size: 14px; -fx-background-color: rgba(255,255,255,1); -fx-padding: 5 10; -fx-border-width: 5px ; -fx-background-radius: 25");
 		
 		TurnItem.add(TurnNumber, 1, 0);
@@ -134,7 +134,7 @@ public class SetHistoryController implements Initializable {
 		 
 		cc1.setPercentWidth(45);
 		cc1.setHgrow(Priority.ALWAYS);
-		cc2.setPercentWidth(10);
+		cc2.setPercentWidth(100);
 		cc2.setHgrow(Priority.ALWAYS);
 		 
 		TurnItem.getColumnConstraints().add(cc1);

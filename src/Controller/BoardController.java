@@ -124,10 +124,11 @@ public class BoardController implements Initializable {
 	
 	private void checkValidPotSize()
 	{
-		if(_letters.size() == 0)
+		if(_letters.size() == 0 && _currentHand.size() == 0)
 		{
 			try 
 			{
+				// This query sets the game to a finished state
 				var score = (Score)_db.SelectFirst("SELECT * FROM score where game_id = " + _currentGame.getGameId(), Score.class);
 				String winner = score.getOwnScore() > score.getOpponentScore() ? MainController.getUser().getUsername() : score.getOpponent();
 				_db.Update("update game " + 
@@ -430,6 +431,7 @@ public class BoardController implements Initializable {
 	}
 	
 	public void clickSkipTurn() {
+		System.out.println("currentturn = " + _currentTurn.getTurnId());
 		String insertQuery = Game.getPassQuery(_currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername(), checkPlayerIfPlayer1());
 		
 		var _db = new DatabaseController<Game>();
@@ -880,9 +882,29 @@ public class BoardController implements Initializable {
 			public void run() {
 				var handLetters = getExistingHandLetters();
 				int tries = 0;
-				while(getAmountLetters(handLetters) == 0 || getAmountLetters(handLetters) != 7 || tries < 4) {
-					try {
-						var hasResigned = _db.SelectCount("SELECT COUNT(*) FROM game WHERE game_state = 'resigned' AND game_id = " + _currentGame.getGameId()) == 1;
+				while(true)
+				{
+					// Try at least 4 times before exiting
+					if(tries == 4)
+					{
+						break;
+					}
+					
+					// Break loop if the handletters are correctly set
+					if(getAmountLetters(handLetters) == 7)
+					{
+						break;
+					}
+					
+					// Wait for the opponent
+					if(getAmountLetters(handLetters) > 0)
+					{
+						tries ++;
+					}
+					
+					try 
+					{
+						var hasResigned = _db.SelectCount("SELECT COUNT(*) FROM game WHERE (game_state = 'resigned' OR game_state = 'finished') AND game_id = " + _currentGame.getGameId()) == 1;
 						
 						if(hasResigned) {
 							Platform.runLater(() -> {
@@ -890,20 +912,39 @@ public class BoardController implements Initializable {
 							});
 							return;
 						}
-						Thread.sleep(1000);
 						handLetters = getExistingHandLetters();
-
-						if(getAmountLetters(handLetters) > 0) {
-							tries++;	
-						}
 						
-						if (getAmountLetters(handLetters) == 0)
-							tries = 0;
-					
-					} catch (Exception e) {
+						Thread.sleep(1000);
+					} 
+					catch (Exception e) 
+					{
 						e.printStackTrace();
 					}
 				}
+//				while(tries < 4 || getAmountLetters(handLetters) == 0 || getAmountLetters(handLetters) != 7) {
+//					try {
+//						var hasResigned = _db.SelectCount("SELECT COUNT(*) FROM game WHERE game_state = 'resigned' AND game_id = " + _currentGame.getGameId()) == 1;
+//						
+//						if(hasResigned) {
+//							Platform.runLater(() -> {
+//								showGameScreen();
+//							});
+//							return;
+//						}
+//						Thread.sleep(1000);
+//						handLetters = getExistingHandLetters();
+//
+//						if(getAmountLetters(handLetters) > 0) {
+//							tries++;	
+//						}
+//						
+//						if (getAmountLetters(handLetters) == 0)
+//							tries = 0;
+//					
+//					} catch (Exception e) {
+//						e.printStackTrace();
+//					}
+//				}
 				
 				final var finalHandLetters = handLetters;
 				
@@ -1035,6 +1076,7 @@ public class BoardController implements Initializable {
 		return new HandLetter(_currentGame, _currentTurn, letter);
 	}
 	
+	//
 	private Letter createLetter() {
 		var amountOfLetters = _letters.size();
 		if(amountOfLetters == 0) 
