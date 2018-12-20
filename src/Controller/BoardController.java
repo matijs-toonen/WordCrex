@@ -1133,7 +1133,6 @@ public class BoardController implements Initializable {
 			if(event.getGestureTarget() instanceof BoardTilePane) {
 				var sourceTile = (BoardTile) event.getGestureSource();
 				var boardTile = (BoardTilePane) event.getGestureTarget();
-				Integer score = 0;
 				
 				var cords = boardTile.getCords();
 								
@@ -1160,34 +1159,41 @@ public class BoardController implements Initializable {
 				event.acceptTransferModes(TransferMode.ANY);
 				event.setDropCompleted(true);
 				_board.updateStatus(cords, PositionStatus.Taken);
-				
-				var wordsData = getWordData(cords);
-				for(var word : wordsData) {
-					System.out.println(word.getWord());
-					System.out.println(word.getScore());
+								
+				refreshVisualScores(cords, boardTile, sourceTile);	
 					
-					score = word.getScore();
-				}
-				
-				clearScores();	
-				
-				if(score != 0) {
-					boardTile.setBoardTile(sourceTile, score);
-					_boardTiles.put(cords, boardTile);
-				}
-									
 				event.consume();
 			}
 		});
 	}
-	
-	private void clearScores() {
-		_fieldHand.entrySet().forEach(handLetter -> {
-			var scoreCords = handLetter.getKey();
+		
+	private void refreshVisualScores(Point dropPoint, BoardTilePane target, BoardTile source) {
+		
+		var wordsData = getWordData(dropPoint);
+		
+		wordsData.forEach(data -> {
 			
-			var tilePane = _boardTiles.get(scoreCords);
-			tilePane.clearScores();
+			var letterCords = data.getLetters();
+			
+			letterCords.entrySet().forEach(letter -> {
+				
+				var cord = letter.getValue().getValue();
+				var tilePane = _boardTiles.get(cord);
+				tilePane.clearScores();
+			});
 		});
+		
+		var score = 0;
+		
+		for(var data : wordsData)
+		{
+			score += data.getScore();
+		}
+		
+		if(score != 0) {
+			target.setBoardTile(source, score);
+			_boardTiles.put(dropPoint, target);
+		}
 	}
 	
 	private void dragOnHand() {
