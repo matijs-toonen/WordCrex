@@ -1167,6 +1167,17 @@ public class BoardController implements Initializable {
 			}
 		});
 	}
+	
+	private void refreshVisualOnRemove(Point removePoint)
+	{
+		var adjacentCords = _board.getAdjacentCords(removePoint);
+		
+		adjacentCords.forEach(cord -> {
+			var target = _boardTiles.get(cord);
+			var source = _fieldHand.get(cord);
+			refreshVisualWordScore(cord, target, source);
+		});
+	}
 		
 	private void refreshVisualWordScore(Point dropPoint, BoardTilePane target, BoardTile source) {
 		
@@ -1227,9 +1238,8 @@ public class BoardController implements Initializable {
 				score += data.getScore();
 			}
 			
-			if(score != 0) {
+			if(score != 0 && source != null) {
 				target.setBoardTile(source, score);
-				_boardTiles.put(dropPoint, target);
 			}
 		}
 	}
@@ -1294,6 +1304,7 @@ public class BoardController implements Initializable {
 						_board.updateStatus(oldCords, PositionStatus.Open);
 						oldBoardTile.removeBoardTile();
 						_fieldHand.remove(oldCords);
+						refreshVisualOnRemove(oldCords);
 					}
 					
 					int x = 10;

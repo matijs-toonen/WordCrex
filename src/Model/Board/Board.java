@@ -36,7 +36,7 @@ public class Board {
 	
 	private boolean placedConnected(Point cord)
 	{
-		return getConnectedCords(cord).size() != 0;
+		return getAdjacentCords(cord).size() != 0;
 	}
 	
 	public ArrayList<Point> getOccupiedPositions(){
@@ -72,7 +72,7 @@ public class Board {
 				
 	private void findPath(LinkedList<Point> visited, Point start)
     {
-        LinkedList<Point> nodes = getConnectedCords(visited.getLast());
+        LinkedList<Point> nodes = getAdjacentCords(visited.getLast());
  
         for (Point node : nodes)
         {
@@ -97,7 +97,7 @@ public class Board {
         }
     }
 		
-	private LinkedList<Point> getConnectedCords(Point cord)
+	public LinkedList<Point> getAdjacentCords(Point cord)
 	{
 		var connectedCords = new LinkedList<Point>();
 		
