@@ -18,11 +18,11 @@
                <children>
                   <Pane fx:id="boardPane" prefHeight="900.0" prefWidth="1635.0" style="-fx-background-color: transparent;">
                <children>
-                  <Pane fx:id="paneHand1" layoutX="782.0" layoutY="450.0" prefHeight="90.0" prefWidth="59.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1);">
+                  <Pane fx:id="paneHand1" layoutX="782.0" layoutY="450.0" prefHeight="110.0" prefWidth="59.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1);">
                      <children>
-                        <Button fx:id="btnNextTurn" mnemonicParsing="false" onAction="#nextTurn" prefHeight="40.0" prefWidth="59.0" text="Next Turn" textAlignment="CENTER" wrapText="true" />
-                        <Line endX="54.0" layoutY="45.0" startX="5.0" strokeLineJoin="ROUND" strokeWidth="0.2" />
-                        <Button fx:id="btnPrevTurn" layoutY="50.0" mnemonicParsing="false" onAction="#previousTurn" prefWidth="59.0" text="Prev turn" textAlignment="CENTER" wrapText="true" />
+                        <Button fx:id="btnNextTurn" layoutX="10.0" layoutY="7.0" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#nextTurn" prefHeight="39.0" prefWidth="39.0" styleClass="buttonRightTurn" textAlignment="CENTER" wrapText="true" />
+                        <Line endX="54.0" layoutY="55.0" startX="5.0" strokeLineJoin="ROUND" strokeWidth="0.2" />
+                        <Button fx:id="btnPrevTurn" layoutX="10.0" layoutY="62.0" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#previousTurn" prefHeight="39.0" prefWidth="39.0" styleClass="buttonLeftTurn" textAlignment="CENTER" wrapText="true" />
                      </children>
                   </Pane>
                </children></Pane>
@@ -68,7 +68,7 @@
                      </children>
                  </GridPane>
                   <Pane fx:id="panePlayField2" layoutX="875.0" layoutY="84.0" prefHeight="680.0" prefWidth="680.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1);" />
-            <Pane layoutX="782.0" layoutY="575.0" prefHeight="59.0" prefWidth="59.0" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1); -fx-background-color: white;">
+            <Pane layoutX="782.0" layoutY="596.0" prefHeight="59.0" prefWidth="59.0" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1); -fx-background-color: white;">
                <children>
                   <Label fx:id="lblTurn" alignment="CENTER" prefHeight="59.0" prefWidth="59.0" text="0" textAlignment="CENTER" />
                </children>

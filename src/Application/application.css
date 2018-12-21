@@ -234,8 +234,28 @@
 	-fx-text-align: center;
 }
 
-.buttonTurn:hover {
-	-fx-text-fill: white;
+.buttonLeftTurn {
+	-fx-background-image: url("../Resources/whiteLeftArrow.png");
+    -fx-background-size: 25px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+	-fx-background-color: #3B86FF;
+}
+
+.buttonLeftTurn:hover {
+	-fx-background-color: #0062ff;
+}
+
+.buttonRightTurn {
+	-fx-background-image: url("../Resources/whiteRightArrow.png");
+    -fx-background-size: 25px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+	-fx-background-color: #3B86FF;
+}
+
+.buttonRightTurn:hover {
+	-fx-background-color: #0062ff;
 }
 
 .rightArrow {

@@ -82,8 +82,6 @@ public class ObserverBoardController implements Initializable {
 		lblScore1.setStyle("-fx-padding: 0 10; -fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 25");
 		lblScore1.setTextAlignment(TextAlignment.CENTER);
 		lblScore2.setStyle("-fx-padding: 0 10; -fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 25");
-		btnNextTurn.getStyleClass().add("buttonTurn");
-		btnPrevTurn.getStyleClass().add("buttonTurn");
 		btnPrevTurn.setDisable(_currentTurn.getTurnId() <= 1);
 		
 		checkMaxTurn();
