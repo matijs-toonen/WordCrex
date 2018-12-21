@@ -52,7 +52,7 @@
             </AnchorPane>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="245.0" prefWidth="398.0">
                <children>
-                  <ScrollPane layoutX="15.0" layoutY="10.0" prefHeight="317.0" prefWidth="368.0" style="-fx-background-color: transparent;">
+                  <ScrollPane hbarPolicy="NEVER" layoutX="15.0" layoutY="10.0" prefHeight="317.0" prefWidth="368.0" style="-fx-background-color: transparent;">
                      <content>
                         <VBox fx:id="vboxFinishedGames" prefHeight="314.0" prefWidth="365.0" style="-fx-background-color: #FFFFFF; -fx-border-width: 0;" />
                      </content>
