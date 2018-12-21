@@ -16,6 +16,7 @@ import View.Items.GameItemObserver;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -102,7 +103,7 @@ public class GameObserverController implements Initializable{
 	//Custom function for handeling the onmouseclickEvent
 	public Consumer<MouseEvent> onLabelClick() {
 		return (event -> {
-	    	var userLabel = (Label) event.getSource();
+	    	var userLabel = (Button) event.getSource();
 	    	var parent = (GameItemObserver) userLabel.getParent();
 	    	var game = parent.getGame();
 	    	var turn = new Turn(1);
