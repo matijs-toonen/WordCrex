@@ -69,7 +69,7 @@ public class BoardTilePane extends Pane {
 	}
 	
 	public void clearScores() {
-		getChildren().remove(lblScore);
+		getChildren().removeAll(lblScore);
 	}
 	
 	public BoardTile getBoardTile() {

@@ -362,7 +362,8 @@ public class BoardController implements Initializable {
 					
 					var letterId = letterData.getKey();
 					var tileX = (int) letterData.getValue().getValue().getX()+1;
-					var tileY = (int) letterData.getValue().getValue().getY()+1;
+					var tileY = (int) letterData.getValue().getValue().getY()+1;					
+					
 					
 					statementBoardPlayer.add(String.format("INSERT INTO boardplayer%1$s \n"
 							+ "(game_id, username, turn_id, letter_id, tile_x, tile_y) \n"
