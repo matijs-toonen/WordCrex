@@ -42,7 +42,7 @@
                   <Font size="13.0" />
                </font>
             </TextField>
-            <PasswordField fx:id="txtPassword" layoutX="200.0" layoutY="505.0" prefHeight="25.0" prefWidth="400.0" promptText="Wachtwoord" styleClass="loginfield">
+            <PasswordField fx:id="txtPassword" layoutX="200.0" layoutY="505.0" prefHeight="25.0" prefWidth="400.0" promptText="Wachtwoord" onAction="#onEnter" styleClass="loginfield">
                <padding>
                   <Insets bottom="10.0" left="5.0" />
                </padding>
