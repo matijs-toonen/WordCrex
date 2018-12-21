@@ -357,7 +357,7 @@ public class BoardController implements Initializable {
 						
 					});
 				}
-				
+				//
 				uniqueLettersData.entrySet().forEach(letterData -> {
 					
 					var letterId = letterData.getKey();
