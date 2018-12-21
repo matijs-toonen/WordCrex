@@ -955,6 +955,7 @@ public class BoardController implements Initializable {
 			
 			var tilePane = _boardTiles.get(cords);
 			tilePane.removeBoardTile();
+			tilePane.clearScores();
 			_board.updateStatus(cords, PositionStatus.Open);
 		});	
 
