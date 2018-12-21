@@ -116,7 +116,9 @@ public class ObserverBoardController implements Initializable {
 	}
 	
 	public void nextTurn(ActionEvent event) {
+		lblTurn.setText(Integer.toString(_currentTurn.getTurnId()));
 		_currentTurn.incrementId();
+		
 		btnPrevTurn.setDisable(false);
 		btnNextTurn.setDisable(_currentTurn.getTurnId() >= _maxTurnId);
 		drawField();
@@ -126,7 +128,7 @@ public class ObserverBoardController implements Initializable {
 	
 	public void previousTurn(ActionEvent event) {
 		_currentTurn.decrementId();
-		
+		lblTurn.setText(Integer.toString(_currentTurn.getTurnId() - 1));
 		btnPrevTurn.setDisable(_currentTurn.getTurnId() <= 1);
 		btnNextTurn.setDisable(_currentTurn.getTurnId() >= _maxTurnId);
 		drawField();
