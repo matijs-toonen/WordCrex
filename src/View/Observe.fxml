@@ -9,6 +9,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
 <ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" pannable="true" prefHeight="881.0" prefWidth="1315.0" style="-fx-background-color: #F0F0F7;" stylesheets="@../Application/application.css" vbarPolicy="NEVER" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
@@ -17,10 +18,11 @@
                <children>
                   <Pane fx:id="boardPane" prefHeight="900.0" prefWidth="1635.0" style="-fx-background-color: transparent;">
                <children>
-                  <Pane fx:id="paneHand1" layoutX="788.0" layoutY="450.0" prefHeight="73.0" prefWidth="59.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1);">
+                  <Pane fx:id="paneHand1" layoutX="782.0" layoutY="450.0" prefHeight="90.0" prefWidth="59.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1);">
                      <children>
-                        <Button fx:id="btnNextTurn" mnemonicParsing="false" onAction="#nextTurn" text="Next Turn" />
-                        <Button fx:id="btnPrevTurn" layoutY="24.0" mnemonicParsing="false" onAction="#previousTurn" text="Prev Turn" />
+                        <Button fx:id="btnNextTurn" mnemonicParsing="false" onAction="#nextTurn" prefHeight="40.0" prefWidth="59.0" text="Next Turn" textAlignment="CENTER" wrapText="true" />
+                        <Line endX="54.0" layoutY="45.0" startX="5.0" strokeLineJoin="ROUND" strokeWidth="0.2" />
+                        <Button fx:id="btnPrevTurn" layoutY="50.0" mnemonicParsing="false" onAction="#previousTurn" prefWidth="59.0" text="Prev turn" textAlignment="CENTER" wrapText="true" />
                      </children>
                   </Pane>
                </children></Pane>
@@ -48,7 +50,7 @@
                               <Insets left="10.0" />
                            </padding>
                         </Label>
-                        <Label fx:id="lblScore1" maxHeight="Infinity" text="Score1" GridPane.columnIndex="1" GridPane.halignment="RIGHT">
+                        <Label fx:id="lblScore1" maxHeight="Infinity" text="Score1" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="RIGHT">
                            <padding>
                               <Insets left="15.0" />
                            </padding>
@@ -58,7 +60,7 @@
                               <Font name="System Bold" size="18.0" />
                            </font>
                         </Label>
-                        <Label fx:id="lblScore2" maxHeight="Infinity" text="Score2" GridPane.columnIndex="3">
+                        <Label fx:id="lblScore2" maxHeight="Infinity" text="Score2" textAlignment="CENTER" GridPane.columnIndex="3">
                            <padding>
                               <Insets right="15.0" />
                            </padding>
@@ -66,6 +68,11 @@
                      </children>
                  </GridPane>
                   <Pane fx:id="panePlayField2" layoutX="875.0" layoutY="84.0" prefHeight="680.0" prefWidth="680.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1);" />
+            <Pane layoutX="782.0" layoutY="575.0" prefHeight="59.0" prefWidth="59.0" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 1, 1); -fx-background-color: white;">
+               <children>
+                  <Label fx:id="lblTurn" alignment="CENTER" prefHeight="59.0" prefWidth="59.0" text="0" textAlignment="CENTER" />
+               </children>
+            </Pane>
                </children>
             </AnchorPane>
         </content>

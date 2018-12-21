@@ -33,6 +33,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.text.TextAlignment;
 
 public class ObserverBoardController implements Initializable {
 	
@@ -45,7 +46,7 @@ public class ObserverBoardController implements Initializable {
     private int _maxTurnId;
 	
 	@FXML
-	private Label lblScore1, lblScore2, lblPlayer1, lblPlayer2, errorPaneLabel;
+	private Label lblScore1, lblScore2, lblPlayer1, lblPlayer2, lblTurn, errorPaneLabel;
 	
 	@FXML
 	private Button btnNextTurn, btnPrevTurn;
@@ -78,11 +79,11 @@ public class ObserverBoardController implements Initializable {
 		lblPlayer1.setStyle("-fx-font-size: 28");
         lblPlayer2.setText(_currentGame.getUser2());
 		lblPlayer2.setStyle("-fx-font-size: 28");
-		lblScore1.setText("1");
-		lblScore1.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 25 0 0 25");
-		lblScore2.setText("9");
-		lblScore2.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 0 25 25 0");
-		
+		lblScore1.setStyle("-fx-padding: 0 10; -fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 25");
+		lblScore1.setTextAlignment(TextAlignment.CENTER);
+		lblScore2.setStyle("-fx-padding: 0 10; -fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 25");
+		btnNextTurn.getStyleClass().add("buttonTurn");
+		btnPrevTurn.getStyleClass().add("buttonTurn");
 		btnPrevTurn.setDisable(_currentTurn.getTurnId() <= 1);
 		
 		checkMaxTurn();
@@ -158,7 +159,7 @@ public class ObserverBoardController implements Initializable {
 	private void visualizeHand(ArrayList<HandLetter> handLetters) {
 		paneHand.getChildren().clear();
 		_currentHand.clear();
-		int x = 13;
+		int x = 10;
 		int y = 13;
 
 		for(var handLetter : handLetters) {

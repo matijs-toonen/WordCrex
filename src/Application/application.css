@@ -234,6 +234,10 @@
 	-fx-text-align: center;
 }
 
+.buttonTurn:hover {
+	-fx-text-fill: white;
+}
+
 .rightArrow {
 	-fx-padding: 0 5;
 	-fx-background-color: #FFFFFF;
