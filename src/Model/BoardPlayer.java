@@ -1,5 +1,6 @@
 package Model;
 
+import java.awt.Point;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -29,10 +30,10 @@ public class BoardPlayer {
 	
 	public BoardPlayer(ResultSet rs, ArrayList<String> columns) {
 		try {
-			_game = columns.contains("game_id") ? new Game(rs.getInt("game_id")) : null;
-			_user = columns.contains("username") ? new Account(rs.getString("username")) : null;
-			_turn = columns.contains("turn_id") ? new Turn(rs.getInt("turn_id")) : null;
-			_letter = columns.contains("letter_id") ? new Letter(rs.getInt("letter_id")) : null;
+			_game = columns.contains("game_id") ? new Game(rs, columns) : null;
+			_user = columns.contains("username") ? new Account(rs, columns) : null;
+			_turn = columns.contains("turn_id") ? new Turn(rs, columns) : null;
+			_letter = columns.contains("letter_id") ? new Letter(rs, columns) : null;
 			_tile = columns.contains("tile_x") && columns.contains("tile_y") ? new Tile(rs.getInt("tile_x"), rs.getInt("tile_y")) : null;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -60,9 +61,17 @@ public class BoardPlayer {
 		return _tile.getX();
 	}
 	
+	public Symbol getSymbol() {
+		return _letter.getSymbol();
+	}
+	
 	public int getLetterY()
 	{
 		return _tile.getY();
+	}
+	
+	public Point getCords() {
+		return new Point(_tile.getX(), _tile.getY());
 	}
 	
 	public static final String hasPlacedTurn(String table, String username, int turnId, int gameId) {

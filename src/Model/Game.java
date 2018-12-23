@@ -176,6 +176,10 @@ public class Game {
  		return ("SELECT * FROM turnboardletter NATURAL JOIN letter NATURAL JOIN symbol WHERE game_id = " + gameId + " AND turn_id < " + turnId);
  	}
  	
+ 	public static final String getPlayedTiles(int gameId, int turnId, String table) {
+ 		return ("SELECT * FROM " + table + " NATURAL JOIN letter NATURAL JOIN symbol WHERE game_id = " + gameId + " AND turn_id = " + turnId);
+ 	}
+ 	
  	public static final String getExisitingHandLetters(int gameId, int turnId) {
  		return ("SELECT * FROM handletter NATURAL JOIN letter NATURAL JOIN symbol where game_id = " + gameId + " AND turn_id = " + turnId);
  	}

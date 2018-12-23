@@ -7,6 +7,8 @@ import Controller.MainController;
 import Model.Game;
 import Model.GameStatus;
 import javafx.event.EventHandler;
+import javafx.scene.Cursor;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -19,6 +21,7 @@ public class GameItemObserver extends AnchorPane {
 	private Label lblUser = new Label();
 	private Label lblTime = new Label();
 	private ImageView imgStatus = new ImageView();
+	private Button rightArrow = new Button();
 	
 	public GameItemObserver(Game game) {
 		super();
@@ -26,6 +29,8 @@ public class GameItemObserver extends AnchorPane {
 		setUserLabel();
 		setSubLabel();
 		setImage();
+		setRightArrow();
+		
 		this.getChildren().addAll(lblTime, imgStatus, lblUser);
 	}
 	
@@ -43,6 +48,8 @@ public class GameItemObserver extends AnchorPane {
 		imgStatus.setFitWidth(40);
 		imgStatus.setStyle("-fx-height: 10px; -fx-width: 10px");
 		imgStatus.setImage(image);
+		
+		this.getChildren().add(rightArrow);
 	}
 	
 	private Image getActiveImage() {
@@ -85,10 +92,25 @@ public class GameItemObserver extends AnchorPane {
 		lblUser.getStyleClass().add("text");
 		lblTime.setStyle("-fx-padding: 20 0 40 50; -fx-font-size: 13px; -fx-text-fill: #ABABB1");
 	}
+	
+	private void setRightArrow() {
+		InputStream is = this.getClass().getResourceAsStream("/Resources/rightArrow.png");
+		Image image = new Image(is);
+
+		rightArrow.setLayoutX(300);
+		rightArrow.setLayoutY(5);
+		rightArrow.setGraphic(new ImageView(image));
+		rightArrow.setCursor(Cursor.HAND);
+		rightArrow.getStyleClass().add("rightArrow");
+	}
+	
+	public Game getGame() {
+		return _currentGame;
+	}
 
 	public void setUserOnClickEvent(Consumer<MouseEvent> action) {
 		
-		lblUser.setOnMouseClicked(new EventHandler<MouseEvent>() {
+		rightArrow.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
 				action.accept(event);

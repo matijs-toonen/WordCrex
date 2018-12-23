@@ -183,8 +183,8 @@ public class BoardController implements Initializable {
 			Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
 		}
 		_rootPane.getChildren().setAll(pane);
-	}
-	
+  }
+  
     private String getOpponent() {
         if(_currentGame.getOpponent() == null)
             return checkPlayerIfPlayer1() ? _currentGame.getUser2() : _currentGame.getUser1();

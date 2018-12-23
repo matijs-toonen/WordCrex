@@ -109,7 +109,7 @@ public class MainController implements Initializable {
 	@FXML
 	private void loadWatch(MouseEvent event)
 	{
-		loadPane("Watch");
+		loadPaneWithParam("Watch", GameObserverController.class);
 	}
 	
 	@FXML
@@ -158,6 +158,8 @@ public class MainController implements Initializable {
 			
 			else if(controller.equals(GameController.class)) 
 				con = (T) new GameController(screenPane);
+			else if(controller.equals(GameObserverController.class))
+				con = (T) new GameObserverController(screenPane);
 			
 			var panes = new FXMLLoader(getClass().getResource("/View/" + paneName + ".fxml"));
 			panes.setController(con);

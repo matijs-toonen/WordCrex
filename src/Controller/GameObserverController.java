@@ -5,15 +5,23 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import Model.Game;
 import Model.GameStatus;
+import Model.Turn;
 import View.Items.GameItem;
 import View.Items.GameItemObserver;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 
 public class GameObserverController implements Initializable{
@@ -21,12 +29,17 @@ public class GameObserverController implements Initializable{
 	private DatabaseController<Game> _db;
 	private ArrayList<Game> _activeGames;
 	private ArrayList<Game> _finishedGames;
+	private AnchorPane _rootPane;
 	
 	@FXML
 	private VBox vboxGames, vboxFinishedGames;
 	
 	@FXML 
 	private TextField searchBox;
+	
+	public GameObserverController(AnchorPane rootPane) {
+		_rootPane = rootPane;
+	}
 	
 	@Override
 	public void initialize(URL url, ResourceBundle resources) {
@@ -72,12 +85,29 @@ public class GameObserverController implements Initializable{
 		});
 	}
 	
-
+	private void loadBoard(Game game, Turn turn) {
+		ScrollPane pane = null;
+		try {
+			var con = new ObserverBoardController(game, turn);
+			var panes = new FXMLLoader(getClass().getResource("/View/Observe.fxml"));
+			panes.setController(con);
+			pane = panes.load();
+		}
+		catch(Exception ex) {
+			Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		//borderPane.setCenter(root);
+		_rootPane.getChildren().setAll(pane);
+	}
+	
 	//Custom function for handeling the onmouseclickEvent
 	public Consumer<MouseEvent> onLabelClick() {
 		return (event -> {
-	    	var userLabel = (Label) event.getSource();
-	        System.out.println("mouse click detected! " + userLabel.getText());
+	    	var userLabel = (Button) event.getSource();
+	    	var parent = (GameItemObserver) userLabel.getParent();
+	    	var game = parent.getGame();
+	    	var turn = new Turn(1);
+	    	loadBoard(game, turn);
 		});
     }
 }
