@@ -1183,7 +1183,7 @@ public class BoardController implements Initializable {
 						
 				shuffle.setVisible(false);
 				
-				refreshVisualWordScore(cords, boardTile);	
+				refreshVisualWordScore(cords, boardTile, sourceTile);	
 					
 				event.consume();
 			}
@@ -1196,11 +1196,12 @@ public class BoardController implements Initializable {
 		
 		adjacentCords.forEach(cord -> {
 			var target = _boardTiles.get(cord);
-			refreshVisualWordScore(cord, target);
+			var source = _fieldHand.get(cord);
+			refreshVisualWordScore(cord, target, source);
 		});
 	}
 		
-	private void refreshVisualWordScore(Point dropPoint, BoardTilePane target) {
+	private void refreshVisualWordScore(Point dropPoint, BoardTilePane target, BoardTile source) {
 		
 		var wordsData = getWordData(dropPoint);
 		
@@ -1257,8 +1258,8 @@ public class BoardController implements Initializable {
 				score += data.getScore();
 			}
 			
-			if(score != 0) {
-				target.setWordScore(score);
+			if(score != 0 && source != null) {
+				target.setBoardTile(source, score);
 			}
 		}
 	}
