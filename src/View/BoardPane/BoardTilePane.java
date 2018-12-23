@@ -87,12 +87,13 @@ public class BoardTilePane extends Pane {
 		showBoardTile(true);
 	}
 	
-	public void setBoardTile(BoardTile newBoardTile, Integer score) {
+	public void setWordScore(Integer score)
+	{
+		getChildren().remove(lblScore);
 		lblScore.setText(score.toString());
 		lblScore.setLayoutX(22);
 		lblScore.setStyle("-fx-padding: 0 2; -fx-text-fill: white; -fx-background-color: orange; -fx-background-radius: 25");
-		
-		setBoardTile(newBoardTile);
+		getChildren().add(lblScore);
 	}
 	
 	public void removeBoardTile() {
