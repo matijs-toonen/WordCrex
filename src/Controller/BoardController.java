@@ -306,7 +306,7 @@ public class BoardController implements Initializable {
 		{	
 			if(!_board.allChainedToMiddle())
 				showErrorMessage("Niet alle tiles zitten aan elkaar");
-			else
+			else if(fieldHandIsLegit())
 			{
 				var wordsData = getUniqueWordData();
 				
@@ -370,9 +370,7 @@ public class BoardController implements Initializable {
 							+ "VALUES (%2$s, '%3$s', %4$s, %5$s, %6$s, %7$s);"
 							, playerNum,gameId, username, turnId, letterId, tileX, tileY));
 				});
-				
-
-								
+												
 				String[] statementBoardPlayerArr = new String[statementBoardPlayer.size()];
 				statementBoardPlayerArr = statementBoardPlayer.toArray(statementBoardPlayerArr);
 				
@@ -382,6 +380,12 @@ public class BoardController implements Initializable {
 					{
 						if(_db.InsertBatch(statementBoardPlayerArr)) 
 						{
+							for(var fieldPoint  : _fieldHand.keySet())
+							{
+								var tilePane = _boardTiles.get(fieldPoint);
+								tilePane.clearScore();
+							}
+							
 							renewHand();
 						}
 					}
@@ -389,16 +393,23 @@ public class BoardController implements Initializable {
 				catch(SQLException e) {
 					e.printStackTrace();
 				}
-				
-				for(Point point : _fieldHand.keySet())
-				{
-					var tilePane = _boardTiles.get(point);
-					tilePane.clearScores();
-				}
 			}
+			else
+			showErrorMessage("Alle geplaatste letters moeten deel van een woord zijn");
 		}
 		else
 			showErrorMessage("Middelste tile moet gevuld zijn");
+	}
+	
+	private boolean fieldHandIsLegit()
+	{
+		for(var fieldPoint : _fieldHand.keySet())
+		{
+			if(getWordData(fieldPoint).size() == 0)
+				return false;
+		}
+		
+		return true;
 	}
 	
 	private LinkedList<WordData> getUniqueWordData()
@@ -1169,9 +1180,7 @@ public class BoardController implements Initializable {
 		var wordsData = getWordData(dropPoint);
 		
 		if(wordsData.size() == 0)
-		{
-			System.out.println("Not a word");
-			
+		{			
 			var column = (int)dropPoint.getX();
 			var row = (int)dropPoint.getY();
 			
@@ -1198,7 +1207,7 @@ public class BoardController implements Initializable {
 			
 			cordsToClear.forEach(cord -> {
 				var tilePane = _boardTiles.get(cord);
-				tilePane.clearScores();
+				tilePane.clearScore();
 			});
 			
 		}
@@ -1212,7 +1221,7 @@ public class BoardController implements Initializable {
 					
 					var cord = letter.getValue().getValue();
 					var tilePane = _boardTiles.get(cord);
-					tilePane.clearScores();
+					tilePane.clearScore();
 				});
 			});
 			
@@ -1550,9 +1559,7 @@ public class BoardController implements Initializable {
 					score += letterScore * bonusMulti;
 				else
 					score += letterScore;
-				
-				System.out.println(bonusLetter);
-					
+									
 				if (bonusLetter == 'W' || bonusLetter == '*')
 				{
 					hasWordMulti = true;

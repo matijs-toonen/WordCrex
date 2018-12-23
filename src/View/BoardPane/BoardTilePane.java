@@ -49,8 +49,8 @@ public class BoardTilePane extends Pane {
 		lblScore.setAlignment(Pos.CENTER);
 		lblScore.getStyleClass().add("tileScore");
 
-		getChildren().removeAll(lblValue, lblSymbol);
-		getChildren().addAll(lblValue, lblSymbol);
+		getChildren().removeAll(lblValue, lblSymbol, lblScore);
+		getChildren().addAll(lblValue, lblSymbol, lblScore);
 	}
 	
 	private void setTypeAsVisual()
@@ -73,8 +73,9 @@ public class BoardTilePane extends Pane {
 			getChildren().addAll(_boardTile,lblScore);
 	}
 	
-	public void clearScores() {
-		getChildren().remove(lblScore);		
+	public void clearScore() {
+		getChildren().remove(lblScore);
+		lblScore.setText("");
 	}
 	
 	public BoardTile getBoardTile() {
