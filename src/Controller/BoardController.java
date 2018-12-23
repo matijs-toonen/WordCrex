@@ -108,7 +108,29 @@ public class BoardController implements Initializable {
 	public BoardController(Game game, AnchorPane rootPane) {
 		this(game, new Turn(1), rootPane);
 	}
+	
+	@Override
+	public void initialize(URL location, ResourceBundle resources) {
+		lblPlayer1.setText(MainController.getUser().getUsername());
+		lblPlayer1.setStyle("-fx-font-size: 28");
+        var opponent = getOpponent();
+        lblPlayer2.setText(opponent);
+		lblPlayer2.setStyle("-fx-font-size: 28");
+		lblScore1.setText("1");
+		lblScore1.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 25 0 0 25");
+		lblScore2.setText("9");
+		lblScore2.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 0 25 25 0");
+		lblTiles.setStyle("-fx-font-size: 20;");
+		
+		scoreRefreshThread();
 
+		createField(false);
+		createHand();
+		dragOnHand();
+		resignedThread();
+	}
+	
+	
 	private void getLettersAndValidate() {
 		_db = new DatabaseController<Symbol>();
 		var statement = Letter.getUnusedLetters(_currentGame.getGameId());
@@ -161,29 +183,6 @@ public class BoardController implements Initializable {
 			Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
 		}
 		_rootPane.getChildren().setAll(pane);
-	}
-	
-	@Override
-	public void initialize(URL location, ResourceBundle resources) {
-		lblPlayer1.setText(MainController.getUser().getUsername());
-		lblPlayer1.setStyle("-fx-font-size: 28");
-        var opponent = getOpponent();
-        lblPlayer2.setText(opponent);
-		lblPlayer2.setStyle("-fx-font-size: 28");
-		lblScore1.setText("1");
-		lblScore1.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 25 0 0 25");
-		lblScore2.setText("9");
-		lblScore2.setStyle("-fx-font-size: 20; -fx-background-color: #F4E4D3; -fx-background-radius: 0 25 25 0");
-		lblTiles.setStyle("-fx-font-size: 20;");
-		
-		scoreRefreshThread();
-
-		createField(false);
-		createHand();
-		dragOnHand();
-		
-		
-		// add tooltip to buttons
 	}
 	
     private String getOpponent() {
@@ -921,18 +920,10 @@ public class BoardController implements Initializable {
 						tries ++;
 					}
 					
+					// get handletters from database
 					try 
-					{
-						var hasResigned = _db.SelectCount("SELECT COUNT(*) FROM game WHERE (game_state = 'resigned' OR game_state = 'finished') AND game_id = " + _currentGame.getGameId()) == 1;
-						
-						if(hasResigned) {
-							Platform.runLater(() -> {
-								showGameScreen();
-							});
-							return;
-						}
+					{	
 						handLetters = getExistingHandLetters();
-						
 						Thread.sleep(1000);
 					} 
 					catch (Exception e) 
@@ -950,6 +941,41 @@ public class BoardController implements Initializable {
 		        });
 			}
 		};
+		
+		thread.setDaemon(true);
+		thread.start();
+	}
+	
+	private void resignedThread() {
+		
+		var thread = new Thread(() ->  {
+			
+			while (true) {
+				
+				try {
+					boolean hasResigned = _db.SelectCount("SELECT COUNT(*) FROM game WHERE (game_state = 'resigned' OR game_state = 'finished') AND game_id = " + _currentGame.getGameId()) == 1;
+				
+					if(hasResigned) {
+						Platform.runLater(() -> {
+							showGameScreen();
+						});
+						return;
+					}
+					
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} finally {
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				
+			}
+			
+		});
 		
 		thread.setDaemon(true);
 		thread.start();

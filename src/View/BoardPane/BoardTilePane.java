@@ -89,6 +89,8 @@ public class BoardTilePane extends Pane {
 	
 	public void setBoardTile(BoardTile newBoardTile, Integer score) {
 		lblScore.setText(score.toString());
+		lblScore.setLayoutX(22);
+		lblScore.setStyle("-fx-padding: 0 2; -fx-text-fill: white; -fx-background-color: orange; -fx-background-radius: 25");
 		
 		setBoardTile(newBoardTile);
 	}
