@@ -7,9 +7,11 @@ import Model.Symbol;
 import Model.Tile;
 import Model.TileType;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
@@ -43,6 +45,9 @@ public class BoardTilePane extends Pane {
 		lblSymbol.setLayoutX(15);
 		lblSymbol.setLayoutY(8);
 		lblSymbol.getStyleClass().add("tileSymbol");
+		
+		lblScore.setAlignment(Pos.CENTER);
+		lblScore.getStyleClass().add("tileScore");
 
 		getChildren().removeAll(lblValue, lblSymbol);
 		getChildren().addAll(lblValue, lblSymbol);
@@ -69,7 +74,7 @@ public class BoardTilePane extends Pane {
 	}
 	
 	public void clearScores() {
-		getChildren().removeAll(lblScore);
+		getChildren().remove(lblScore);		
 	}
 	
 	public BoardTile getBoardTile() {

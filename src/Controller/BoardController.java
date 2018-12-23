@@ -348,13 +348,13 @@ public class BoardController implements Initializable {
 					var lettersData = wordData.getLetters();
 					
 					lettersData.entrySet().forEach(letterData -> {
+					
 						
 						var letterId = letterData.getKey();
 						var letterCharCord = letterData.getValue();
 						
 						if(!uniqueLettersData.containsKey(letterId))
 							uniqueLettersData.put(letterId, letterCharCord);
-						
 					});
 				}
 				
@@ -388,6 +388,12 @@ public class BoardController implements Initializable {
 				}
 				catch(SQLException e) {
 					e.printStackTrace();
+				}
+				
+				for(Point point : _fieldHand.keySet())
+				{
+					var tilePane = _boardTiles.get(point);
+					tilePane.clearScores();
 				}
 			}
 		}
@@ -956,7 +962,6 @@ public class BoardController implements Initializable {
 			
 			var tilePane = _boardTiles.get(cords);
 			tilePane.removeBoardTile();
-			tilePane.clearScores();
 			_board.updateStatus(cords, PositionStatus.Open);
 		});	
 
@@ -1138,7 +1143,9 @@ public class BoardController implements Initializable {
 				event.acceptTransferModes(TransferMode.ANY);
 				event.setDropCompleted(true);
 				_board.updateStatus(cords, PositionStatus.Taken);
-								
+						
+				shuffle.setVisible(false);
+				
 				refreshVisualWordScore(cords, boardTile, sourceTile);	
 					
 				event.consume();
