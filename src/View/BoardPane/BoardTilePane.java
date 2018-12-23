@@ -74,7 +74,6 @@ public class BoardTilePane extends Pane {
 	}
 	
 	public void clearScore() {
-		getChildren().remove(lblScore);
 		lblScore.setText("");
 	}
 	
