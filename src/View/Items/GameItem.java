@@ -50,7 +50,6 @@ public class GameItem extends AnchorPane {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println(_CurrentScore);
 	}
 	
 	private void setImage() {
