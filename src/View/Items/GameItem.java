@@ -1,11 +1,14 @@
 package View.Items;
 
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.function.Consumer;
 
+import Controller.DatabaseController;
 import Controller.MainController;
 import Model.Game;
 import Model.GameStatus;
+import Model.Score;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
@@ -24,15 +27,30 @@ public class GameItem extends AnchorPane {
 	private ImageView imgStatus = new ImageView();
 	private Button rightArrow = new Button();
 	
+	private DatabaseController<Score> _db = new DatabaseController<Score>();
+	private Score _CurrentScore;
+	
 	public GameItem(Game game) {
 		super();
 		_currentGame = game;
+		LoadScore();
 		setUserLabel();
 		setSubLabel();
 		setImage();
 		setRightArrow();
 		
 		this.getChildren().addAll(lblStatus, imgStatus, lblUser, rightArrow);
+	}
+	
+	private void LoadScore()
+	{
+		try {
+			_CurrentScore = (Score) _db.SelectFirst(Score.getScoreFromGameQuery(_currentGame.getGameId()), Score.class);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println(_CurrentScore);
 	}
 	
 	private void setImage() {
@@ -103,7 +121,10 @@ public class GameItem extends AnchorPane {
 	
 	private void setUserLabel() { 
 		var userText = _currentGame.getOpponent();
-		lblUser.setText(userText);
+		var OpponentScore = _CurrentScore.getOpponentScore();
+		var OwnScore = _CurrentScore.getOwnScore();
+		
+		lblUser.setText(userText + " : " + OwnScore +"-"+OpponentScore);
 		lblUser.getStyleClass().add("text");
 		lblUser.setStyle("-fx-padding: 0 0 0 50; -fx-font-size: 14px; -fx-text-fill: #4D4F5C; -fx-font-weight: bold;");
 	}

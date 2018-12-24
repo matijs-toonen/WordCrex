@@ -21,6 +21,7 @@ public class Game {
 	private Answer _answerPlayer2;
 	private String _opponent;
 	private String _winner;
+	private String _CurrentScore;
 	
 	
 	/*
@@ -123,6 +124,7 @@ public class Game {
 	/*
 	 * Queries
 	 */
+	
 	public static final String getWinnerQuery(String username) {
 		return ("SELECT game_id,username_winner, " +
 				"(SELECT IF(username_player1 = '"+username+"', username_player2, username_player1)) AS opponent " +
