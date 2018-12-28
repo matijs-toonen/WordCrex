@@ -305,5 +305,5 @@
 	-fx-text-fill: white;
 	-fx-background-radius : .5em;
 	-fx-label-padding: 0 10 0 10;
-	-fx-padding: 0 0 0 -10
+	-fx-start-margin: -10;
 }
