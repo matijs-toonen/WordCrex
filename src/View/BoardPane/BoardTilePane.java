@@ -7,9 +7,11 @@ import Model.Symbol;
 import Model.Tile;
 import Model.TileType;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
@@ -43,9 +45,12 @@ public class BoardTilePane extends Pane {
 		lblSymbol.setLayoutX(15);
 		lblSymbol.setLayoutY(8);
 		lblSymbol.getStyleClass().add("tileSymbol");
+		
+		lblScore.setAlignment(Pos.CENTER);
+		lblScore.getStyleClass().add("tileScore");
 
-		getChildren().removeAll(lblValue, lblSymbol);
-		getChildren().addAll(lblValue, lblSymbol);
+		getChildren().removeAll(lblValue, lblSymbol, lblScore);
+		getChildren().addAll(lblValue, lblSymbol, lblScore);
 	}
 	
 	private void setTypeAsVisual()
@@ -68,8 +73,8 @@ public class BoardTilePane extends Pane {
 			getChildren().addAll(_boardTile,lblScore);
 	}
 	
-	public void clearScores() {
-		getChildren().remove(lblScore);
+	public void clearScore() {
+		lblScore.setText("");
 	}
 	
 	public BoardTile getBoardTile() {
@@ -83,8 +88,6 @@ public class BoardTilePane extends Pane {
 	
 	public void setBoardTile(BoardTile newBoardTile, Integer score) {
 		lblScore.setText(score.toString());
-		lblScore.setLayoutX(22);
-		lblScore.setStyle("-fx-padding: 0 2; -fx-text-fill: white; -fx-background-color: orange; -fx-background-radius: 25");
 		
 		setBoardTile(newBoardTile);
 	}
