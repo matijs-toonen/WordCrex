@@ -42,8 +42,18 @@ public class LoginController {
 	 * 
 	 * @param e
 	 */
+	
+	@FXML
+	public void onEnter(ActionEvent ae){
+		login();
+	}
+	
 	public void onClickLogin(ActionEvent e)
 	{
+		login();
+	}
+	
+	private void login() {
 		_username = txtLogin.getText().toLowerCase();
 		_password = txtPassword.getText().toLowerCase();
 		

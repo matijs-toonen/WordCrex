@@ -50,6 +50,18 @@ public class Score {
 		return String.format("SELECT * FROM score WHERE game_id = %d", gameId);
 	}
 	
+	public String getUser1() {
+		return _username1;
+	}
+	
+	public String getUser2() {
+		return _username2;
+	}
+	
+	public String getOpponent() {
+		return MainController.getUser().getUsername().equals(_username1) ? _username2 : _username1;
+	}
+	
 	public int getOwnScore() {
 		String myUsername = MainController.getUser().getUsername();
 		

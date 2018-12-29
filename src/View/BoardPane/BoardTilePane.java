@@ -20,6 +20,7 @@ public class BoardTilePane extends Pane {
 	private boolean _isTaken;
 	private Label lblValue = new Label();
 	private Label lblSymbol = new Label();
+	private Label lblScore = new Label();
 	
 	public BoardTilePane(Point point, TileType type) {
 		super();
@@ -61,10 +62,14 @@ public class BoardTilePane extends Pane {
 	}
 	
 	private void showBoardTile(boolean shouldAdd) {
-		getChildren().remove(_boardTile);
+		getChildren().removeAll(_boardTile,lblScore);
 		
 		if(shouldAdd && _boardTile != null)
-			getChildren().add(_boardTile);
+			getChildren().addAll(_boardTile,lblScore);
+	}
+	
+	public void clearScores() {
+		getChildren().remove(lblScore);
 	}
 	
 	public BoardTile getBoardTile() {
@@ -74,6 +79,14 @@ public class BoardTilePane extends Pane {
 	public void setBoardTile(BoardTile newBoardTile) {
 		_boardTile = newBoardTile;
 		showBoardTile(true);
+	}
+	
+	public void setBoardTile(BoardTile newBoardTile, Integer score) {
+		lblScore.setText(score.toString());
+		lblScore.setLayoutX(22);
+		lblScore.setStyle("-fx-padding: 0 2; -fx-text-fill: white; -fx-background-color: orange; -fx-background-radius: 25");
+		
+		setBoardTile(newBoardTile);
 	}
 	
 	public void removeBoardTile() {

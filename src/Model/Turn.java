@@ -35,6 +35,10 @@ public class Turn {
 		_turnId++;
 	}
 	
+	public void decrementId() {
+		_turnId--;
+	}
+	
 	public static final String getInsertNewTurn(int gameId, int turnId) {
 		return("INSERT INTO turn VALUES(" + gameId + ", " + turnId + ")");
 	}
