@@ -102,7 +102,6 @@ public class ChallengeController implements Initializable  {
 		vboxChallenges.getChildren().clear();
 		
 		Game.hasGameWithUsername(_gameChallenges, searchBox.getText()).forEach(gameChallenge -> {
-			System.out.println(gameChallenge.getGameId());
 			var challengeItem = new ChallengeItem(gameChallenge);
 			vboxChallenges.getChildren().add(challengeItem);
 			challengeItem.setOnClickEvent(onHandleChallengeClick());

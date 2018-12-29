@@ -83,7 +83,6 @@ public class SuggestController implements Initializable{
 		try {
 			WordError.setVisible(false);
 			String statement = Word.insertQuery(wordValue, MainController.getUser().getUsername());
-			System.out.println(statement);
 			_db.Insert(statement);
 		} catch (SQLException e) {
 			WordError.setVisible(true);
