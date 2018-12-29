@@ -47,6 +47,7 @@ public class BoardTilePane extends Pane {
 		lblSymbol.getStyleClass().add("tileSymbol");
 		
 		lblScore.setAlignment(Pos.CENTER);
+        lblScore.setLayoutX(18);
 		lblScore.getStyleClass().add("tileScore");
 
 		getChildren().removeAll(lblValue, lblSymbol, lblScore);
