@@ -25,7 +25,7 @@ public class GameController implements Initializable{
 	/*
 	 * PROPS
 	 */
-	private DatabaseController<Game> _db = new DatabaseController<Game>();;
+	private DatabaseController<Game> _db = new DatabaseController<Game>();
 	private ArrayList<Game> _activeGames;
 	private AnchorPane _rootPane;
 	private ArrayList<Game> _finishedGames;

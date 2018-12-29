@@ -151,8 +151,8 @@ public class ChallengeController implements Initializable  {
 	    	
 	    	// create game in database
 	    	
-	    	String newGameQuery = Game.getChallengeAwnserQuery(gameId, awnser);
-			String turnQuery = Game.getNewTurnQuery(gameId);			
+	    	String newGameQuery = Game.getChallengeAwnserQuery(game.getGameId(), awnser);
+			String turnQuery = Game.getNewTurnQuery(game.getGameId());			
     		try {
 				_dbGame.Update(newGameQuery);
 				

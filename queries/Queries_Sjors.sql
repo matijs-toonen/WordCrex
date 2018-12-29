@@ -145,16 +145,16 @@ where word = @wordGuess;
 -- Bord
 -- Turn aanmaken(elke keer als een turn is afgelopen de turn id ophogen)
 
-set @gameid = 528;
+set @gameid = 500;
 
 INSERT INTO turn (game_id, turn_id)
 VALUES( @gameid, (select max(turn_id) + 1 from turn where game_id = @gameid));
 
 INSERT INTO turnplayer1 (game_id, turn_id, username_player1, turnaction_type)
-VALUES( @gameid, (select max(turn_id) + 1 from turn where game_id = @gameid), 'sjors', 'resign');
+VALUES( @gameid, (select max(turn_id) + 1 from turn where game_id = @gameid), 'ger', 'play');
 
 INSERT INTO turnplayer2 (game_id, turn_id, username_player2, turnaction_type)
-VALUES( @gameid, (select max(turn_id) + 1 from turn where game_id = @gameid), 'matijs', 'play');
+VALUES( @gameid, (select max(turn_id) + 1 from turn where game_id = @gameid), 'rik', 'play');
 
 -- turn acties verwerken
 -- Als er gewoon gespeeld word
@@ -182,13 +182,6 @@ where username_player2 = 'rik' and game_id = @gameid and turn_ID = (select max(t
 -- check of er een pass aanwezig is in de huidige turn
 set @gameid = 500;
 
-UPDATE turnplayer1 
-SET 
-    turnaction_type = 'resign'
-WHERE
-    game_id = @gameid 
-		AND turn_id = @turnid
-        AND username_player1 = @username;
 
 UPDATE game 
 SET 
@@ -205,15 +198,23 @@ WHERE
         WHERE
             p1.turnaction_type = 'resign'
                 OR p2.turnaction_type = 'resign'
-                AND g.game_id = 528); 
+                AND g.game_id = 500); 
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
-INSERT INTO turnplayer1 (game_id, turn_id, username_player1, turnaction_type)
-VALUES( @gameid, 2, 'sjors', 'resign');
-INSERT INTO turnplayer2 (game_id, turn_id, username_player2, turnaction_type)
-VALUES( @gameid, 2, 'matijs', 'play');
+set @gameid = 502;
+set @turnid = 1;
 
+select letter_id,game_id,turn_id,tile_x,tile_y
+from boardplayer1
+where game_id = @gameid and turn_id = @turnid;
+
+select letter_id,game_id,turn_id,tile_x,tile_y
+from boardplayer2
+where game_id = @gameid and turn_id = @turnid;
+
+delete from turn where game_id = 513;
+delete from game where game_id = 513;
 select * from game where answer_player2 = 'unknown';
 select * from answer;
 select * from gamestate;

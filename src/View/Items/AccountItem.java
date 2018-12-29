@@ -74,10 +74,7 @@ public class AccountItem extends AnchorPane {
 			}
 		}
 		
-		if(chbAdministrator.isSelected()) {
-			chbAdministrator.setDisable(true);
-			chbAdministrator.getStyleClass().add("disabled");
-		}
+		KeepOneRole();
 		
 		chbAdministrator.setLayoutX(200);
 		chbAdministrator.setLayoutY(20);
@@ -100,28 +97,75 @@ public class AccountItem extends AnchorPane {
 
 	public void setUpdateEvent(Consumer<String> action) {
 		
+		
+		
 		chbAdministrator.selectedProperty().addListener((ChangeListener<? super Boolean>)((observer, oldVal, newVal) -> {
+			KeepOneRole();
+			
 			var query = changed(observer, newVal, "administrator");
 			action.accept(query);
-			chbAdministrator.setDisable(true);
-			chbAdministrator.getStyleClass().add("disabled");
 		}));
 		
 		chbModerator.selectedProperty().addListener((ChangeListener<? super Boolean>)((observer, oldVal, newVal) -> {
+			KeepOneRole();
+			
 			var query = changed(observer, newVal, "moderator");
 			action.accept(query);
 		}));
 		
 		chbObserver.selectedProperty().addListener((ChangeListener<? super Boolean>)((observer, oldVal, newVal) -> {
+			KeepOneRole();
+			
 			var query = changed(observer, newVal, "observer");
 			action.accept(query);
 		}));
 		
 		chbPlayer.selectedProperty().addListener((ChangeListener<? super Boolean>)((observer, oldVal, newVal) -> {
+			KeepOneRole();
+			
 			var query = changed(observer, newVal, "player");
 			action.accept(query);
 		}));
 
+	}
+	
+	private void KeepOneRole() {
+		if(CheckedBoxes() >= 2) {
+			chbAdministrator.setDisable(false);
+			chbModerator.setDisable(false);
+			chbObserver.setDisable(false);
+			chbPlayer.setDisable(false);
+		}
+		
+		if(chbAdministrator.isSelected() && chbModerator.isSelected() == false && chbObserver.isSelected() == false && chbPlayer.isSelected() == false) {
+			//Disable chbAdministrator
+			chbAdministrator.setDisable(true);
+			chbAdministrator.getStyleClass().add("disabled");
+		} else if (chbModerator.isSelected() && chbAdministrator.isSelected() == false && chbObserver.isSelected() == false && chbPlayer.isSelected() == false)	{
+			chbModerator.setDisable(true);
+			chbModerator.getStyleClass().add("disabled");
+		} else if (chbObserver.isSelected() && chbAdministrator.isSelected() == false && chbModerator.isSelected() == false && chbPlayer.isSelected() == false)	{
+			chbObserver.setDisable(true);
+			chbObserver.getStyleClass().add("disabled");
+		} else if (chbPlayer.isSelected() && chbAdministrator.isSelected() == false && chbModerator.isSelected() == false && chbObserver.isSelected() == false)	{
+			chbPlayer.setDisable(true);
+			chbPlayer.getStyleClass().add("disabled");
+		}
+	}
+	
+	private int CheckedBoxes() {
+		int CheckboxesChecked = 0;
+		
+		if(chbAdministrator.isSelected())
+			CheckboxesChecked = CheckboxesChecked +1;
+		if (chbModerator.isSelected())
+			CheckboxesChecked = CheckboxesChecked +1;
+		if (chbObserver.isSelected())
+			CheckboxesChecked = CheckboxesChecked +1;
+		if (chbPlayer.isSelected())
+			CheckboxesChecked = CheckboxesChecked +1;
+		
+		return CheckboxesChecked;
 	}
 	
 	private String changed(ObservableValue<? extends Boolean> observable, Boolean newValue, String role) {

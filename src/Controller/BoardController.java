@@ -169,6 +169,7 @@ public class BoardController implements Initializable {
 		}
 	}
 	
+
 	private void showGameScreen() {
 		AnchorPane pane = null;
 		try 
@@ -431,7 +432,6 @@ public class BoardController implements Initializable {
 	}
 	
 	public void clickSkipTurn() {
-		System.out.println("currentturn = " + _currentTurn.getTurnId());
 		String insertQuery = Game.getPassQuery(_currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername(), checkPlayerIfPlayer1());
 		
 		var _db = new DatabaseController<Game>();
@@ -449,6 +449,7 @@ public class BoardController implements Initializable {
 	{		
 		try 
 		{
+
 			var resignTurnStatement = TurnPlayer.getResignQuery(checkPlayerIfPlayer1(), "resign", _currentGame.getGameId(), _currentTurn.getTurnId(), MainController.getUser().getUsername());
 			var resignGameStatement = Game.getResignQuery(_currentGame.getGameId(), getOpponent());
 			
@@ -483,6 +484,7 @@ public class BoardController implements Initializable {
 		}
 		return false;
 	}
+
 
 	private boolean checkPlayerIfPlayer1() {
 		return MainController.getUser().getUsername().equals(_currentGame.getUser1());
@@ -1156,6 +1158,8 @@ public class BoardController implements Initializable {
 				sourceTile.setLayoutY(0);
 				boardTile.setBoardTile(sourceTile);
 				
+				shuffle.setVisible(false);
+
 				_fieldHand.put(cords, sourceTile);
 				_boardTiles.put(cords, boardTile);
 				

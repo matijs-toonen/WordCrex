@@ -134,6 +134,7 @@ public class Game {
 	/*
 	 * Queries
 	 */
+	
 	public static final String getWinnerQuery(String username) {
 		
 		return String.format("SELECT g.game_id,\n" + 
